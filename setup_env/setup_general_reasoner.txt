@@ -1,8 +1,32 @@
 
+pip install huggingface-hub==0.34.0
+pip install torch==2.4.0 --index-url https://download.pytorch.org/whl/cu124
+pip install psutil
+pip install flash-attn --no-build-isolation
+pip install -e ./verl
+pip install vllm==0.8.3
+pip install flashinfer-python
+pip install math-verify
 
-git submodule update --init --recursive
-uv sync
-source .venv/bin/activate
-uv pip install -e verl
-uv pip install -e ".[vllm,acecoder,torl,search_tool]"
-uv pip install "flash-attn==2.8.3" --no-build-isolation
+
+python data_preprocess.py --local-dir /data/yubo/fim_code_rl/General-Reasoner-Data/webinstruct-verified
+
+hf download TIGER-Lab/general-verifier --local-dir /data/yubo/fim_code_rl/General-Reasoner-Data/general-reasoner-verifier
+
+hf download Qwen/Qwen2.5-7B --local-dir /data/yubo/fim_code_rl/General-Reasoner-Data/Qwen2.5-7B
+
+huggingface-cli download TIGER-Lab/general-verifier --local-dir /data/yubo/fim_code_rl/General-Reasoner-Data/general-reasoner-verifier
+
+huggingface-cli download Qwen/Qwen2.5-7B --local-dir /data/yubo/fim_code_rl/General-Reasoner-Data/Qwen2.5-7B
+
+ray start --address <MASTER-NODE-IP>:6379
+
+ray start --address 0.0.0.0:6379
+
+ray start --address localhost:6379
+
+bash train_general_reasoner.sh
+
+ray start --head --port=6379
+
+

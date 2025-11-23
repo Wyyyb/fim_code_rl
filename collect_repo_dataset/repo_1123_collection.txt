@@ -1,0 +1,7 @@
+https://github.com/joeynmt/joeynmt.git
+https://github.com/karpathy/nanoGPT.git
+https://github.com/karpathy/minbpe.git
+https://github.com/karpathy/nanochat.git
+https://github.com/pytorch/examples.git
+
+
