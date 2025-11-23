@@ -6,14 +6,14 @@ export NCCL_DEBUG=DEBUG
 export RAY_BACKEND_LOG_LEVEL=debug
 export RAY_DEDUP_LOGS=1
 
-export PROJECT_NAME= # to be replaced
-export WANDB_API_KEY= # to be replaced
+export PROJECT_NAME=fim_code_rl_1123 # to be replaced
+export WANDB_API_KEY=f318ffd0dcf5d31701fd33aee12e57e9cf15444f # to be replaced
 export WANDB_OFFICIAL=1
 # export VLLM_ATTENTION_BACKEND=XFORMERS
-export HDFS_DATA_PATH= # to be replaced
-export HDFS_MODEL_PATH= # to be replaced
-export HDFS_CHECKPOINT_PATH= # to be replaced
-export HDFS_LOG_PATH= # to be replaced
+export HDFS_DATA_PATH=/data/yubo/fim_code_rl/General-Reasoner-Data # to be replaced
+export HDFS_MODEL_PATH=/data/yubo/fim_code_rl/General-Reasoner-Data # to be replaced
+export HDFS_CHECKPOINT_PATH=/data/yubo/fim_code_rl/General-Reasoner-Data # to be replaced
+export HDFS_LOG_PATH=/data/yubo/fim_code_rl/General-Reasoner-Data # to be replaced
 if [ -z "$RUN_NAME" ]; then
     RUN_NAME=general-reasoner
 fi
