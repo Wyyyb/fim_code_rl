@@ -41,7 +41,7 @@ ROLLOUT_GPU_MEMORY_UTIL=0.6
 ACTOR_OPTIMIZER_OFFLOAD=False
 ACTOR_PARAMETER_OFFLOAD=False
 MODEL_NAME=Qwen2.5-7B
-VERIFIER_NAME=general-verifier
+VERIFIER_NAME=general-reasoner-verifier
 
 generate_suffix() {
   local suffix=""
