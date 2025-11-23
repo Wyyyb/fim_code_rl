@@ -5,6 +5,7 @@ set -x
 export NCCL_DEBUG=DEBUG
 export RAY_BACKEND_LOG_LEVEL=debug
 export RAY_DEDUP_LOGS=1
+export HYDRA_FULL_ERROR=1
 
 export PROJECT_NAME=fim_code_rl_1123 # to be replaced
 export WANDB_API_KEY=f318ffd0dcf5d31701fd33aee12e57e9cf15444f # to be replaced
