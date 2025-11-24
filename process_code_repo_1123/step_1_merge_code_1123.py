@@ -1,0 +1,269 @@
+import os
+import ast
+import sys
+from pathlib import Path
+from typing import Set, Dict, List, Tuple
+from collections import defaultdict, OrderedDict
+
+
+class ImportAnalyzer:
+    """分析Python文件的import依赖关系"""
+
+    def __init__(self, repo_path: str):
+        self.repo_path = Path(repo_path)
+        self.py_files = self._find_all_py_files()
+        self.module_map = self._build_module_map()
+
+    def _find_all_py_files(self) -> Dict[str, Path]:
+        """找到所有Python文件并建立映射"""
+        py_files = {}
+        for py_file in self.repo_path.rglob("*.py"):
+            if "__pycache__" in str(py_file):
+                continue
+            # 使用相对路径作为模块名
+            rel_path = py_file.relative_to(self.repo_path)
+            module_name = str(rel_path.with_suffix("")).replace(os.sep, ".")
+            py_files[module_name] = py_file
+        return py_files
+
+    def _build_module_map(self) -> Dict[str, str]:
+        """建立模块名到文件路径的映射"""
+        module_map = {}
+        for module_name, file_path in self.py_files.items():
+            # 支持多种导入方式
+            parts = module_name.split(".")
+            for i in range(len(parts)):
+                partial_name = ".".join(parts[i:])
+                if partial_name not in module_map:
+                    module_map[partial_name] = module_name
+        return module_map
+
+    def parse_imports(self, file_path: Path) -> Tuple[List[str], List[str]]:
+        """解析文件的import语句
+
+        Returns:
+            (internal_imports, external_imports)
+        """
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            tree = ast.parse(content)
+        except Exception as e:
+            print(f"Warning: Failed to parse {file_path}: {e}")
+            return [], []
+
+        internal_imports = []
+        external_imports = []
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    self._categorize_import(alias.name, internal_imports, external_imports)
+            elif isinstance(node, ast.ImportFrom):
+                if node.module:
+                    self._categorize_import(node.module, internal_imports, external_imports)
+
+        return internal_imports, external_imports
+
+    def _categorize_import(self, import_name: str, internal: List[str], external: List[str]):
+        """将import分类为内部或外部"""
+        # 尝试匹配内部模块
+        found = False
+        for key in self.module_map:
+            if import_name.startswith(key) or key.startswith(import_name):
+                if self.module_map[key] in self.py_files:
+                    internal.append(self.module_map[key])
+                    found = True
+                    break
+
+        if not found:
+            external.append(import_name.split('.')[0])
+
+    def get_file_content(self, file_path: Path) -> str:
+        """读取文件内容"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        except Exception as e:
+            print(f"Warning: Failed to read {file_path}: {e}")
+            return ""
+
+
+class FileMerger:
+    """合并Python文件并生成self-contained版本"""
+
+    def __init__(self, repo_path: str, output_dir: str):
+        self.analyzer = ImportAnalyzer(repo_path)
+        self.output_dir = Path(output_dir)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+
+    def merge_file(self, module_name: str) -> Tuple[str, Set[str]]:
+        """合并单个文件及其所有依赖
+
+        Returns:
+            (merged_content, external_dependencies)
+        """
+        visited = OrderedDict()  # 保持顺序，用于去重
+        external_deps = set()
+
+        def process_module(mod_name: str, level: int = 0):
+            """递归处理模块依赖"""
+            if mod_name in visited:
+                return  # 已处理，避免重复
+
+            if mod_name not in self.analyzer.py_files:
+                return
+
+            file_path = self.analyzer.py_files[mod_name]
+            internal_imports, external_imports = self.analyzer.parse_imports(file_path)
+
+            # 先处理依赖（深度优先）
+            for dep in internal_imports:
+                if dep != mod_name:  # 避免自引用
+                    process_module(dep, level + 1)
+
+            # 添加当前模块
+            content = self.analyzer.get_file_content(file_path)
+            visited[mod_name] = (content, level, list(internal_imports))
+            external_deps.update(external_imports)
+
+        # 开始处理
+        process_module(module_name)
+
+        # 生成合并后的内容
+        merged_content = self._generate_merged_content(visited, module_name)
+
+        return merged_content, external_deps
+
+    def _generate_merged_content(self, visited: OrderedDict, main_module: str) -> str:
+        """生成带层级注释的合并内容"""
+        lines = []
+        lines.append("# " + "=" * 78)
+        lines.append(f"# Self-contained merged file for: {main_module}")
+        lines.append(f"# Generated by repository file merger")
+        lines.append("# " + "=" * 78)
+        lines.append("")
+        lines.append("# Import dependency tree:")
+
+        # 生成依赖树
+        for mod_name, (content, level, deps) in visited.items():
+            indent = "  " * level
+            lines.append(f"# {indent}└─ {mod_name}")
+            if deps:
+                for dep in deps:
+                    if dep in visited:
+                        lines.append(f"#   {indent}  ├─ imports: {dep}")
+
+        lines.append("# " + "=" * 78)
+        lines.append("")
+
+        # 添加所有模块内容
+        for mod_name, (content, level, deps) in visited.items():
+            lines.append("")
+            lines.append("# " + "-" * 78)
+            lines.append(f"# Module: {mod_name}")
+            lines.append(f"# Level: {level}")
+            lines.append("# " + "-" * 78)
+            lines.append("")
+
+            # 移除原文件的import语句（可选）
+            # content = self._remove_internal_imports(content, deps)
+
+            lines.append(content)
+            lines.append("")
+
+        return "\n".join(lines)
+
+    def _remove_internal_imports(self, content: str, internal_deps: List[str]) -> str:
+        """移除内部import语句（可选功能）"""
+        try:
+            tree = ast.parse(content)
+            lines = content.split('\n')
+
+            # 找到需要移除的行
+            lines_to_remove = set()
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.Import, ast.ImportFrom)):
+                    if hasattr(node, 'lineno'):
+                        lines_to_remove.add(node.lineno - 1)
+
+            # 保留非import行
+            filtered_lines = [line for i, line in enumerate(lines)
+                              if i not in lines_to_remove]
+            return '\n'.join(filtered_lines)
+        except:
+            return content
+
+    def process_all_files(self):
+        """处理所有Python文件"""
+        print(f"Found {len(self.analyzer.py_files)} Python files")
+        print(f"Output directory: {self.output_dir}")
+        print("-" * 80)
+
+        for module_name, file_path in self.analyzer.py_files.items():
+            print(f"Processing: {module_name}")
+
+            # 合并文件
+            merged_content, external_deps = self.merge_file(module_name)
+
+            # 生成输出文件名
+            safe_name = module_name.replace(".", "_")
+            output_py = self.output_dir / f"{safe_name}_merged.py"
+            output_txt = self.output_dir / f"{safe_name}_deps.txt"
+
+            # 写入合并后的Python文件
+            with open(output_py, 'w', encoding='utf-8') as f:
+                f.write(merged_content)
+
+            # 写入外部依赖列表
+            with open(output_txt, 'w', encoding='utf-8') as f:
+                f.write(f"External dependencies for: {module_name}\n")
+                f.write("=" * 60 + "\n\n")
+                if external_deps:
+                    for dep in sorted(external_deps):
+                        f.write(f"{dep}\n")
+                else:
+                    f.write("No external dependencies found.\n")
+
+            print(f"  ✓ Generated: {output_py.name}")
+            print(f"  ✓ Generated: {output_txt.name}")
+            print(f"  ✓ External deps: {len(external_deps)}")
+            print()
+
+
+def main():
+    """主函数"""
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Merge Python files in a repository into self-contained versions"
+    )
+    parser.add_argument(
+        "repo_path",
+        help="Path to the repository (e.g., ./fim_code_rl)"
+    )
+    parser.add_argument(
+        "--output",
+        "-o",
+        default="./merged_output",
+        help="Output directory (default: ./merged_output)"
+    )
+
+    args = parser.parse_args()
+
+    # 验证输入路径
+    if not os.path.exists(args.repo_path):
+        print(f"Error: Repository path does not exist: {args.repo_path}")
+        sys.exit(1)
+
+    # 执行合并
+    merger = FileMerger(args.repo_path, args.output)
+    merger.process_all_files()
+
+    print("=" * 80)
+    print("✓ All files processed successfully!")
+    print(f"✓ Output directory: {os.path.abspath(args.output)}")
+
+
+if __name__ == "__main__":
+    main()
