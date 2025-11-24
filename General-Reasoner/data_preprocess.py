@@ -60,3 +60,9 @@ if __name__ == '__main__':
     local_dir = args.local_dir
     train_dataset.to_parquet(os.path.join(local_dir, 'train.parquet'))
     test_dataset.to_parquet(os.path.join(local_dir, 'test.parquet'))
+
+    train_dataset.to_json(os.path.join(local_dir, 'train.json'), orient='records', lines=False, force_ascii=False)
+    test_dataset.to_json(os.path.join(local_dir, 'test.json'), orient='records', lines=False, force_ascii=False)
+
+    train_dataset.to_json(os.path.join(local_dir, 'train.jsonl'), orient='records', lines=True, force_ascii=False)
+    test_dataset.to_json(os.path.join(local_dir, 'test.jsonl'), orient='records', lines=True, force_ascii=False)
