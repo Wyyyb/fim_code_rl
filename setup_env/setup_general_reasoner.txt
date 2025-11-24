@@ -8,8 +8,9 @@ pip install vllm==0.8.3
 pip install flashinfer-python
 pip install math-verify
 
+python ../data_preprocess_new.py --local-dir /data/yubo/fim_code_rl/General-Reasoner-Data/webinstruct-verified
 
-python data_preprocess.py --local-dir /data/yubo/fim_code_rl/General-Reasoner-Data/webinstruct-verified
+python ../data_preprocess.py --local-dir /data/yubo/fim_code_rl/General-Reasoner-Data/webinstruct-verified
 
 hf download TIGER-Lab/general-verifier --local-dir /data/yubo/fim_code_rl/General-Reasoner-Data/general-reasoner-verifier
 
