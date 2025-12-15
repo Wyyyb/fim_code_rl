@@ -24,7 +24,10 @@ def clone_repos(csv_file, output_dir):
         for row in reader:
             repo_url = row['repo']
             # 从URL中提取仓库名称
+            user_name = repo_url.rstrip('.git').split('/')[-2]
             repo_name = repo_url.rstrip('.git').split('/')[-1]
+            repo_name = user_name + '-' + repo_name
+            repo_name = repo_name.replace('.', '_')
             target_path = output_path / repo_name
 
             print(f"\n{'=' * 60}")
