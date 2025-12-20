@@ -86,110 +86,6 @@ class ImportAnalyzer:
             return ""
 
 
-class DependencyGraph:
-    """依赖图构建和分析"""
-
-    def __init__(self, analyzer: ImportAnalyzer):
-        self.analyzer = analyzer
-        self.graph = {}  # module -> list of dependencies
-        self.reverse_graph = defaultdict(list)  # module -> list of dependents
-        self._build_graph()
-
-    def _build_graph(self):
-        """一次性构建完整的依赖图"""
-        for module_name, file_path in self.analyzer.py_files.items():
-            internal_imports, _ = self.analyzer.parse_imports(file_path)
-            # 去重并排除自引用
-            unique_deps = list(dict.fromkeys(
-                dep for dep in internal_imports
-                if dep != module_name and dep in self.analyzer.py_files
-            ))
-            self.graph[module_name] = unique_deps
-
-            for dep in unique_deps:
-                self.reverse_graph[dep].append(module_name)
-
-    def get_all_dependencies(self, module_name: str) -> OrderedDict:
-        """获取模块的所有依赖（包括传递依赖），使用迭代而非递归
-
-        Returns:
-            OrderedDict: {module_name: (content, level, direct_deps)}
-            按拓扑顺序排列（被依赖的在前）
-        """
-        if module_name not in self.graph:
-            return OrderedDict()
-
-        # 第一步：BFS 收集所有相关模块
-        all_modules = set()
-        queue = [module_name]
-        all_modules.add(module_name)
-
-        while queue:
-            current = queue.pop(0)
-            if current in self.graph:
-                for dep in self.graph[current]:
-                    if dep not in all_modules:
-                        all_modules.add(dep)
-                        queue.append(dep)
-
-        # 第二步：在子图上进行拓扑排序
-        # 构建子图的入度
-        sub_graph = {mod: [d for d in self.graph.get(mod, []) if d in all_modules]
-                     for mod in all_modules}
-        in_degree = {mod: 0 for mod in all_modules}
-
-        for mod, deps in sub_graph.items():
-            for dep in deps:
-                in_degree[mod] += 1  # mod 依赖 dep，所以 mod 的入度+1
-
-        # Kahn's algorithm - 入度为0的先输出（被依赖但不依赖其他的）
-        # 注意：这里我们要反过来，让被依赖的排在前面
-        # 所以用"出度"的概念，或者反转依赖方向
-        out_degree = {mod: len(sub_graph.get(mod, [])) for mod in all_modules}
-
-        sorted_modules = []
-        # 从没有依赖的模块开始（它们应该排在最前面）
-        queue = [mod for mod, degree in out_degree.items() if degree == 0]
-
-        visited_in_sort = set()
-        while queue:
-            current = queue.pop(0)
-            if current in visited_in_sort:
-                continue
-            visited_in_sort.add(current)
-            sorted_modules.append(current)
-
-            # 找到依赖 current 的模块，减少它们的"待处理依赖数"
-            for mod in all_modules:
-                if current in sub_graph.get(mod, []):
-                    out_degree[mod] -= 1
-                    if out_degree[mod] == 0 and mod not in visited_in_sort:
-                        queue.append(mod)
-
-        # 处理循环依赖中的剩余模块
-        for mod in all_modules:
-            if mod not in visited_in_sort:
-                sorted_modules.append(mod)
-
-        # 第三步：构建结果，计算层级
-        result = OrderedDict()
-        levels = {}
-
-        for mod in sorted_modules:
-            deps = sub_graph.get(mod, [])
-            if not deps:
-                level = 0
-            else:
-                # 层级 = 最大依赖层级 + 1
-                level = max((levels.get(d, 0) for d in deps), default=0) + 1
-            levels[mod] = level
-
-            content = self.analyzer.get_file_content(self.analyzer.py_files[mod])
-            result[mod] = (content, level, deps)
-
-        return result
-
-
 class FileMerger:
     """合并Python文件并生成self-contained版本"""
 
@@ -197,16 +93,8 @@ class FileMerger:
         self.repo_path = Path(repo_path)
         self.repo_name = self.repo_path.name
         self.analyzer = ImportAnalyzer(repo_path)
-        self.dep_graph = None  # 延迟初始化
         self.output_dir = Path(output_dir) / self.repo_name
         self.output_dir.mkdir(parents=True, exist_ok=True)
-
-    def _ensure_dep_graph(self):
-        """确保依赖图已构建"""
-        if self.dep_graph is None:
-            print(f"  Building dependency graph for {self.repo_name}...")
-            self.dep_graph = DependencyGraph(self.analyzer)
-            print(f"  Dependency graph built with {len(self.dep_graph.graph)} modules")
 
     def merge_file(self, module_name: str) -> Tuple[str, Set[str]]:
         """合并单个文件及其所有依赖（去重版本）
@@ -214,21 +102,99 @@ class FileMerger:
         Returns:
             (merged_content, external_dependencies)
         """
-        self._ensure_dep_graph()
-
-        # 获取所有依赖（已经去重和排序）
-        visited = self.dep_graph.get_all_dependencies(module_name)
-
-        # 收集外部依赖
+        visited = OrderedDict()  # 保持顺序，用于去重
         external_deps = set()
-        for mod in visited:
-            _, ext_imports = self.analyzer.parse_imports(self.analyzer.py_files[mod])
-            external_deps.update(ext_imports)
+        processing = set()  # 用于检测循环依赖
+
+        def process_module(mod_name: str, level: int = 0) -> int:
+            """递归处理模块依赖
+
+            Returns:
+                实际的依赖深度级别
+            """
+            # 已处理过，直接返回（去重关键点）
+            if mod_name in visited:
+                return visited[mod_name][1]  # 返回已记录的level
+
+            # 检测循环依赖
+            if mod_name in processing:
+                print(f"  Warning: Circular dependency detected: {mod_name}")
+                return level
+
+            if mod_name not in self.analyzer.py_files:
+                return level
+
+            processing.add(mod_name)
+
+            file_path = self.analyzer.py_files[mod_name]
+            internal_imports, external_imports = self.analyzer.parse_imports(file_path)
+
+            # 去重内部依赖
+            unique_internal_imports = list(dict.fromkeys(internal_imports))
+
+            # 先处理依赖（深度优先），计算最大深度
+            max_dep_level = level
+            for dep in unique_internal_imports:
+                if dep != mod_name:  # 避免自引用
+                    dep_level = process_module(dep, level + 1)
+                    max_dep_level = max(max_dep_level, dep_level)
+
+            # 添加当前模块（只添加一次）
+            content = self.analyzer.get_file_content(file_path)
+            visited[mod_name] = (content, level, unique_internal_imports)
+            external_deps.update(external_imports)
+
+            processing.remove(mod_name)
+            return level
+
+        # 开始处理
+        process_module(module_name)
+
+        # 按依赖顺序重新排列（被依赖的排在前面）
+        sorted_modules = self._topological_sort(visited)
 
         # 生成合并后的内容
-        merged_content = self._generate_merged_content(visited, module_name)
+        merged_content = self._generate_merged_content(sorted_modules, module_name)
 
         return merged_content, external_deps
+
+    def _topological_sort(self, visited: OrderedDict) -> OrderedDict:
+        """拓扑排序，确保依赖在前，依赖者在后"""
+        # 建立依赖图
+        graph = {mod: set(deps) & set(visited.keys())
+                 for mod, (_, _, deps) in visited.items()}
+
+        # 计算入度
+        in_degree = {mod: 0 for mod in visited}
+        for mod, deps in graph.items():
+            for dep in deps:
+                if dep in in_degree:
+                    in_degree[mod] += 1
+
+        # Kahn's algorithm
+        sorted_modules = OrderedDict()
+        queue = [mod for mod, degree in in_degree.items() if degree == 0]
+
+        while queue:
+            # 优先处理入度为0的节点
+            current = queue.pop(0)
+            content, level, deps = visited[current]
+            sorted_modules[current] = (content, level, deps)
+
+            # 更新入度
+            for mod, mod_deps in graph.items():
+                if current in mod_deps:
+                    in_degree[mod] -= 1
+                    if in_degree[mod] == 0 and mod not in sorted_modules:
+                        queue.append(mod)
+
+        # 处理可能的循环依赖遗留
+        for mod in visited:
+            if mod not in sorted_modules:
+                content, level, deps = visited[mod]
+                sorted_modules[mod] = (content, level, deps)
+
+        return sorted_modules
 
     def _generate_merged_content(self, visited: OrderedDict, main_module: str) -> str:
         """生成带层级注释的合并内容"""
@@ -244,14 +210,13 @@ class FileMerger:
 
         # 生成依赖树
         for mod_name, (content, level, deps) in visited.items():
-            indent = "  " * min(level, 10)  # 限制缩进深度
+            indent = "  " * level
             marker = "★" if mod_name == main_module else "└─"
             lines.append(f"# {indent}{marker} {mod_name}")
             if deps:
-                for dep in deps[:5]:  # 限制显示的依赖数量
+                valid_deps = [dep for dep in deps if dep in visited]
+                for dep in valid_deps:
                     lines.append(f"#   {indent}  ├─ imports: {dep}")
-                if len(deps) > 5:
-                    lines.append(f"#   {indent}  └─ ... and {len(deps) - 5} more")
 
         lines.append("# " + "=" * 78)
         lines.append("")
@@ -261,10 +226,7 @@ class FileMerger:
             lines.append("")
             lines.append("# " + "-" * 78)
             lines.append(f"# Module [{idx}/{len(visited)}]: {mod_name}")
-            dep_str = ', '.join(deps[:5]) if deps else 'None'
-            if len(deps) > 5:
-                dep_str += f" ... and {len(deps) - 5} more"
-            lines.append(f"# Dependencies: {dep_str}")
+            lines.append(f"# Dependencies: {', '.join(deps) if deps else 'None'}")
             lines.append("# " + "-" * 78)
             lines.append("")
             lines.append(content)
@@ -292,12 +254,9 @@ class FileMerger:
         print(f"Output directory: {self.output_dir}")
         print("-" * 80)
 
-        # 预先构建依赖图（只构建一次）
-        self._ensure_dep_graph()
-
         for module_name, file_path in self.analyzer.py_files.items():
             try:
-                print(f"  Processing: {module_name}", end="", flush=True)
+                print(f"  Processing: {module_name}")
 
                 # 合并文件
                 merged_content, external_deps = self.merge_file(module_name)
@@ -322,13 +281,14 @@ class FileMerger:
                     else:
                         f.write("No external dependencies found.\n")
 
-                print(f" ✓ (deps: {len(external_deps)})")
+                print(f"    ✓ Generated: {output_py.name}")
+                print(f"    ✓ External deps: {len(external_deps)}")
 
                 stats['processed'] += 1
                 stats['all_external_deps'].update(external_deps)
 
             except Exception as e:
-                print(f" ✗ Failed: {e}")
+                print(f"    ✗ Failed: {e}")
                 stats['failed'] += 1
 
         # 生成仓库级别的依赖汇总
@@ -371,7 +331,7 @@ class MultiRepoProcessor:
                 py_files = [f for f in py_files if "__pycache__" not in str(f)]
                 if py_files:
                     repos.append(item)
-        return sorted(repos)  # 排序以保证顺序一致
+        return repos
 
     def process_all_repos(self):
         """处理所有仓库"""
@@ -386,16 +346,13 @@ class MultiRepoProcessor:
 
         all_stats = []
 
-        for idx, repo in enumerate(repos, 1):
-            print(f"\n[{idx}/{len(repos)}] ", end="")
+        for repo in repos:
             try:
                 merger = FileMerger(str(repo), str(self.output_dir))
                 stats = merger.process_all_files()
                 all_stats.append(stats)
             except Exception as e:
                 print(f"Error processing repository {repo.name}: {e}")
-                import traceback
-                traceback.print_exc()
                 all_stats.append({
                     'repo_name': repo.name,
                     'error': str(e)
@@ -503,3 +460,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # python step_1_merge_repo_1220.py /data/yubo/datasets/collected_sc_1214 -m -o /data/yubo/datasets/output_sc_1214
