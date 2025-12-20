@@ -41,7 +41,7 @@ def clone_repos(csv_file, output_dir):
             try:
                 # 克隆仓库
                 result = subprocess.run(
-                    ['git', 'clone', repo_url, str(target_path)],
+                    ['git', 'clone', repo_url],
                     capture_output=True,
                     text=True,
                     check=True
