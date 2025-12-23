@@ -94,8 +94,7 @@ Notes:
 ## Code to Analyze
 
 ```python
-{code_content}
-```"""
+"""
 
 
 class GeminiClient:
@@ -401,13 +400,12 @@ class FIMDataGenerator:
         """
         Process a single code sample and return list of FIM training items.
         """
-        print("sample", sample)
         sample_id = sample['sample_id']
         repo_id = sample['repo_id']
         code_content = sample['code_content']
         print("building prompt")
         # Build prompt
-        prompt = PROMPT_TEMPLATE.format(code_content=code_content)
+        prompt = PROMPT_TEMPLATE + code_content
         print("calling Gemini API")
         # Call Gemini API
         try:
