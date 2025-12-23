@@ -320,25 +320,68 @@ class FIMDataGenerator:
         with open(self.checkpoint_path, 'w', encoding='utf-8') as f:
             json.dump(checkpoint, f, ensure_ascii=False, indent=2)
 
+    def _extract_json_object(self, text: str) -> Optional[str]:
+        """Extract a complete JSON object by matching balanced braces."""
+        start_idx = text.find('{')
+        if start_idx == -1:
+            return None
+
+        brace_count = 0
+        in_string = False
+        escape_next = False
+
+        for i, char in enumerate(text[start_idx:], start=start_idx):
+            if escape_next:
+                escape_next = False
+                continue
+
+            if char == '\\':
+                escape_next = True
+                continue
+
+            if char == '"' and not escape_next:
+                in_string = not in_string
+                continue
+
+            if in_string:
+                continue
+
+            if char == '{':
+                brace_count += 1
+            elif char == '}':
+                brace_count -= 1
+                if brace_count == 0:
+                    return text[start_idx:i + 1]
+
+        return None
+
     def _parse_gemini_response(self, response: str) -> Optional[dict]:
         """Parse Gemini's JSON response."""
-        # Try to extract JSON from the response
-        # Sometimes the response might have markdown code blocks
-        json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', response, re.DOTALL)
-        if json_match:
-            json_str = json_match.group(1)
+        if not response or not response.strip():
+            logger.warning("Empty response from Gemini")
+            return None
+
+        # Try to extract JSON from markdown code blocks first
+        code_block_match = re.search(r'```(?:json)?\s*\n?([\s\S]*?)\n?```', response)
+        if code_block_match:
+            json_str = code_block_match.group(1).strip()
         else:
-            # Try to find raw JSON
-            json_match = re.search(r'\{.*\}', response, re.DOTALL)
-            if json_match:
-                json_str = json_match.group(0)
-            else:
-                return None
+            # Try to find JSON object by matching balanced braces
+            json_str = self._extract_json_object(response)
+
+        if not json_str:
+            logger.warning(f"No JSON found in response. Response preview: {response[:300]}...")
+            return None
 
         try:
-            return json.loads(json_str)
+            result = json.loads(json_str)
+            if 'code_evaluation' not in result:
+                logger.warning("Missing 'code_evaluation' in parsed response")
+                return None
+            return result
         except json.JSONDecodeError as e:
-            logger.warning(f"Failed to parse JSON: {e}")
+            logger.error(f"Failed to parse JSON: {e}")
+            logger.error(f"Problematic JSON (first 500 chars): {json_str[:500]}")
             return None
 
     def process_single_sample(self, sample: dict) -> list[dict]:
