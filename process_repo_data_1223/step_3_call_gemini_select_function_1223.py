@@ -493,7 +493,7 @@ class FIMDataGenerator:
 
         # Group by repo for progress tracking
         repo_samples = {}
-        for sample in remaining_samples:
+        for sample in remaining_samples[:2]:
             repo_id = sample['repo_id']
             if repo_id not in repo_samples:
                 repo_samples[repo_id] = []
