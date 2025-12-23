@@ -11,6 +11,7 @@ import json
 import logging
 import re
 import ast
+import time  # 新增：用于等待
 from pathlib import Path
 from typing import Optional
 from tqdm import tqdm
@@ -280,13 +281,17 @@ class FIMDataGenerator:
             input_path: str,
             output_path: str,
             checkpoint_path: str,
-            model: str = "gemini-3-flash-preview"
+            model: str = "gemini-3-flash-preview",
+            print_response: bool = True,  # 新增：是否打印响应
+            wait_seconds: float = 2.0  # 新增：等待秒数
     ):
         self.input_path = Path(input_path)
         self.output_path = Path(output_path)
         self.checkpoint_path = Path(checkpoint_path)
         self.gemini_client = GeminiClient(model=model)
         self.function_extractor = FunctionExtractor()
+        self.print_response = print_response  # 新增
+        self.wait_seconds = wait_seconds  # 新增
 
         # Global function ID counter
         self.function_id = 0
@@ -384,6 +389,14 @@ class FIMDataGenerator:
             logger.error(f"Problematic JSON (first 500 chars): {json_str[:500]}")
             return None
 
+    def _print_gemini_response(self, sample_id: str, response: str):
+        """打印 Gemini 的响应内容"""
+        print("\n" + "=" * 80)
+        print(f"📝 Gemini Response for Sample: {sample_id}")
+        print("=" * 80)
+        print(response)
+        print("=" * 80 + "\n")
+
     def process_single_sample(self, sample: dict) -> list[dict]:
         """
         Process a single code sample and return list of FIM training items.
@@ -398,6 +411,16 @@ class FIMDataGenerator:
         # Call Gemini API
         try:
             response = self.gemini_client.get_response(prompt)
+
+            # 新增：打印 Gemini 响应
+            if self.print_response:
+                self._print_gemini_response(sample_id, response)
+
+            # 新增：等待指定秒数
+            if self.wait_seconds > 0:
+                logger.info(f"⏳ Waiting {self.wait_seconds} seconds before next request...")
+                time.sleep(self.wait_seconds)
+
         except Exception as e:
             logger.error(f"Failed to get Gemini response for sample {sample_id}: {e}")
             return []
@@ -582,6 +605,25 @@ def main():
         default="gemini-3-flash-preview",
         help="Gemini model to use"
     )
+    # 新增：命令行参数控制打印和等待
+    parser.add_argument(
+        "--print-response", "-p",
+        action="store_true",
+        default=True,
+        help="Print Gemini response for each sample (default: True)"
+    )
+    parser.add_argument(
+        "--no-print-response",
+        action="store_false",
+        dest="print_response",
+        help="Disable printing Gemini response"
+    )
+    parser.add_argument(
+        "--wait", "-w",
+        type=float,
+        default=2.0,
+        help="Seconds to wait after each API call (default: 2.0)"
+    )
 
     args = parser.parse_args()
 
@@ -589,7 +631,9 @@ def main():
         input_path=args.input,
         output_path=args.output,
         checkpoint_path=args.checkpoint,
-        model=args.model
+        model=args.model,
+        print_response=args.print_response,  # 新增
+        wait_seconds=args.wait  # 新增
     )
 
     generator.run()
