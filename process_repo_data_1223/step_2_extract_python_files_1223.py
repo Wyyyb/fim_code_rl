@@ -7,6 +7,7 @@ Each Python file becomes one record with code content and metadata.
 """
 
 import argparse
+import ast
 import csv
 import json
 import os
@@ -91,6 +92,32 @@ def count_lines(content: str) -> int:
     return len(content.splitlines())
 
 
+def count_functions(content: str) -> int:
+    """
+    Count the number of functions in the code.
+    Includes top-level functions and class methods.
+    Does not count classes themselves.
+    """
+    if not content:
+        return 0
+
+    try:
+        tree = ast.parse(content)
+    except SyntaxError:
+        # If parsing fails, return -1 to indicate error
+        return -1
+
+    function_count = 0
+
+    for node in ast.walk(tree):
+        # Count FunctionDef (regular functions and methods)
+        # Count AsyncFunctionDef (async functions and methods)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            function_count += 1
+
+    return function_count
+
+
 def extract_python_files(repo_folder: Path, repo_metadata: dict, global_id_counter: int) -> tuple[list, int]:
     """
     Extract all Python files from a repository folder.
@@ -124,6 +151,9 @@ def extract_python_files(repo_folder: Path, repo_metadata: dict, global_id_count
                 # Count lines
                 line_num = count_lines(content)
 
+                # Count functions
+                func_num = count_functions(content)
+
                 # Create record
                 record = {
                     'sample_id': current_id,
@@ -131,6 +161,7 @@ def extract_python_files(repo_folder: Path, repo_metadata: dict, global_id_count
                     'repository_url': repo_metadata['repository_url'],
                     'file_path': relative_path_str,
                     'line_num': line_num,
+                    'func_num': func_num,
                     'category': repo_metadata['category'],
                     'quality_rating': repo_metadata['quality_rating'],
                     'description': repo_metadata['description'],
@@ -204,6 +235,7 @@ def main():
     repos_processed = 0
     repos_not_found = 0
     global_id_counter = 0
+    parse_error_count = 0
 
     for repo_id, metadata in repo_metadata.items():
         if repo_id not in repo_folders:
@@ -217,7 +249,12 @@ def main():
         records, global_id_counter = extract_python_files(repo_folder, metadata, global_id_counter)
         all_records.extend(records)
 
-        print(f"  Extracted {len(records)} Python files")
+        # Count parse errors in this batch
+        batch_errors = sum(1 for r in records if r['func_num'] == -1)
+        parse_error_count += batch_errors
+
+        print(f"  Extracted {len(records)} Python files" + (
+            f" ({batch_errors} parse errors)" if batch_errors > 0 else ""))
         repos_processed += 1
 
     # Save to JSON
@@ -238,6 +275,7 @@ def main():
     print(f"  Repos processed:    {repos_processed}")
     print(f"  Repos not found:    {repos_not_found}")
     print(f"  Python files:       {len(all_records)}")
+    print(f"  Parse errors:       {parse_error_count} (func_num = -1)")
     print(f"  Output file:        {output_path}")
     print("=" * 50)
 
