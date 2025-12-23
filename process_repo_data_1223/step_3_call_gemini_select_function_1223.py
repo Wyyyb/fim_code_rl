@@ -502,7 +502,7 @@ class FIMDataGenerator:
 
         # Process samples
         total_repos = len(repo_samples)
-
+        print("total repos: ", total_repos)
         with tqdm(total=len(remaining_samples), desc="Processing samples") as pbar:
             for repo_idx, (repo_id, samples) in enumerate(repo_samples.items()):
                 logger.info(f"\n{'=' * 60}")
@@ -511,7 +511,7 @@ class FIMDataGenerator:
 
                 for sample_idx, sample in enumerate(samples):
                     sample_id = sample['sample_id']
-
+                    print("sample_id:", sample_id)
                     # Update progress description
                     pbar.set_description(
                         f"Repo {repo_idx + 1}/{total_repos} | "
@@ -521,6 +521,7 @@ class FIMDataGenerator:
 
                     # Process sample
                     try:
+                        print("process single sample")
                         new_items = self.process_single_sample(sample)
                         self.results.extend(new_items)
 
