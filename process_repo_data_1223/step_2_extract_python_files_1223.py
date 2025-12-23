@@ -84,9 +84,20 @@ def read_python_file(file_path: Path) -> Optional[str]:
     return None
 
 
-def extract_python_files(repo_folder: Path, repo_metadata: dict) -> list:
-    """Extract all Python files from a repository folder."""
+def count_lines(content: str) -> int:
+    """Count the number of lines in the code content."""
+    if not content:
+        return 0
+    return len(content.splitlines())
+
+
+def extract_python_files(repo_folder: Path, repo_metadata: dict, global_id_counter: int) -> tuple[list, int]:
+    """
+    Extract all Python files from a repository folder.
+    Returns (records, updated_counter).
+    """
     records = []
+    current_id = global_id_counter
 
     # Walk through all files in the repo
     for root, dirs, files in os.walk(repo_folder):
@@ -110,11 +121,16 @@ def extract_python_files(repo_folder: Path, repo_metadata: dict) -> list:
                 if content is None:
                     continue
 
+                # Count lines
+                line_num = count_lines(content)
+
                 # Create record
                 record = {
+                    'sample_id': current_id,
                     'repo_id': repo_metadata['repo_id'],
                     'repository_url': repo_metadata['repository_url'],
                     'file_path': relative_path_str,
+                    'line_num': line_num,
                     'category': repo_metadata['category'],
                     'quality_rating': repo_metadata['quality_rating'],
                     'description': repo_metadata['description'],
@@ -124,8 +140,9 @@ def extract_python_files(repo_folder: Path, repo_metadata: dict) -> list:
                 }
 
                 records.append(record)
+                current_id += 1
 
-    return records
+    return records, current_id
 
 
 def main():
@@ -186,6 +203,7 @@ def main():
     all_records = []
     repos_processed = 0
     repos_not_found = 0
+    global_id_counter = 0
 
     for repo_id, metadata in repo_metadata.items():
         if repo_id not in repo_folders:
@@ -196,7 +214,7 @@ def main():
         repo_folder = repo_folders[repo_id]
         print(f"[{repo_id}] Processing: {repo_folder.name}")
 
-        records = extract_python_files(repo_folder, metadata)
+        records, global_id_counter = extract_python_files(repo_folder, metadata, global_id_counter)
         all_records.extend(records)
 
         print(f"  Extracted {len(records)} Python files")
