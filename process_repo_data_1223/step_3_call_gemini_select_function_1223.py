@@ -407,13 +407,14 @@ class FIMDataGenerator:
 
         # Build prompt
         prompt = PROMPT_TEMPLATE.format(code_content=code_content)
-
+        print("calling Gemini API")
         # Call Gemini API
         try:
             response = self.gemini_client.get_response(prompt)
 
             # 新增：打印 Gemini 响应
             if self.print_response:
+                print("print response")
                 self._print_gemini_response(sample_id, response)
 
             # 新增：等待指定秒数
