@@ -305,7 +305,8 @@ class FIMDataGenerator:
 
         # Load checkpoint if exists
         self.processed_samples = set()
-        self.results = []  # Now stores sample-level results
+        self.skipped_samples = set()  # Track skipped samples separately
+        self.results = []  # Stores sample-level results
         self._load_checkpoint()
 
     def _load_checkpoint(self):
@@ -315,10 +316,20 @@ class FIMDataGenerator:
                 with open(self.checkpoint_path, 'r', encoding='utf-8') as f:
                     checkpoint = json.load(f)
                 self.processed_samples = set(checkpoint.get('processed_samples', []))
+                self.skipped_samples = set(checkpoint.get('skipped_samples', []))
                 self.results = checkpoint.get('results', [])
                 self.function_id = checkpoint.get('next_function_id', 0)
-                logger.info(f"Loaded checkpoint: {len(self.processed_samples)} samples processed, "
-                            f"{len(self.results)} samples with results")
+
+                # Count total functions extracted
+                total_funcs = sum(
+                    len(r.get('selected_function_list', [])) for r in self.results
+                )
+                logger.info(f"Loaded checkpoint:")
+                logger.info(f"  - Processed samples: {len(self.processed_samples)}")
+                logger.info(f"  - Skipped samples: {len(self.skipped_samples)}")
+                logger.info(f"  - Results saved: {len(self.results)}")
+                logger.info(f"  - Functions extracted: {total_funcs}")
+                logger.info(f"  - Next function ID: {self.function_id}")
             except Exception as e:
                 logger.warning(f"Failed to load checkpoint: {e}")
 
@@ -326,11 +337,23 @@ class FIMDataGenerator:
         """Save current progress to checkpoint file."""
         checkpoint = {
             'processed_samples': list(self.processed_samples),
+            'skipped_samples': list(self.skipped_samples),
             'results': self.results,
             'next_function_id': self.function_id
         }
-        with open(self.checkpoint_path, 'w', encoding='utf-8') as f:
-            json.dump(checkpoint, f, ensure_ascii=False, indent=2)
+
+        # Write to temp file first, then rename (atomic operation)
+        temp_path = self.checkpoint_path.with_suffix('.tmp')
+        try:
+            with open(temp_path, 'w', encoding='utf-8') as f:
+                json.dump(checkpoint, f, ensure_ascii=False, indent=2)
+            # Atomic rename
+            temp_path.replace(self.checkpoint_path)
+            logger.debug(f"Checkpoint saved: {len(self.processed_samples)} processed, {len(self.results)} results")
+        except Exception as e:
+            logger.error(f"Failed to save checkpoint: {e}")
+            if temp_path.exists():
+                temp_path.unlink()
 
     def _extract_json_object(self, text: str) -> Optional[str]:
         """Extract a complete JSON object by matching balanced braces."""
@@ -396,7 +419,7 @@ class FIMDataGenerator:
             logger.error(f"Problematic JSON (first 500 chars): {json_str[:500]}")
             return None
 
-    def _print_gemini_response(self, sample_id: str, response: str):
+    def _print_gemini_response(self, sample_id, response: str):
         """Print Gemini response content."""
         print("\n" + "=" * 80)
         print(f"📝 Gemini Response for Sample: {sample_id}")
@@ -520,12 +543,16 @@ class FIMDataGenerator:
 
         total_samples = len(data)
 
-        # Filter out already processed samples
-        remaining_samples = [s for s in data if s['sample_id'] not in self.processed_samples]
+        # Get all sample IDs that have been handled (processed or skipped)
+        handled_samples = self.processed_samples | self.skipped_samples
+
+        # Filter out already handled samples
+        remaining_samples = [s for s in data if s['sample_id'] not in handled_samples]
 
         logger.info(f"Total samples in file: {total_samples}")
-        logger.info(f"Already processed: {len(self.processed_samples)}")
-        logger.info(f"Remaining to process: {len(remaining_samples)}")
+        logger.info(f"Already processed (sent to Gemini): {len(self.processed_samples)}")
+        logger.info(f"Already skipped (filter criteria): {len(self.skipped_samples)}")
+        logger.info(f"Remaining to handle: {len(remaining_samples)}")
         logger.info(
             f"Filter criteria: line_num in [{self.min_line_num}, {self.max_line_num}], func_num >= {self.min_func_num}")
 
@@ -537,9 +564,11 @@ class FIMDataGenerator:
                 repo_samples[repo_id] = []
             repo_samples[repo_id].append(sample)
 
-        # Statistics
-        skipped_count = 0
-        processed_count = 0
+        # Statistics for this run
+        skipped_this_run = 0
+        processed_this_run = 0
+
+        # Calculate total functions extracted so far
         total_functions_extracted = sum(
             len(r.get('selected_function_list', [])) for r in self.results
         )
@@ -560,8 +589,12 @@ class FIMDataGenerator:
 
                     if not is_eligible:
                         logger.info(f"  Sample {sample_id} skipped: {reason}")
-                        skipped_count += 1
-                        self.processed_samples.add(sample_id)
+                        skipped_this_run += 1
+                        self.skipped_samples.add(sample_id)
+
+                        # Save checkpoint after each skipped sample
+                        self._save_checkpoint()
+
                         pbar.update(1)
                         continue
 
@@ -569,7 +602,7 @@ class FIMDataGenerator:
                     pbar.set_description(
                         f"Repo {repo_idx + 1}/{total_repos} | "
                         f"Sample {sample_idx + 1}/{len(samples)} | "
-                        f"Functions: {total_functions_extracted}"
+                        f"Funcs: {total_functions_extracted}"
                     )
 
                     # Process sample
@@ -577,51 +610,62 @@ class FIMDataGenerator:
                         result = self.process_single_sample(sample)
                         if result:
                             self.results.append(result)
-                            processed_count += 1
+                            processed_this_run += 1
                             num_funcs = len(result.get('selected_function_list', []))
                             total_functions_extracted += num_funcs
+
                             if num_funcs > 0:
-                                logger.info(f"  Sample {sample_id}: extracted {num_funcs} functions")
+                                logger.info(f"  ✅ Sample {sample_id}: extracted {num_funcs} functions")
                             else:
-                                logger.info(f"  Sample {sample_id}: no functions selected")
+                                logger.info(f"  ⚪ Sample {sample_id}: no functions selected")
+
+                            # Mark as processed
+                            self.processed_samples.add(sample_id)
+                        else:
+                            # API call failed or parse failed, still mark to avoid retry
+                            logger.warning(f"  ❌ Sample {sample_id}: processing failed")
+                            self.processed_samples.add(sample_id)
 
                     except Exception as e:
                         logger.error(f"Error processing sample {sample_id}: {e}")
+                        # Mark as processed to avoid infinite retry
+                        self.processed_samples.add(sample_id)
 
-                    # Mark as processed
-                    self.processed_samples.add(sample_id)
-
-                    # Save checkpoint periodically
-                    if len(self.processed_samples) % 10 == 0:
-                        self._save_checkpoint()
+                    # Save checkpoint after each processed sample
+                    self._save_checkpoint()
 
                     pbar.update(1)
 
-        # Final save
-        self._save_checkpoint()
-
-        # Save final results
-        logger.info(f"\nSaving {len(self.results)} processed samples to {self.output_path}")
+        # Save final output
+        logger.info(f"\n{'=' * 60}")
+        logger.info(f"Saving {len(self.results)} processed samples to {self.output_path}")
         with open(self.output_path, 'w', encoding='utf-8') as f:
             json.dump(self.results, f, ensure_ascii=False, indent=2)
 
         # Print summary
-        self._print_summary(skipped_count, processed_count, total_functions_extracted)
+        self._print_summary(skipped_this_run, processed_this_run, total_functions_extracted)
 
-    def _print_summary(self, skipped_count: int, processed_count: int, total_functions: int):
+    def _print_summary(self, skipped_this_run: int, processed_this_run: int, total_functions: int):
         """Print processing summary."""
         print("\n" + "=" * 60)
         print("Processing Summary")
         print("=" * 60)
-        print(f"Total samples processed: {len(self.processed_samples)}")
-        print(f"Samples skipped (filter criteria): {skipped_count}")
-        print(f"Samples sent to Gemini: {processed_count}")
-        print(f"Total functions extracted: {total_functions}")
+        print(f"\n📊 Overall Statistics:")
+        print(f"  Total samples processed (sent to Gemini): {len(self.processed_samples)}")
+        print(f"  Total samples skipped (filter criteria): {len(self.skipped_samples)}")
+        print(f"  Total results saved: {len(self.results)}")
+        print(f"  Total functions extracted: {total_functions}")
+
+        print(f"\n📈 This Run:")
+        print(f"  Samples processed: {processed_this_run}")
+        print(f"  Samples skipped: {skipped_this_run}")
 
         if self.results:
             # Count samples with functions
             samples_with_funcs = sum(1 for r in self.results if r.get('selected_function_list'))
-            print(f"Samples with selected functions: {samples_with_funcs}")
+            print(f"\n📁 Results Breakdown:")
+            print(f"  Samples with selected functions: {samples_with_funcs}")
+            print(f"  Samples without functions: {len(self.results) - samples_with_funcs}")
 
             # Statistics by difficulty
             difficulty_counts = {}
@@ -631,23 +675,24 @@ class FIMDataGenerator:
                     difficulty_counts[score] = difficulty_counts.get(score, 0) + 1
 
             if difficulty_counts:
-                print("\nDifficulty Distribution:")
+                print("\n📊 Difficulty Distribution:")
                 for score in sorted(difficulty_counts.keys(), key=lambda x: (isinstance(x, str), x)):
-                    print(f"  Score {score}: {difficulty_counts[score]} functions")
+                    print(f"    Score {score}: {difficulty_counts[score]} functions")
 
             # Average functions per sample
             if samples_with_funcs > 0:
                 avg_funcs = total_functions / samples_with_funcs
-                print(f"\nAverage functions per suitable sample: {avg_funcs:.2f}")
+                print(f"\n📈 Average functions per suitable sample: {avg_funcs:.2f}")
 
             # Code evaluation statistics
             suitable_count = sum(
                 1 for r in self.results
                 if r.get('code_evaluation', {}).get('is_suitable', False)
             )
-            print(f"\nSamples deemed suitable by Gemini: {suitable_count}")
+            print(f"\n✅ Samples deemed suitable by Gemini: {suitable_count}")
+            print(f"❌ Samples deemed not suitable: {len(self.results) - suitable_count}")
 
-        print("=" * 60)
+        print("\n" + "=" * 60)
 
 
 def main():
