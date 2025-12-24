@@ -4,6 +4,8 @@ FIM (Fill-in-the-Middle) Training Data Generator
 
 This script processes Python code files and uses Gemini API to select appropriate
 functions for FIM training tasks.
+
+Supports W&B Weave for tracking API calls and costs.
 """
 
 import os
@@ -17,12 +19,28 @@ from typing import Optional
 from tqdm import tqdm
 from google import genai
 
+# Optional wandb/weave integration
+try:
+    import wandb
+    import weave
+
+    WANDB_AVAILABLE = True
+except ImportError:
+    WANDB_AVAILABLE = False
+    print("⚠️ wandb/weave not installed. Run: pip install wandb weave")
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Gemini Pricing (per 1M tokens in USD) - Paid Tier
+PRICING = {
+    'input': 0.50,  # $0.50 per 1M input tokens
+    'output': 3.00,  # $3.00 per 1M output tokens (including thinking tokens)
+}
 
 # English prompt template
 PROMPT_TEMPLATE = """You are a code analysis expert. Your task is to help construct a Fill-in-the-Middle (FIM) training dataset.
@@ -97,18 +115,91 @@ Notes:
 """
 
 
-class GeminiClient:
-    """Gemini API client for code analysis."""
+class TokenCounter:
+    """Track token usage and calculate costs."""
 
-    def __init__(self, model: str = "gemini-2.5-flash-preview-05-20"):
+    def __init__(self):
+        self.total_input_tokens = 0
+        self.total_output_tokens = 0
+        self.request_count = 0
+
+    def add_usage(self, input_tokens: int, output_tokens: int):
+        """Add token usage from a request."""
+        self.total_input_tokens += input_tokens
+        self.total_output_tokens += output_tokens
+        self.request_count += 1
+
+    def get_cost(self) -> dict:
+        """Calculate current costs."""
+        input_cost = (self.total_input_tokens / 1_000_000) * PRICING['input']
+        output_cost = (self.total_output_tokens / 1_000_000) * PRICING['output']
+        total_cost = input_cost + output_cost
+
+        return {
+            'input_tokens': self.total_input_tokens,
+            'output_tokens': self.total_output_tokens,
+            'total_tokens': self.total_input_tokens + self.total_output_tokens,
+            'input_cost': input_cost,
+            'output_cost': output_cost,
+            'total_cost': total_cost,
+            'request_count': self.request_count
+        }
+
+    def print_cost_summary(self):
+        """Print a formatted cost summary."""
+        cost = self.get_cost()
+        print(f"\n💰 Token Usage & Cost:")
+        print(f"   Input tokens:  {cost['input_tokens']:,} (${cost['input_cost']:.4f})")
+        print(f"   Output tokens: {cost['output_tokens']:,} (${cost['output_cost']:.4f})")
+        print(f"   Total tokens:  {cost['total_tokens']:,}")
+        print(f"   💵 Total cost: ${cost['total_cost']:.4f}")
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary for serialization."""
+        return {
+            'total_input_tokens': self.total_input_tokens,
+            'total_output_tokens': self.total_output_tokens,
+            'request_count': self.request_count
+        }
+
+    def load_from_dict(self, data: dict):
+        """Load from dictionary."""
+        self.total_input_tokens = data.get('total_input_tokens', 0)
+        self.total_output_tokens = data.get('total_output_tokens', 0)
+        self.request_count = data.get('request_count', 0)
+
+
+class GeminiClient:
+    """Gemini API client for code analysis with optional Weave tracking."""
+
+    def __init__(
+            self,
+            model: str = "gemini-3-flash-preview",
+            token_counter: TokenCounter = None,
+            use_wandb: bool = False
+    ):
         api_key = os.getenv("GOOGLE_API_KEY")
         if not api_key:
             raise ValueError("GOOGLE_API_KEY environment variable not set")
         self.client = genai.Client()
         self.model = model
+        self.token_counter = token_counter
+        self.use_wandb = use_wandb and WANDB_AVAILABLE
 
-    def get_response(self, prompt: str, temperature: float = 0.3) -> str:
-        """Get response from Gemini API."""
+    def get_response(self, prompt: str, sample_id: str = None, temperature: float = 0.3) -> tuple[str, dict]:
+        """
+        Get response from Gemini API.
+
+        Returns:
+            tuple: (response_text, usage_info)
+        """
+        if self.use_wandb:
+            return self._get_response_with_weave(prompt, sample_id, temperature)
+        else:
+            return self._get_response_direct(prompt, temperature)
+
+    def _get_response_direct(self, prompt: str, temperature: float = 0.3) -> tuple[str, dict]:
+        """Direct API call without Weave tracking."""
         try:
             response = self.client.models.generate_content(
                 model=self.model,
@@ -118,10 +209,99 @@ class GeminiClient:
                     "top_p": 0.9,
                 },
             )
-            return response.text
+
+            # Extract token usage from response
+            usage_info = self._extract_usage(response)
+
+            return response.text, usage_info
+
         except Exception as e:
             logger.error(f"Gemini API call failed: {str(e)}")
             raise
+
+    def _get_response_with_weave(self, prompt: str, sample_id: str = None, temperature: float = 0.3) -> tuple[
+        str, dict]:
+        """API call with Weave tracking."""
+        try:
+            # Use weave.op decorator dynamically for tracking
+            start_time = time.time()
+
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=prompt,
+                config={
+                    "temperature": temperature,
+                    "top_p": 0.9,
+                },
+            )
+
+            latency = time.time() - start_time
+
+            # Extract token usage from response
+            usage_info = self._extract_usage(response)
+
+            # Calculate costs
+            input_cost = (usage_info['input_tokens'] / 1_000_000) * PRICING['input']
+            output_cost = (usage_info['output_tokens'] / 1_000_000) * PRICING['output']
+            total_cost = input_cost + output_cost
+
+            # Log to wandb
+            wandb.log({
+                "api_call/sample_id": sample_id,
+                "api_call/model": self.model,
+                "api_call/input_tokens": usage_info['input_tokens'],
+                "api_call/output_tokens": usage_info['output_tokens'],
+                "api_call/total_tokens": usage_info['input_tokens'] + usage_info['output_tokens'],
+                "api_call/input_cost": input_cost,
+                "api_call/output_cost": output_cost,
+                "api_call/total_cost": total_cost,
+                "api_call/latency_seconds": latency,
+                "api_call/temperature": temperature,
+                "api_call/prompt_length": len(prompt),
+                "api_call/response_length": len(response.text) if response.text else 0,
+                # Cumulative metrics
+                "cumulative/total_input_tokens": self.token_counter.total_input_tokens + usage_info[
+                    'input_tokens'] if self.token_counter else usage_info['input_tokens'],
+                "cumulative/total_output_tokens": self.token_counter.total_output_tokens + usage_info[
+                    'output_tokens'] if self.token_counter else usage_info['output_tokens'],
+                "cumulative/total_cost": self.token_counter.get_cost()[
+                                             'total_cost'] + total_cost if self.token_counter else total_cost,
+                "cumulative/request_count": self.token_counter.request_count + 1 if self.token_counter else 1,
+            })
+
+            return response.text, usage_info
+
+        except Exception as e:
+            logger.error(f"Gemini API call failed: {str(e)}")
+            # Log error to wandb
+            if self.use_wandb:
+                wandb.log({
+                    "api_call/error": str(e),
+                    "api_call/sample_id": sample_id,
+                })
+            raise
+
+    def _extract_usage(self, response) -> dict:
+        """Extract token usage from response."""
+        usage_info = {
+            'input_tokens': 0,
+            'output_tokens': 0
+        }
+
+        # Try to get usage metadata from response
+        if hasattr(response, 'usage_metadata'):
+            usage = response.usage_metadata
+            usage_info['input_tokens'] = getattr(usage, 'prompt_token_count', 0)
+            usage_info['output_tokens'] = getattr(usage, 'candidates_token_count', 0)
+
+            # Add to token counter if available
+            if self.token_counter:
+                self.token_counter.add_usage(
+                    usage_info['input_tokens'],
+                    usage_info['output_tokens']
+                )
+
+        return usage_info
 
 
 class FunctionExtractor:
@@ -285,12 +465,14 @@ class FIMDataGenerator:
             wait_seconds: float = 2.0,
             min_line_num: int = 50,
             max_line_num: int = 1000,
-            min_func_num: int = 3
+            min_func_num: int = 3,
+            use_wandb: bool = False,
+            wandb_project: str = "fim-data-generator",
+            wandb_run_name: str = None
     ):
         self.input_path = Path(input_path)
         self.output_path = Path(output_path)
         self.checkpoint_path = Path(checkpoint_path)
-        self.gemini_client = GeminiClient(model=model)
         self.function_extractor = FunctionExtractor()
         self.print_response = print_response
         self.wait_seconds = wait_seconds
@@ -303,11 +485,59 @@ class FIMDataGenerator:
         # Global function ID counter
         self.function_id = 0
 
+        # Token counter for cost tracking
+        self.token_counter = TokenCounter()
+
+        # W&B configuration
+        self.use_wandb = use_wandb and WANDB_AVAILABLE
+        self.wandb_project = wandb_project
+        self.wandb_run_name = wandb_run_name
+
+        # Initialize wandb if enabled
+        if self.use_wandb:
+            self._init_wandb()
+
+        # Initialize Gemini client with token counter
+        self.gemini_client = GeminiClient(
+            model=model,
+            token_counter=self.token_counter,
+            use_wandb=self.use_wandb
+        )
+
         # Load checkpoint if exists
         self.processed_samples = set()
         self.skipped_samples = set()  # Track skipped samples separately
         self.results = []  # Stores sample-level results
         self._load_checkpoint()
+
+    def _init_wandb(self):
+        """Initialize W&B and Weave."""
+        logger.info("🔧 Initializing W&B and Weave...")
+
+        # Initialize wandb run
+        run_name = self.wandb_run_name or f"fim-gen-{time.strftime('%Y%m%d-%H%M%S')}"
+
+        wandb.init(
+            project=self.wandb_project,
+            name=run_name,
+            config={
+                "model": self.gemini_client.model if hasattr(self, 'gemini_client') else "gemini-3-flash-preview",
+                "input_path": str(self.input_path),
+                "output_path": str(self.output_path),
+                "min_line_num": self.min_line_num,
+                "max_line_num": self.max_line_num,
+                "min_func_num": self.min_func_num,
+                "wait_seconds": self.wait_seconds,
+                "pricing_input_per_1m": PRICING['input'],
+                "pricing_output_per_1m": PRICING['output'],
+            },
+            resume="allow"  # Allow resuming if run already exists
+        )
+
+        # Initialize Weave for tracing
+        weave.init(self.wandb_project)
+
+        logger.info(f"✅ W&B initialized: {wandb.run.url}")
 
     def _load_checkpoint(self):
         """Load checkpoint data if exists."""
@@ -320,6 +550,10 @@ class FIMDataGenerator:
                 self.results = checkpoint.get('results', [])
                 self.function_id = checkpoint.get('next_function_id', 0)
 
+                # Load token usage
+                if 'token_usage' in checkpoint:
+                    self.token_counter.load_from_dict(checkpoint['token_usage'])
+
                 # Count total functions extracted
                 total_funcs = sum(
                     len(r.get('selected_function_list', [])) for r in self.results
@@ -330,6 +564,24 @@ class FIMDataGenerator:
                 logger.info(f"  - Results saved: {len(self.results)}")
                 logger.info(f"  - Functions extracted: {total_funcs}")
                 logger.info(f"  - Next function ID: {self.function_id}")
+
+                # Print loaded token usage
+                cost = self.token_counter.get_cost()
+                logger.info(f"  - Total tokens used: {cost['total_tokens']:,}")
+                logger.info(f"  - Total cost so far: ${cost['total_cost']:.4f}")
+
+                # Log to wandb if enabled
+                if self.use_wandb:
+                    wandb.log({
+                        "checkpoint/loaded": True,
+                        "checkpoint/processed_samples": len(self.processed_samples),
+                        "checkpoint/skipped_samples": len(self.skipped_samples),
+                        "checkpoint/results_count": len(self.results),
+                        "checkpoint/functions_extracted": total_funcs,
+                        "checkpoint/total_tokens": cost['total_tokens'],
+                        "checkpoint/total_cost": cost['total_cost'],
+                    })
+
             except Exception as e:
                 logger.warning(f"Failed to load checkpoint: {e}")
 
@@ -339,7 +591,8 @@ class FIMDataGenerator:
             'processed_samples': list(self.processed_samples),
             'skipped_samples': list(self.skipped_samples),
             'results': self.results,
-            'next_function_id': self.function_id
+            'next_function_id': self.function_id,
+            'token_usage': self.token_counter.to_dict()
         }
 
         # Write to temp file first, then rename (atomic operation)
@@ -419,13 +672,22 @@ class FIMDataGenerator:
             logger.error(f"Problematic JSON (first 500 chars): {json_str[:500]}")
             return None
 
-    def _print_gemini_response(self, sample_id, response: str):
+    def _print_gemini_response(self, sample_id, response: str, usage_info: dict):
         """Print Gemini response content."""
         print("\n" + "=" * 80)
         print(f"📝 Gemini Response for Sample: {sample_id}")
+        print(f"   Tokens: input={usage_info['input_tokens']:,}, output={usage_info['output_tokens']:,}")
         print("=" * 80)
         print(response)
         print("=" * 80 + "\n")
+
+    def _print_current_cost(self):
+        """Print current token usage and cost."""
+        cost = self.token_counter.get_cost()
+        print(f"💰 累计费用: ${cost['total_cost']:.4f} "
+              f"(输入: {cost['input_tokens']:,} tokens, "
+              f"输出: {cost['output_tokens']:,} tokens, "
+              f"请求数: {cost['request_count']})")
 
     def _check_sample_eligibility(self, sample: dict) -> tuple[bool, str]:
         """
@@ -463,11 +725,17 @@ class FIMDataGenerator:
 
         # Call Gemini API
         try:
-            response = self.gemini_client.get_response(prompt)
+            response, usage_info = self.gemini_client.get_response(
+                prompt,
+                sample_id=sample_id
+            )
 
             # Print Gemini response if enabled
             if self.print_response:
-                self._print_gemini_response(sample_id, response)
+                self._print_gemini_response(sample_id, response, usage_info)
+
+            # Print current cost after each API call
+            self._print_current_cost()
 
             # Wait specified seconds
             if self.wait_seconds > 0:
@@ -482,6 +750,12 @@ class FIMDataGenerator:
         parsed_response = self._parse_gemini_response(response)
         if not parsed_response:
             logger.warning(f"Failed to parse response for sample {sample_id}")
+            # Log parsing failure to wandb
+            if self.use_wandb:
+                wandb.log({
+                    "parsing/failure": 1,
+                    "parsing/sample_id": sample_id,
+                })
             return None
 
         # Check if code is suitable
@@ -491,11 +765,32 @@ class FIMDataGenerator:
         result_sample = sample.copy()
         result_sample['gemini_full_response'] = response
         result_sample['code_evaluation'] = code_eval
+        result_sample['token_usage'] = usage_info  # Store per-sample token usage
         result_sample['selected_function_list'] = []
 
         if not code_eval.get('is_suitable', False):
             logger.info(f"Sample {sample_id} not suitable: {code_eval.get('rejection_reason', 'Unknown')}")
+            # Log to wandb
+            if self.use_wandb:
+                wandb.log({
+                    "evaluation/not_suitable": 1,
+                    "evaluation/sample_id": sample_id,
+                    "evaluation/complexity_score": code_eval.get('complexity_score', 0),
+                    "evaluation/quality_score": code_eval.get('quality_score', 0),
+                    "evaluation/cohesion_score": code_eval.get('cohesion_score', 0),
+                })
             return result_sample
+
+        # Log suitable sample to wandb
+        if self.use_wandb:
+            wandb.log({
+                "evaluation/suitable": 1,
+                "evaluation/sample_id": sample_id,
+                "evaluation/complexity_score": code_eval.get('complexity_score', 0),
+                "evaluation/quality_score": code_eval.get('quality_score', 0),
+                "evaluation/cohesion_score": code_eval.get('cohesion_score', 0),
+                "evaluation/average_score": code_eval.get('average_score', 0),
+            })
 
         # Process selected functions
         selected_functions = parsed_response.get('selected_functions', [])
@@ -532,6 +827,15 @@ class FIMDataGenerator:
             result_sample['selected_function_list'].append(function_item)
             self.function_id += 1
 
+            # Log function extraction to wandb
+            if self.use_wandb:
+                wandb.log({
+                    "function/extracted": 1,
+                    "function/function_id": function_item['function_id'],
+                    "function/difficulty_score": func_info.get('difficulty_score', 0),
+                    "function/line_count": func_data['end_line'] - func_data['start_line'],
+                })
+
         return result_sample
 
     def run(self):
@@ -555,6 +859,18 @@ class FIMDataGenerator:
         logger.info(f"Remaining to handle: {len(remaining_samples)}")
         logger.info(
             f"Filter criteria: line_num in [{self.min_line_num}, {self.max_line_num}], func_num >= {self.min_func_num}")
+
+        # Print current cost status
+        self._print_current_cost()
+
+        # Log initial state to wandb
+        if self.use_wandb:
+            wandb.log({
+                "progress/total_samples": total_samples,
+                "progress/already_processed": len(self.processed_samples),
+                "progress/already_skipped": len(self.skipped_samples),
+                "progress/remaining": len(remaining_samples),
+            })
 
         # Group by repo for progress tracking
         repo_samples = {}
@@ -592,6 +908,13 @@ class FIMDataGenerator:
                         skipped_this_run += 1
                         self.skipped_samples.add(sample_id)
 
+                        # Log skip to wandb
+                        if self.use_wandb:
+                            wandb.log({
+                                "skip/count": 1,
+                                "skip/reason": reason,
+                            })
+
                         # Save checkpoint after each skipped sample
                         self._save_checkpoint()
 
@@ -599,10 +922,11 @@ class FIMDataGenerator:
                         continue
 
                     # Update progress description
+                    cost = self.token_counter.get_cost()
                     pbar.set_description(
                         f"Repo {repo_idx + 1}/{total_repos} | "
-                        f"Sample {sample_idx + 1}/{len(samples)} | "
-                        f"Funcs: {total_functions_extracted}"
+                        f"Funcs: {total_functions_extracted} | "
+                        f"Cost: ${cost['total_cost']:.3f}"
                     )
 
                     # Process sample
@@ -621,6 +945,17 @@ class FIMDataGenerator:
 
                             # Mark as processed
                             self.processed_samples.add(sample_id)
+
+                            # Log progress to wandb
+                            if self.use_wandb:
+                                cost = self.token_counter.get_cost()
+                                wandb.log({
+                                    "progress/processed_samples": len(self.processed_samples),
+                                    "progress/skipped_samples": len(self.skipped_samples),
+                                    "progress/results_count": len(self.results),
+                                    "progress/total_functions": total_functions_extracted,
+                                    "progress/total_cost": cost['total_cost'],
+                                })
                         else:
                             # API call failed or parse failed, still mark to avoid retry
                             logger.warning(f"  ❌ Sample {sample_id}: processing failed")
@@ -630,6 +965,14 @@ class FIMDataGenerator:
                         logger.error(f"Error processing sample {sample_id}: {e}")
                         # Mark as processed to avoid infinite retry
                         self.processed_samples.add(sample_id)
+
+                        # Log error to wandb
+                        if self.use_wandb:
+                            wandb.log({
+                                "error/count": 1,
+                                "error/sample_id": sample_id,
+                                "error/message": str(e),
+                            })
 
                     # Save checkpoint after each processed sample
                     self._save_checkpoint()
@@ -645,6 +988,35 @@ class FIMDataGenerator:
         # Print summary
         self._print_summary(skipped_this_run, processed_this_run, total_functions_extracted)
 
+        # Log final summary to wandb
+        if self.use_wandb:
+            cost = self.token_counter.get_cost()
+            wandb.log({
+                "final/processed_samples": len(self.processed_samples),
+                "final/skipped_samples": len(self.skipped_samples),
+                "final/results_count": len(self.results),
+                "final/total_functions": total_functions_extracted,
+                "final/total_input_tokens": cost['input_tokens'],
+                "final/total_output_tokens": cost['output_tokens'],
+                "final/total_tokens": cost['total_tokens'],
+                "final/total_cost": cost['total_cost'],
+                "final/cost_per_function": cost[
+                                               'total_cost'] / total_functions_extracted if total_functions_extracted > 0 else 0,
+            })
+
+            # Create summary table for wandb
+            summary_table = wandb.Table(columns=["Metric", "Value"])
+            summary_table.add_data("Total Processed", len(self.processed_samples))
+            summary_table.add_data("Total Skipped", len(self.skipped_samples))
+            summary_table.add_data("Functions Extracted", total_functions_extracted)
+            summary_table.add_data("Total Cost ($)", f"${cost['total_cost']:.4f}")
+            summary_table.add_data("Input Tokens", cost['input_tokens'])
+            summary_table.add_data("Output Tokens", cost['output_tokens'])
+            wandb.log({"summary_table": summary_table})
+
+            # Finish wandb run
+            wandb.finish()
+
     def _print_summary(self, skipped_this_run: int, processed_this_run: int, total_functions: int):
         """Print processing summary."""
         print("\n" + "=" * 60)
@@ -659,6 +1031,9 @@ class FIMDataGenerator:
         print(f"\n📈 This Run:")
         print(f"  Samples processed: {processed_this_run}")
         print(f"  Samples skipped: {skipped_this_run}")
+
+        # Print token usage and cost
+        self.token_counter.print_cost_summary()
 
         if self.results:
             # Count samples with functions
@@ -691,6 +1066,16 @@ class FIMDataGenerator:
             )
             print(f"\n✅ Samples deemed suitable by Gemini: {suitable_count}")
             print(f"❌ Samples deemed not suitable: {len(self.results) - suitable_count}")
+
+            # Cost per function
+            cost = self.token_counter.get_cost()
+            if total_functions > 0:
+                cost_per_func = cost['total_cost'] / total_functions
+                print(f"\n💵 Cost per extracted function: ${cost_per_func:.4f}")
+
+        # Print wandb info if enabled
+        if self.use_wandb:
+            print(f"\n🔗 W&B Dashboard: {wandb.run.url if wandb.run else 'N/A'}")
 
         print("\n" + "=" * 60)
 
@@ -735,7 +1120,7 @@ def main():
     parser.add_argument(
         "--wait", "-w",
         type=float,
-        default=2.0,
+        default=1.0,
         help="Seconds to wait after each API call (default: 2.0)"
     )
     parser.add_argument(
@@ -757,7 +1142,33 @@ def main():
         help="Minimum func_num to process a sample (default: 3)"
     )
 
+    # W&B arguments
+    parser.add_argument(
+        "--wandb",
+        action="store_true",
+        default=True,
+        help="Enable W&B logging and Weave tracing"
+    )
+    parser.add_argument(
+        "--wandb-project",
+        type=str,
+        default="fim-data-generator",
+        help="W&B project name (default: fim-data-generator)"
+    )
+    parser.add_argument(
+        "--wandb-run-name",
+        type=str,
+        default="exp_1",
+        help="W&B run name (default: auto-generated)"
+    )
+
     args = parser.parse_args()
+
+    # Check wandb availability if enabled
+    if args.wandb and not WANDB_AVAILABLE:
+        logger.warning("⚠️ W&B requested but not available. Install with: pip install wandb weave")
+        logger.warning("   Continuing without W&B logging...")
+        args.wandb = False
 
     generator = FIMDataGenerator(
         input_path=args.input,
@@ -768,11 +1179,17 @@ def main():
         wait_seconds=args.wait,
         min_line_num=args.min_lines,
         max_line_num=args.max_lines,
-        min_func_num=args.min_funcs
+        min_func_num=args.min_funcs,
+        use_wandb=args.wandb,
+        wandb_project=args.wandb_project,
+        wandb_run_name=args.wandb_run_name
     )
 
     generator.run()
 
 
 if __name__ == "__main__":
+    '''
+    python step_3_call_gemini_select_function_1223.py --wandb --wandb-project "my-fim-project" --wandb-run-name "experiment-1"
+    '''
     main()
