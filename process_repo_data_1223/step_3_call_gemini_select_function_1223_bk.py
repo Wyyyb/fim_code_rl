@@ -11,7 +11,7 @@ import json
 import logging
 import re
 import ast
-import time
+import time  # 新增：用于等待
 from pathlib import Path
 from typing import Optional
 from tqdm import tqdm
@@ -281,31 +281,23 @@ class FIMDataGenerator:
             output_path: str,
             checkpoint_path: str,
             model: str = "gemini-3-flash-preview",
-            print_response: bool = True,
-            wait_seconds: float = 2.0,
-            min_line_num: int = 50,
-            max_line_num: int = 1000,
-            min_func_num: int = 3
+            print_response: bool = True,  # 新增：是否打印响应
+            wait_seconds: float = 2.0  # 新增：等待秒数
     ):
         self.input_path = Path(input_path)
         self.output_path = Path(output_path)
         self.checkpoint_path = Path(checkpoint_path)
         self.gemini_client = GeminiClient(model=model)
         self.function_extractor = FunctionExtractor()
-        self.print_response = print_response
-        self.wait_seconds = wait_seconds
-
-        # Filter parameters
-        self.min_line_num = min_line_num
-        self.max_line_num = max_line_num
-        self.min_func_num = min_func_num
+        self.print_response = print_response  # 新增
+        self.wait_seconds = wait_seconds  # 新增
 
         # Global function ID counter
         self.function_id = 0
 
         # Load checkpoint if exists
         self.processed_samples = set()
-        self.results = []  # Now stores sample-level results
+        self.results = []
         self._load_checkpoint()
 
     def _load_checkpoint(self):
@@ -318,7 +310,7 @@ class FIMDataGenerator:
                 self.results = checkpoint.get('results', [])
                 self.function_id = checkpoint.get('next_function_id', 0)
                 logger.info(f"Loaded checkpoint: {len(self.processed_samples)} samples processed, "
-                            f"{len(self.results)} samples with results")
+                            f"{len(self.results)} functions extracted")
             except Exception as e:
                 logger.warning(f"Failed to load checkpoint: {e}")
 
@@ -397,85 +389,55 @@ class FIMDataGenerator:
             return None
 
     def _print_gemini_response(self, sample_id: str, response: str):
-        """Print Gemini response content."""
+        """打印 Gemini 的响应内容"""
         print("\n" + "=" * 80)
         print(f"📝 Gemini Response for Sample: {sample_id}")
         print("=" * 80)
         print(response)
         print("=" * 80 + "\n")
 
-    def _check_sample_eligibility(self, sample: dict) -> tuple[bool, str]:
+    def process_single_sample(self, sample: dict) -> list[dict]:
         """
-        Check if a sample meets the filtering criteria.
-
-        Returns:
-            tuple: (is_eligible, reason)
-        """
-        line_num = sample.get('line_num', 0)
-        func_num = sample.get('func_num', 0)
-
-        if line_num < self.min_line_num:
-            return False, f"line_num ({line_num}) < min_line_num ({self.min_line_num})"
-
-        if line_num > self.max_line_num:
-            return False, f"line_num ({line_num}) > max_line_num ({self.max_line_num})"
-
-        if func_num < self.min_func_num:
-            return False, f"func_num ({func_num}) < min_func_num ({self.min_func_num})"
-
-        return True, "passed"
-
-    def process_single_sample(self, sample: dict) -> Optional[dict]:
-        """
-        Process a single code sample and return the enriched sample with selected functions.
-
-        Returns:
-            The original sample dict with added fields, or None if skipped/failed.
+        Process a single code sample and return list of FIM training items.
         """
         sample_id = sample['sample_id']
+        repo_id = sample['repo_id']
         code_content = sample['code_content']
-
         # Build prompt
         prompt = PROMPT_TEMPLATE + code_content
-
         # Call Gemini API
         try:
             response = self.gemini_client.get_response(prompt)
 
-            # Print Gemini response if enabled
+            # 新增：打印 Gemini 响应
             if self.print_response:
+                print("print response")
                 self._print_gemini_response(sample_id, response)
 
-            # Wait specified seconds
+            # 新增：等待指定秒数
             if self.wait_seconds > 0:
                 logger.info(f"⏳ Waiting {self.wait_seconds} seconds before next request...")
                 time.sleep(self.wait_seconds)
 
         except Exception as e:
             logger.error(f"Failed to get Gemini response for sample {sample_id}: {e}")
-            return None
+            return []
 
         # Parse response
         parsed_response = self._parse_gemini_response(response)
         if not parsed_response:
             logger.warning(f"Failed to parse response for sample {sample_id}")
-            return None
+            return []
 
         # Check if code is suitable
         code_eval = parsed_response.get('code_evaluation', {})
-
-        # Create result based on original sample
-        result_sample = sample.copy()
-        result_sample['gemini_full_response'] = response
-        result_sample['code_evaluation'] = code_eval
-        result_sample['selected_function_list'] = []
-
         if not code_eval.get('is_suitable', False):
             logger.info(f"Sample {sample_id} not suitable: {code_eval.get('rejection_reason', 'Unknown')}")
-            return result_sample
+            return []
 
         # Process selected functions
         selected_functions = parsed_response.get('selected_functions', [])
+        results = []
 
         for func_info in selected_functions:
             function_name = func_info.get('function_name')
@@ -494,22 +456,24 @@ class FIMDataGenerator:
                 logger.warning(f"Could not mask function '{function_name}' in sample {sample_id}")
                 continue
 
-            # Create function item
-            function_item = {
+            # Create result item
+            result_item = {
+                'repo_id': repo_id,
+                'sample_id': sample_id,
                 'function_id': self.function_id,
                 'function_name': function_name,
                 'function_code': func_data['code'],
                 'masked_code': masked_code,
-                'start_line': func_data['start_line'],
-                'end_line': func_data['end_line'],
                 'difficulty_score': func_info.get('difficulty_score'),
-                'selection_reason': func_info.get('reason')
+                'selection_reason': func_info.get('reason'),
+                'gemini_full_response': response,
+                'code_evaluation': code_eval
             }
 
-            result_sample['selected_function_list'].append(function_item)
+            results.append(result_item)
             self.function_id += 1
 
-        return result_sample
+        return results
 
     def run(self):
         """Run the FIM data generation pipeline."""
@@ -519,30 +483,19 @@ class FIMDataGenerator:
             data = json.load(f)
 
         total_samples = len(data)
-
-        # Filter out already processed samples
         remaining_samples = [s for s in data if s['sample_id'] not in self.processed_samples]
 
-        logger.info(f"Total samples in file: {total_samples}")
+        logger.info(f"Total samples: {total_samples}")
         logger.info(f"Already processed: {len(self.processed_samples)}")
-        logger.info(f"Remaining to process: {len(remaining_samples)}")
-        logger.info(
-            f"Filter criteria: line_num in [{self.min_line_num}, {self.max_line_num}], func_num >= {self.min_func_num}")
+        logger.info(f"Remaining: {len(remaining_samples)}")
 
         # Group by repo for progress tracking
         repo_samples = {}
-        for sample in remaining_samples:
+        for sample in remaining_samples[:2]:
             repo_id = sample['repo_id']
             if repo_id not in repo_samples:
                 repo_samples[repo_id] = []
             repo_samples[repo_id].append(sample)
-
-        # Statistics
-        skipped_count = 0
-        processed_count = 0
-        total_functions_extracted = sum(
-            len(r.get('selected_function_list', [])) for r in self.results
-        )
 
         # Process samples
         total_repos = len(repo_samples)
@@ -554,36 +507,20 @@ class FIMDataGenerator:
 
                 for sample_idx, sample in enumerate(samples):
                     sample_id = sample['sample_id']
-
-                    # Check eligibility before calling Gemini
-                    is_eligible, reason = self._check_sample_eligibility(sample)
-
-                    if not is_eligible:
-                        logger.info(f"  Sample {sample_id} skipped: {reason}")
-                        skipped_count += 1
-                        self.processed_samples.add(sample_id)
-                        pbar.update(1)
-                        continue
-
                     # Update progress description
                     pbar.set_description(
                         f"Repo {repo_idx + 1}/{total_repos} | "
                         f"Sample {sample_idx + 1}/{len(samples)} | "
-                        f"Functions: {total_functions_extracted}"
+                        f"Functions: {len(self.results)}"
                     )
 
                     # Process sample
                     try:
-                        result = self.process_single_sample(sample)
-                        if result:
-                            self.results.append(result)
-                            processed_count += 1
-                            num_funcs = len(result.get('selected_function_list', []))
-                            total_functions_extracted += num_funcs
-                            if num_funcs > 0:
-                                logger.info(f"  Sample {sample_id}: extracted {num_funcs} functions")
-                            else:
-                                logger.info(f"  Sample {sample_id}: no functions selected")
+                        new_items = self.process_single_sample(sample)
+                        self.results.extend(new_items)
+
+                        if new_items:
+                            logger.info(f"  Sample {sample_id}: extracted {len(new_items)} functions")
 
                     except Exception as e:
                         logger.error(f"Error processing sample {sample_id}: {e}")
@@ -601,51 +538,40 @@ class FIMDataGenerator:
         self._save_checkpoint()
 
         # Save final results
-        logger.info(f"\nSaving {len(self.results)} processed samples to {self.output_path}")
+        logger.info(f"\nSaving {len(self.results)} FIM training items to {self.output_path}")
         with open(self.output_path, 'w', encoding='utf-8') as f:
             json.dump(self.results, f, ensure_ascii=False, indent=2)
 
         # Print summary
-        self._print_summary(skipped_count, processed_count, total_functions_extracted)
+        self._print_summary()
 
-    def _print_summary(self, skipped_count: int, processed_count: int, total_functions: int):
+    def _print_summary(self):
         """Print processing summary."""
         print("\n" + "=" * 60)
         print("Processing Summary")
         print("=" * 60)
         print(f"Total samples processed: {len(self.processed_samples)}")
-        print(f"Samples skipped (filter criteria): {skipped_count}")
-        print(f"Samples sent to Gemini: {processed_count}")
-        print(f"Total functions extracted: {total_functions}")
+        print(f"Total functions extracted: {len(self.results)}")
 
         if self.results:
-            # Count samples with functions
-            samples_with_funcs = sum(1 for r in self.results if r.get('selected_function_list'))
-            print(f"Samples with selected functions: {samples_with_funcs}")
-
             # Statistics by difficulty
             difficulty_counts = {}
-            for result in self.results:
-                for func in result.get('selected_function_list', []):
-                    score = func.get('difficulty_score', 'N/A')
-                    difficulty_counts[score] = difficulty_counts.get(score, 0) + 1
+            for item in self.results:
+                score = item.get('difficulty_score', 'N/A')
+                difficulty_counts[score] = difficulty_counts.get(score, 0) + 1
 
-            if difficulty_counts:
-                print("\nDifficulty Distribution:")
-                for score in sorted(difficulty_counts.keys(), key=lambda x: (isinstance(x, str), x)):
-                    print(f"  Score {score}: {difficulty_counts[score]} functions")
+            print("\nDifficulty Distribution:")
+            for score in sorted(difficulty_counts.keys(), key=lambda x: (isinstance(x, str), x)):
+                print(f"  Score {score}: {difficulty_counts[score]} functions")
 
-            # Average functions per sample
-            if samples_with_funcs > 0:
-                avg_funcs = total_functions / samples_with_funcs
-                print(f"\nAverage functions per suitable sample: {avg_funcs:.2f}")
+            # Functions per sample
+            sample_counts = {}
+            for item in self.results:
+                sid = item['sample_id']
+                sample_counts[sid] = sample_counts.get(sid, 0) + 1
 
-            # Code evaluation statistics
-            suitable_count = sum(
-                1 for r in self.results
-                if r.get('code_evaluation', {}).get('is_suitable', False)
-            )
-            print(f"\nSamples deemed suitable by Gemini: {suitable_count}")
+            avg_funcs = sum(sample_counts.values()) / len(sample_counts) if sample_counts else 0
+            print(f"\nAverage functions per suitable sample: {avg_funcs:.2f}")
 
         print("=" * 60)
 
@@ -657,17 +583,17 @@ def main():
     parser = argparse.ArgumentParser(description="Generate FIM training data from Python code")
     parser.add_argument(
         "--input", "-i",
-        default="/data/yubo/datasets/extracted_python_files_1223.json",
+        default="/data/yubo/datasets/step_2_extracted_python_files_1223.json",
         help="Path to input JSON file"
     )
     parser.add_argument(
         "--output", "-o",
-        default="/data/yubo/datasets/fim_training_data.json",
+        default="/data/yubo/datasets/step_3_fim_training_data.json",
         help="Path to output JSON file"
     )
     parser.add_argument(
         "--checkpoint", "-c",
-        default="/data/yubo/datasets/fim_checkpoint.json",
+        default="/data/yubo/datasets/step_3_fim_checkpoint.json",
         help="Path to checkpoint file"
     )
     parser.add_argument(
@@ -675,6 +601,7 @@ def main():
         default="gemini-3-flash-preview",
         help="Gemini model to use"
     )
+    # 新增：命令行参数控制打印和等待
     parser.add_argument(
         "--print-response", "-p",
         action="store_true",
@@ -693,24 +620,6 @@ def main():
         default=2.0,
         help="Seconds to wait after each API call (default: 2.0)"
     )
-    parser.add_argument(
-        "--min-lines",
-        type=int,
-        default=50,
-        help="Minimum line_num to process a sample (default: 50)"
-    )
-    parser.add_argument(
-        "--max-lines",
-        type=int,
-        default=1000,
-        help="Maximum line_num to process a sample (default: 1000)"
-    )
-    parser.add_argument(
-        "--min-funcs",
-        type=int,
-        default=3,
-        help="Minimum func_num to process a sample (default: 3)"
-    )
 
     args = parser.parse_args()
 
@@ -719,11 +628,8 @@ def main():
         output_path=args.output,
         checkpoint_path=args.checkpoint,
         model=args.model,
-        print_response=args.print_response,
-        wait_seconds=args.wait,
-        min_line_num=args.min_lines,
-        max_line_num=args.max_lines,
-        min_func_num=args.min_funcs
+        print_response=args.print_response,  # 新增
+        wait_seconds=args.wait  # 新增
     )
 
     generator.run()
