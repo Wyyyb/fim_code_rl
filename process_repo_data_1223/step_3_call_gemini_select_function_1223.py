@@ -1005,14 +1005,14 @@ class FIMDataGenerator:
             })
 
             # Create summary table for wandb
-            summary_table = wandb.Table(columns=["Metric", "Value"])
-            summary_table.add_data("Total Processed", len(self.processed_samples))
-            summary_table.add_data("Total Skipped", len(self.skipped_samples))
-            summary_table.add_data("Functions Extracted", total_functions_extracted)
-            summary_table.add_data("Total Cost ($)", f"${cost['total_cost']:.4f}")
-            summary_table.add_data("Input Tokens", cost['input_tokens'])
-            summary_table.add_data("Output Tokens", cost['output_tokens'])
-            wandb.log({"summary_table": summary_table})
+            # summary_table = wandb.Table(columns=["Metric", "Value"])
+            # summary_table.add_data("Total Processed", len(self.processed_samples))
+            # summary_table.add_data("Total Skipped", len(self.skipped_samples))
+            # summary_table.add_data("Functions Extracted", total_functions_extracted)
+            # summary_table.add_data("Total Cost ($)", f"${cost['total_cost']:.4f}")
+            # summary_table.add_data("Input Tokens", cost['input_tokens'])
+            # summary_table.add_data("Output Tokens", cost['output_tokens'])
+            # wandb.log({"summary_table": summary_table})
 
             # Finish wandb run
             wandb.finish()
