@@ -1087,17 +1087,17 @@ def main():
     parser = argparse.ArgumentParser(description="Generate FIM training data from Python code")
     parser.add_argument(
         "--input", "-i",
-        default="/data/yubo/datasets/extracted_python_files_1223.json",
+        default="/data/yubo/datasets/process_data_output_1228/extracted_python_files_1223.json",
         help="Path to input JSON file"
     )
     parser.add_argument(
         "--output", "-o",
-        default="/data/yubo/datasets/fim_training_data.json",
+        default="/data/yubo/datasets/process_data_output_1228/step_3_selected_function_data_1229.json",
         help="Path to output JSON file"
     )
     parser.add_argument(
         "--checkpoint", "-c",
-        default="/data/yubo/datasets/fim_checkpoint.json",
+        default="/data/yubo/datasets/process_data_output_1228/step_3_checkpoint.json",
         help="Path to checkpoint file"
     )
     parser.add_argument(
@@ -1132,7 +1132,7 @@ def main():
     parser.add_argument(
         "--max-lines",
         type=int,
-        default=1000,
+        default=1500,
         help="Maximum line_num to process a sample (default: 1000)"
     )
     parser.add_argument(
@@ -1190,6 +1190,6 @@ def main():
 
 if __name__ == "__main__":
     '''
-    python step_3_call_gemini_select_function_1223.py --wandb --wandb-project "my-fim-project" --wandb-run-name "experiment-1"
+    python step_3_call_gemini_select_function_1223.py --wandb --wandb-project "my-fim-project" --wandb-run-name "experiment-1229"
     '''
     main()
