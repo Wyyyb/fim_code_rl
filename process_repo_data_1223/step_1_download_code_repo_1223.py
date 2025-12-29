@@ -64,8 +64,10 @@ def clone_repo(repo_id: str, repo_url: str, target_dir: Path) -> bool:
 
 def main():
     # Configuration
-    csv_file = Path("code_repos_csv_1223.txt")
-    target_dir = Path("/data/yubo/datasets/collected_sc_1223")
+    # csv_file = Path("code_repos_csv_1223.txt")
+    # target_dir = Path("/data/yubo/datasets/collected_sc_1223")
+    csv_file = Path("code_repo_csv_1228.txt")
+    target_dir = Path("/data/yubo/datasets/collected_sc_1228")
 
     # Check if CSV file exists
     if not csv_file.exists():
