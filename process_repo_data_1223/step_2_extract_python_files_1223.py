@@ -103,7 +103,8 @@ def count_functions(content: str) -> int:
 
     try:
         tree = ast.parse(content)
-    except SyntaxError:
+    except Exception as e:
+        print(f"  [ERROR] Could not parse {content}: {e}")
         # If parsing fails, return -1 to indicate error
         return -1
 
