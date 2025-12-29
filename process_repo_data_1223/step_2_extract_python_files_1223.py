@@ -286,5 +286,10 @@ if __name__ == "__main__":
     --csv_file code_repos_csv_1223.txt \
     --repos_dir /data/yubo/datasets/collected_sc_1223 \
     --output_path /data/yubo/datasets/extracted_python_files_1223.json
+    
+    python step_2_extract_python_files_1223.py \
+    --csv_file code_repo_csv_1228.txt \
+    --repos_dir /data/yubo/datasets/collected_sc_1228 \
+    --output_path /data/yubo/datasets/extracted_python_files_1223.json
     '''
     main()
