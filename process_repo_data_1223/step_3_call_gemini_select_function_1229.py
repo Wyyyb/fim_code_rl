@@ -1340,15 +1340,15 @@ if __name__ == "__main__":
 
     # 分片并行运行（5个分片）:
     # 终端1:
-    python step_3_call_gemini_select_function_1229.py --shard 1 --total-shards 5 --wandb --wandb-run-name "exp_1229_1"
+    python step_3_call_gemini_select_function_1229.py --shard 1 --total-shards 5 --wandb --wandb-run-name "exp_1230_1"
     # 终端2:
-    python step_3_call_gemini_select_function_1229.py --shard 2 --total-shards 5 --wandb --wandb-run-name "exp_1229_2"
+    python step_3_call_gemini_select_function_1229.py --shard 2 --total-shards 5 --wandb --wandb-run-name "exp_1230_2"
     # 终端3:
-    python step_3_call_gemini_select_function_1229.py --shard 3 --total-shards 5 --wandb --wandb-run-name "exp_1229_3"
+    python step_3_call_gemini_select_function_1229.py --shard 3 --total-shards 5 --wandb --wandb-run-name "exp_1230_3"
     # 终端4:
-    python step_3_call_gemini_select_function_1229.py --shard 4 --total-shards 5 --wandb --wandb-run-name "exp_1229_4"
+    python step_3_call_gemini_select_function_1229.py --shard 4 --total-shards 5 --wandb --wandb-run-name "exp_1230_4"
     # 终端5:
-    python step_3_call_gemini_select_function_1229.py --shard 5 --total-shards 5 --wandb --wandb-run-name "exp_1229_5"
+    python step_3_call_gemini_select_function_1229.py --shard 5 --total-shards 5 --wandb --wandb-run-name "exp_1230_5"
 
     # 或者使用精确索引范围:
     python step_3_call_gemini_select_function_1229.py --start-idx 0 --end-idx 1000 --wandb --wandb-run-name "exp_1"
