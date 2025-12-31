@@ -1,11 +1,12 @@
 
-mkdir -p step_4_test_logs
+mkdir -p step_4_1231_logs
 
-for i in $(seq 1 2); do
+for i in $(seq 1 50); do
   nohup python step_4_fim_completion_and_critique_1230.py \
-    -i /data/yubo/datasets/process_data_output_1228/step_3_bk_1229/step_3_results_merged_1230.json \
-    -o /data/yubo/datasets/process_data_output_1228/step_3_bk_1229/step_4_results_merged_1230_test.json \
-    --shard $i --total-shards 2 \
-    --wandb --wandb-run-name "exp_step_4_1230_test" \
-    > step_4_test_logs/shard_$i.log 2>&1 &
+    -i /data/yubo/datasets/process_data_output_1228/step_3_res_data_1231/step_3_results_merged_1231.json \
+    -o /data/yubo/datasets/process_data_output_1228/step_3_res_data_1231/step_4_results_merged_1231.json \
+    --shard $i --total-shards 50 \
+    --wandb --wandb-run-name "exp_step_4_1231" \
+    > step_4_1231_logs/shard_$i.log 2>&1 &
 done
+
