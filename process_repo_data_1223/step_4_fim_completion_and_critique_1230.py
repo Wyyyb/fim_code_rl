@@ -296,7 +296,7 @@ class GeminiClient:
 
     def __init__(
             self,
-            model: str = "gemini-2.5-flash-preview-05-20",
+            model: str = "gemini-3-flash-preview",
             token_counter: TokenCounter = None,
             use_wandb: bool = False
     ):
@@ -613,7 +613,7 @@ class FIMCompletionPipeline:
             input_path: str,
             output_path: str,
             checkpoint_path: str,
-            model: str = "gemini-2.5-flash-preview-05-20",
+            model: str = "gemini-3-flash-preview",
             fim_temperature: float = 0.7,
             critique_temperature: float = 0.3,
             wait_seconds: float = 1.0,
