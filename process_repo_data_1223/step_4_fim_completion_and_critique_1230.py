@@ -134,19 +134,19 @@ Please evaluate the completion on these dimensions (1-5 scale, where 5 is best):
    - 2: Major functional differences
    - 1: Completely incorrect
 
-2. **API Usage (1-5)**: Does it correctly use other functions, methods, and external APIs present in the codebase?
+2. **Executability (1-5)**: Can the code actually run without errors? Check for syntax errors, indentation issues, undefined variables, missing imports, type errors, etc.
+   - 5: Code is fully executable, no errors
+   - 4: Minor issues that are easy to fix (e.g., a small typo, slightly off indentation)
+   - 3: Some issues but the main logic is executable (e.g., missing an edge case handler that would crash)
+   - 2: Significant issues that would prevent execution (e.g., syntax errors, undefined variables)
+   - 1: Code is pseudo-code or completely non-executable (e.g., placeholder comments, wrong language syntax)
+
+3. **API Usage (1-5)**: Does it correctly use other functions, methods, and external APIs present in the codebase?
    - 5: All calls match ground truth
    - 4: Minor differences in API usage
    - 3: Some incorrect or missing API calls
    - 2: Major API usage errors
    - 1: Completely wrong API usage
-
-3. **Code Structure (1-5)**: Is the code structure (control flow, loops, conditions) similar?
-   - 5: Nearly identical structure
-   - 4: Similar structure with minor variations
-   - 3: Different but reasonable structure
-   - 2: Significantly different structure
-   - 1: Completely different approach
 
 4. **Readability (1-5)**: Is the code clean, well-formatted, and follows Python conventions?
    - 5: Excellent readability, possibly better than ground truth
@@ -172,10 +172,10 @@ Please provide your analysis in the following JSON format:
   "scores": {{
     "correctness": <1-5>,
     "correctness_reason": "<brief explanation>",
+    "executability": <1-5>,
+    "executability_reason": "<brief explanation, list specific issues if any>",
     "api_usage": <1-5>,
     "api_usage_reason": "<brief explanation>",
-    "code_structure": <1-5>,
-    "code_structure_reason": "<brief explanation>",
     "readability": <1-5>,
     "readability_reason": "<brief explanation>",
     "completeness": <1-5>,
@@ -194,6 +194,8 @@ Please provide your analysis in the following JSON format:
 - **3**: The completion captures the main idea but has notable differences or issues.
 - **2**: The completion has major problems but shows some understanding of the task.
 - **1**: The completion is fundamentally incorrect or completely misses the point.
+
+Note: A high correctness score but low executability score indicates the model understood the logic but made implementation mistakes (e.g., pseudo-code or syntax errors). This distinction is important for training data quality assessment.
 
 Please provide your detailed analysis and scores.
 '''
@@ -921,8 +923,8 @@ class FIMCompletionPipeline:
             wandb.log({
                 "scores/overall": result['critique_response']['overall_score'],
                 "scores/correctness": result['critique_response']['scores'].get('correctness', 0),
+                "scores/executability": result['critique_response']['scores'].get('executability', 0),
                 "scores/api_usage": result['critique_response']['scores'].get('api_usage', 0),
-                "scores/code_structure": result['critique_response']['scores'].get('code_structure', 0),
                 "scores/readability": result['critique_response']['scores'].get('readability', 0),
                 "scores/completeness": result['critique_response']['scores'].get('completeness', 0),
             })
@@ -1098,7 +1100,7 @@ Examples:
     # Model configuration
     parser.add_argument(
         "--model", "-m",
-        default="gemini-3-flash-preview",
+        default="gemini-2.5-flash-preview-05-20",
         help="Gemini model to use"
     )
     parser.add_argument(
@@ -1167,7 +1169,7 @@ Examples:
     parser.add_argument(
         "--wandb-project",
         type=str,
-        default="fim-completion-critique",
+        default="fim-completion-critique-1230",
         help="W&B project name"
     )
     parser.add_argument(
