@@ -1,3 +1,6 @@
+
+mkdir -p step_4_test_logs
+
 for i in $(seq 1 5); do
   nohup python step_4_fim_completion_and_critique.py \
     -i /data/yubo/datasets/process_data_output_1228/step_3_bk_1229/step_3_results_merged_1230.json \
