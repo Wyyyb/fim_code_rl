@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 def main():
-    input_dir = Path("/data/yubo/datasets/process_data_output_1228/step_3_bk_1229")
+    input_dir = Path("/data/yubo/datasets/process_data_output_1228/step_3_res_data_1231")
     num_shards = 5
 
     all_results = []
@@ -30,7 +30,7 @@ def main():
         print(f"   - Results: {len(results)}, Functions: {num_funcs}")
 
     # 保存
-    output_path = input_dir / "step_3_results_merged_1230.json"
+    output_path = input_dir / "step_3_results_merged_1231.json"
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(all_results, f, ensure_ascii=False, indent=2)
 
