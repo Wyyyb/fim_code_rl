@@ -1098,7 +1098,7 @@ Examples:
     # Model configuration
     parser.add_argument(
         "--model", "-m",
-        default="gemini-2.5-flash-preview-05-20",
+        default="gemini-3-flash-preview",
         help="Gemini model to use"
     )
     parser.add_argument(
