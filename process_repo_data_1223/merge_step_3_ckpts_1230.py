@@ -9,7 +9,7 @@ from pathlib import Path
 
 def main():
     input_dir = Path("/data/yubo/datasets/process_data_output_1228/step_3_res_data_1231")
-    num_shards = 5
+    num_shards = 50
 
     all_results = []
 
