@@ -7,6 +7,7 @@ for i in $(seq 1 100); do
     -o /data/yubo/datasets/process_data_output_1228/step_3_res_data_1231/step_4_results_merged_1231.json \
     --shard $i --total-shards 100 \
     --wandb --wandb-run-name "exp_step_4_1231" \
+    --skip-preprocess \
     > step_4_1231_logs/shard_$i.log 2>&1 &
 done
 
