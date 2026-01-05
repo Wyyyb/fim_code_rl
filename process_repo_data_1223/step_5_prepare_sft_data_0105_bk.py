@@ -211,10 +211,6 @@ def construct_sft_sample(record: dict) -> Optional[dict]:
         if not assistant_content:
             return None
 
-        # Clean special tokens from both user and assistant content
-        user_content = clean_special_tokens(user_content)
-        assistant_content = clean_special_tokens(assistant_content)
-
         return {
             "messages": [
                 {"role": "user", "content": user_content},
@@ -240,45 +236,12 @@ def count_tokens(text: str, encoding_name: str = "cl100k_base") -> int:
     """
     try:
         encoding = tiktoken.get_encoding(encoding_name)
-        # Disable special token check to handle tokens like <|endoftext|>
-        return len(encoding.encode(text, disallowed_special=()))
-    except Exception:
+        # print("successful to get encoding by tiktoken")
+        return len(encoding.encode(text))
+    except Exception as e:
         # Fallback: rough estimate based on characters
+        print("failed to get encoding, use rule based encoding", e)
         return len(text) // 4
-
-
-# Special tokens to remove from training data
-SPECIAL_TOKENS_TO_REMOVE = [
-    '<|endoftext|>',
-    '<|fim_prefix|>',
-    '<|fim_middle|>',
-    '<|fim_suffix|>',
-    '<|fim▁begin|>',
-    '<|fim▁hole|>',
-    '<|fim▁end|>',
-    '<|pad|>',
-    '<|eos|>',
-    '<|bos|>',
-    '<|sep|>',
-    '<|cls|>',
-    '<|mask|>',
-]
-
-
-def clean_special_tokens(text: str) -> str:
-    """
-    Remove special tokens from text that could interfere with training.
-
-    Args:
-        text: Input text
-
-    Returns:
-        Cleaned text with special tokens removed
-    """
-    cleaned = text
-    for token in SPECIAL_TOKENS_TO_REMOVE:
-        cleaned = cleaned.replace(token, '')
-    return cleaned
 
 
 def compute_statistics(
@@ -431,7 +394,7 @@ def main():
         epilog='''
 Examples:
   # Process all checkpoint files in a directory:
-  python prepare_sft_data.py -d ./checkpoints -o sft_train.jsonl
+  python prepare_sft_data.py -d /data/yubo/datasets/process_data_output_1228/step_4_res_data_1231/ -o /data/yubo/datasets/process_data_output_1228/step_5_sft_data_0105/fim_sft_data_0105.jsonl
 
   # With custom filter thresholds:
   python prepare_sft_data.py -d ./checkpoints -o sft_train.jsonl \\
