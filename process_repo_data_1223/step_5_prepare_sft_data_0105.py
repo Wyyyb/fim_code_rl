@@ -457,8 +457,8 @@ Examples:
     parser.add_argument(
         "--min-individual-score",
         type=int,
-        default=2,
-        help="Minimum individual dimension score (exclusive, default: 2, meaning scores < 2 are filtered)"
+        default=3,
+        help="Minimum individual dimension score (exclusive, default: 3, meaning scores < 3 are filtered)"
     )
     parser.add_argument(
         "--min-overall-score",
