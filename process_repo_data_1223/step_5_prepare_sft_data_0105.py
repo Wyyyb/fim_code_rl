@@ -236,10 +236,11 @@ def count_tokens(text: str, encoding_name: str = "cl100k_base") -> int:
     """
     try:
         encoding = tiktoken.get_encoding(encoding_name)
+        print("successful to get encoding by tiktoken")
         return len(encoding.encode(text))
-    except Exception:
+    except Exception as e:
         # Fallback: rough estimate based on characters
-        print("failed to get encoding, use rule based encoding")
+        print("failed to get encoding, use rule based encoding", e)
         return len(text) // 4
 
 
@@ -501,4 +502,7 @@ Examples:
 
 
 if __name__ == "__main__":
+
+    # python step_5_prepare_sft_data_0105.py -d /data/yubo/datasets/process_data_output_1228/step_4_res_data_1231/ -o /data/yubo/datasets/process_data_output_1228/step_5_sft_data_0105/fim_sft_data_0105.jsonl
+
     main()
