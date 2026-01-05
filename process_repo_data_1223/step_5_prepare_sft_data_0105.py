@@ -236,7 +236,7 @@ def count_tokens(text: str, encoding_name: str = "cl100k_base") -> int:
     """
     try:
         encoding = tiktoken.get_encoding(encoding_name)
-        print("successful to get encoding by tiktoken")
+        # print("successful to get encoding by tiktoken")
         return len(encoding.encode(text))
     except Exception as e:
         # Fallback: rough estimate based on characters
