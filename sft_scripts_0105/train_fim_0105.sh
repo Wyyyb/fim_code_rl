@@ -2,22 +2,22 @@ set -x
 
 # conda activate YOUR_ENV
 
-MODEL_PATH="../../models/Qwen2.5-Math-7B"
+MODEL_PATH="/data/yubo/models/Qwen2.5-Coder-7B-Instruct"
 
-DATA_PATH="../data/DSR-CFT-p0.jsonl"
+DATA_PATH="/data/yubo/datasets/process_data_output_1228/step_5_sft_data_0105/fim_sft_data_0105.jsonl"
 
-OUTPUT_DIR="../output_models_math/"
+OUTPUT_DIR="/data/yubo/sft_ckpts/fim_qwen25_coder_7b_ins_0105_ckpt"
 
 if [ ! -d "$OUTPUT_DIR" ]; then
   mkdir -p "$OUTPUT_DIR"
 fi
 
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+export CUDA_VISIBLE_DEVICES=4,5,6,7
 
 cd ../ms-swift
 
 torchrun \
-    --nproc_per_node 8 \
+    --nproc_per_node 4 \
     --standalone \
     swift/cli/sft.py\
     --use_hf True \
@@ -41,18 +41,18 @@ torchrun \
     --gradient_checkpointing True \
     --per_device_train_batch_size 1 \
     --weight_decay 0.05 \
-    --learning_rate 5e-6 \
+    --learning_rate 1e-5 \
     --lr_scheduler_type "cosine" \
     --report_to none \
     --logging_first_step True \
     --logging_steps 1 \
     \
-    --num_train_epochs 50 \
-    --gradient_accumulation_steps 64 \
+    --num_train_epochs 1 \
+    --gradient_accumulation_steps 32 \
     --save_strategy "epoch" \
-    --save_steps 2 \
+    --save_steps 1000 \
     --save_only_model True \
-    --warmup_ratio 0.05 \
+    --warmup_ratio 0.1 \
     --ddp_backend "nccl" \
     \
     --freeze_llm False \
