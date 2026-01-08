@@ -30,4 +30,8 @@ def main():
 
 
 if __name__ == "__main__":
+
+    """
+    huggingface-cli download Qwen/Qwen2.5-Coder-7B-Instruct --local-dir /data/yubo/models/Qwen2.5-Coder-7B-Instruct
+    """
     main()
