@@ -540,6 +540,6 @@ Examples:
 
 if __name__ == "__main__":
 
-    # python step_5_prepare_sft_data_0105.py -d /data/yubo/datasets/process_data_output_1228/step_4_res_data_1231/ -o /data/yubo/datasets/process_data_output_1228/step_5_sft_data_0105/fim_sft_data_0105.jsonl
+    # python step_5_prepare_sft_data_0105.py -d /data/yubo/datasets/process_data_output_1228/step_4_res_data_1231/ -o /data/yubo/datasets/process_data_output_1228/step_5_sft_data_0105/fim_sft_data_0108.jsonl
 
     main()
