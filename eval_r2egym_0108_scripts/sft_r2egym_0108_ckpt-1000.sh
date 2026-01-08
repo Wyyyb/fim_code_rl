@@ -49,7 +49,7 @@ torchrun \
     \
     --num_train_epochs 2 \
     --gradient_accumulation_steps 2 \
-    --save_strategy "step" \
+    --save_strategy "steps" \
     --save_steps 400 \
     --save_only_model True \
     --warmup_ratio 0.05 \
