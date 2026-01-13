@@ -1,11 +1,11 @@
 # Activate the virtual environment (if in new terminal)
+cd ../R2E-Gym
 source .venv/bin/activate
 
 # Set required environment variables
 export TEMP=1
 export EXP_NAME="eval_ori_qwen25_coder_7b_ins_r2egym_sft_0108-ckpt_808-0113-0"
 
-cd ../R2E-Gym
 # Run the DeepSWE agent on SWE-Bench Verified
 time python src/r2egym/agenthub/run/edit.py runagent_multiple \
     --traj_dir "./traj" \
