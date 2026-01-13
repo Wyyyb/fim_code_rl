@@ -14,7 +14,7 @@ time python src/r2egym/agenthub/run/edit.py runagent_multiple \
     --k 500 \
     --dataset "R2E-Gym/SWE-Bench-Verified" \
     --split "test" \
-    --llm_name "/data/yubowang/fim_sft_ckpts/ori_qwen25_coder_7b_ins_r2egym_sft_0108-ckpt_808" \
+    --llm_name "ubowang/ori_qwen25_coder_7b_ins_r2egym_sft_0108-ckpt_808" \
     --scaffold "r2egym" \
     --use_fn_calling False \
     --exp_name "$EXP_NAME" \

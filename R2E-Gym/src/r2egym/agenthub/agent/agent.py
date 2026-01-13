@@ -69,8 +69,9 @@ class Agent:
         self.llm_name = args.llm_name
 
         self.llm_base_url = (
+            "http://0.0.0.0:9002/v1"
             # "http://localhost:8000/v1"
-            os.environ.get("LLM_BASE_URL", "http://0.0.0.0:9002/v1")
+            # os.environ.get("LLM_BASE_URL", "http://0.0.0.0:9002/v1")
             # if ("openai/" in self.llm_name) or ("hosted_vllm" in self.llm_name)
             # else None
         )
@@ -180,7 +181,8 @@ class Agent:
         # Start timer
         start_time = time.time()
         # check if using locally hosted models
-        using_local = "openai/" in self.llm_name or "hosted" in self.llm_name
+        # using_local = "openai/" in self.llm_name or "hosted" in self.llm_name
+        using_local = True
         if using_local:
             litellm.api_key = None
 
@@ -201,6 +203,8 @@ class Agent:
                     kwargs = {}
                 if "o3" not in self.llm_name and "o4" not in self.llm_name:
                     kwargs["temperature"] = temperature
+                print("#" * 60 + "\nrequesting llm name:", self.llm_name)
+                print("llm_base_url", self.llm_base_url)
                 response = litellm.completion(
                     model=self.llm_name,
                     tools=tools,
@@ -210,6 +214,7 @@ class Agent:
                     # max_tokens=3000,
                     **kwargs,
                 )
+                print("#" * 60 + "\nresponse:", response)
                 self.logger.warning(f"Querying LLM complete")
                 break
             except Exception as e:
