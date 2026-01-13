@@ -70,9 +70,9 @@ class Agent:
 
         self.llm_base_url = (
             # "http://localhost:8000/v1"
-            os.environ.get("LLM_BASE_URL", "http://localhost:8000/v1")
-            if ("openai/" in self.llm_name) or ("hosted_vllm" in self.llm_name)
-            else None
+            os.environ.get("LLM_BASE_URL", "http://0.0.0.0:9002/v1")
+            # if ("openai/" in self.llm_name) or ("hosted_vllm" in self.llm_name)
+            # else None
         )
         self.system_prompt_template = args.system_prompt
         self.instance_prompt_template = args.instance_prompt
