@@ -69,11 +69,11 @@ class Agent:
         self.llm_name = args.llm_name
 
         self.llm_base_url = (
-            "http://0.0.0.0:9002/v1"
+            # "http://0.0.0.0:9002/v1"
             # "http://localhost:8000/v1"
-            # os.environ.get("LLM_BASE_URL", "http://0.0.0.0:9002/v1")
-            # if ("openai/" in self.llm_name) or ("hosted_vllm" in self.llm_name)
-            # else None
+            os.environ.get("LLM_BASE_URL", "http://127.0.0.1:9002/v1")
+            if ("openai/" in self.llm_name) or ("hosted_vllm" in self.llm_name)
+            else None
         )
         self.system_prompt_template = args.system_prompt
         self.instance_prompt_template = args.instance_prompt
@@ -181,8 +181,7 @@ class Agent:
         # Start timer
         start_time = time.time()
         # check if using locally hosted models
-        # using_local = "openai/" in self.llm_name or "hosted" in self.llm_name
-        using_local = True
+        using_local = "openai/" in self.llm_name or "hosted" in self.llm_name
         if using_local:
             litellm.api_key = None
 
