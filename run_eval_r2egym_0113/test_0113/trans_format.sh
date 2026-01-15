@@ -1,5 +1,6 @@
 
 cd /data/yubowang/fim_code_rl/R2E-Gym
+source .venv/bin/activate
 
 traj_dir="traj-fim_qwen25_coder_7b_ins_0105_r2egym_sft_0108-ckpt_808-k_10"
 traj_file="eval_fim_qwen25_coder_7b_ins_0105_r2egym_sft_0108-ckpt_808-0113-0.jsonl"
