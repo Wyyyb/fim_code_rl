@@ -1,5 +1,5 @@
 # Activate the virtual environment (if in new terminal)
-cd ../R2E-Gym
+cd /data/yubowang/fim_code_rl/R2E-Gym
 source .venv/bin/activate
 
 # Set required environment variables
