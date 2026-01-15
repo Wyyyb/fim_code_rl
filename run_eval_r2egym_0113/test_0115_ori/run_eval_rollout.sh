@@ -4,7 +4,7 @@ source .venv/bin/activate
 
 # Set required environment variables
 PORT=9002
-SERVED_NAME="ori_qwen25_coder_7b_ins_r2egym_sft_0108-ckpt_808_0115-k50"
+SERVED_NAME="ori_qwen25_coder_7b_ins_r2egym_sft_0108-ckpt_808"
 
 export TEMP=1
 export EXP_NAME="eval_ori_qwen25_coder_7b_ins_r2egym_sft_0108-ckpt_808-0115-0"
