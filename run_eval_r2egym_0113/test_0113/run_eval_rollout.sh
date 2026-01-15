@@ -4,7 +4,7 @@ source .venv/bin/activate
 
 # Set required environment variables
 PORT=9003
-SERVED_NAME="fim_qwen25_coder_7b_ins_0105_r2egym_sft_0108-ckpt_808"
+SERVED_NAME="fim_qwen25_coder_7b_ins_0105_r2egym_sft_0108-ckpt_808_0115-k50"
 
 export TEMP=1
 export EXP_NAME="eval_fim_qwen25_coder_7b_ins_0105_r2egym_sft_0108-ckpt_808-0115-0"
@@ -13,7 +13,7 @@ export OPENAI_API_KEY=EMPTY
 
 # Run the DeepSWE agent on SWE-Bench Verified
 time python src/r2egym/agenthub/run/edit.py runagent_multiple \
-    --traj_dir "./traj-fim_qwen25_coder_7b_ins_0105_r2egym_sft_0108-ckpt_808-k_10" \
+    --traj_dir "./traj-fim_qwen25_coder_7b_ins_0105_r2egym_sft_0108-ckpt_808_0115-k50" \
     --max_workers 10 \
     --start_idx 0 \
     --k 50 \
