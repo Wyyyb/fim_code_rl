@@ -10,5 +10,13 @@ python src/r2egym/agenthub/trajectory/create_swebench_submission.py \
     --output_json_path $traj_dir/swebench_submission.json
 
 
+cd ../SWE-bench
+
+python -m swebench.harness.run_evaluation \
+    --dataset_name princeton-nlp/SWE-bench_Verified \
+    --predictions_path $traj_dir/swebench_submission.json \
+    --max_workers 32 \
+    --run_id swebv \
+    --cache_level none
 
 
