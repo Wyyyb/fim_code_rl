@@ -17,7 +17,7 @@ time python src/r2egym/agenthub/run/edit.py runagent_multiple \
     --max_workers 10 \
     --start_idx 0 \
     --k 300 \
-    --dataset "SWE-bench/SWE-bench_Lite" \
+    --dataset "R2E-Gym/SWE-Bench-Lite" \
     --split "test" \
     --llm_name "openai/${SERVED_NAME}" \
     --scaffold "r2egym" \
