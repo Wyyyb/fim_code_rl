@@ -2,7 +2,7 @@
 cd /data/yubowang/fim_code_rl/R2E-Gym
 source .venv/bin/activate
 
-traj_dir="traj-fim_qwen25_coder_7b_ins_0105_r2egym_sft_0108-ckpt_808_0115-k50"
+traj_dir="traj-fim_qwen25_coder_7b_ins_0105_r2egym_sft_0108-ckpt_808_0115-k500"
 traj_file="eval_fim_qwen25_coder_7b_ins_0105_r2egym_sft_0108-ckpt_808-0115-0.jsonl"
 
 python src/r2egym/agenthub/trajectory/create_swebench_submission.py \

@@ -13,10 +13,10 @@ export OPENAI_API_KEY=EMPTY
 
 # Run the DeepSWE agent on SWE-Bench Verified
 time python src/r2egym/agenthub/run/edit.py runagent_multiple \
-    --traj_dir "./traj-ori_qwen25_coder_7b_ins_r2egym_sft_0108-ckpt_808_0115-k50" \
+    --traj_dir "./traj-ori_qwen25_coder_7b_ins_r2egym_sft_0108-ckpt_808_0115-k500" \
     --max_workers 8 \
     --start_idx 0 \
-    --k 50 \
+    --k 500 \
     --dataset "R2E-Gym/SWE-Bench-Verified" \
     --split "test" \
     --llm_name "openai/${SERVED_NAME}" \
