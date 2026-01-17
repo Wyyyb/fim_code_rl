@@ -6,7 +6,10 @@ source /data2/yubo/miniconda3/bin/activate
 conda activate /data2/yubo/miniconda3/envs/fim
 
 pip install ms-swift -U
-pip install ms-swift -U
+pip install deepspeed
+pip install huggingface-hub==0.34
+
+
 
 
 

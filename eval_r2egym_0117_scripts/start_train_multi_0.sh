@@ -4,7 +4,7 @@ set -x
 SCRIPT_DIR=$(dirname "$0")
 UPLOAD_BASE_DIR="/data2/yubo/sft_ckpts"
 
-for ckpt_step in 500 1000 1500 2000 2500 3000 3500 4000 4500 4977; do
+for ckpt_step in 500 1500 2500 3500 4500; do
     echo "========================================"
     echo "Starting training for checkpoint-${ckpt_step}"
     echo "========================================"
