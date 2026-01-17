@@ -2,7 +2,7 @@
 
 # 上传所有checkpoint到Hugging Face Hub
 
-REPO_PREFIX="ubowang/fim_qwen25_coder_7b_ins_0115_r2egym_sft_0117-ckpt"
+REPO_PREFIX="ubowang/fim_qwen25_coder_7b_ins_0116-ckpt"
 BASE_DIR="/data/yubo/sft_ckpts/fim_qwen25_coder_7b_ins_0109_ckpt/v2-20260109-221234"
 
 # 遍历所有checkpoint目录

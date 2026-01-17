@@ -2,11 +2,11 @@ set -x
 
 # conda activate YOUR_ENV
 
-MODEL_PATH=""
+MODEL_PATH="ubowang/fim_qwen25_coder_7b_ins_0115_r2egym_sft_0117-ckpt_500"
 
 DATA_PATH="/data2/yubo/datasets/R2EGym-Data/R2EGym-SFT-Trajectories.jsonl"
 
-OUTPUT_DIR="/data2/yubo/sft_ckpts/fim_qwen25_coder_7b_ins_0105_r2egym_sft_0108"
+OUTPUT_DIR="/data2/yubo/sft_ckpts/fim_qwen25_coder_7b_ins_0105_r2egym_sft_0117"
 
 if [ ! -d "$OUTPUT_DIR" ]; then
   mkdir -p "$OUTPUT_DIR"
