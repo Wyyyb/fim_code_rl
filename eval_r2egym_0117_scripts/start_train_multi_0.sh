@@ -9,7 +9,7 @@ for ckpt_step in 500 1500 2500 3500 4500; do
     echo "Starting training for checkpoint-${ckpt_step}"
     echo "========================================"
 
-    bash "$SCRIPT_DIR/single_train.sh" $ckpt_step
+    bash "$SCRIPT_DIR/single_train_0.sh" $ckpt_step
 
     if [ $? -eq 0 ]; then
         echo "Finished training for checkpoint-${ckpt_step}"
