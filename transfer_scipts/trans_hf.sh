@@ -7,4 +7,8 @@ huggingface-cli download ubowang/fim_qwen25_coder_7b_ins_0105_r2egym_sft_0108-ck
 
 
 
+huggingface-cli download Qwen/Qwen2.5-Coder-32B-Instruct --local-dir /data1/yubo/models/Qwen2.5-Coder-32B-Instruct
+
+huggingface-cli download Qwen/Qwen2.5-Coder-32B-Instruct --local-dir /data2/yubo/models/Qwen2.5-Coder-32B-Instruct
+
 
