@@ -48,7 +48,7 @@ torchrun \
     --logging_steps 1 \
     \
     --num_train_epochs 1 \
-    --gradient_accumulation_steps 16 \
+    --gradient_accumulation_steps 32 \
     --save_strategy "steps" \
     --save_steps 500 \
     --save_only_model True \
