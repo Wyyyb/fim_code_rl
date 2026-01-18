@@ -2,22 +2,22 @@ set -x
 
 # conda activate YOUR_ENV
 
-MODEL_PATH="/data1/yubo/models/Qwen2.5-Coder-32B-Instruct"
+MODEL_PATH="/data2/yubo/models/Qwen2.5-Coder-32B-Instruct"
 
-DATA_PATH="/data1/yubo/datasets/process_data_output_1228/step_5_sft_data_0105/fim_sft_data_0108.jsonl"
+DATA_PATH="/data2/yubo/datasets/fim_midtrain_data_0108_212k/fim_sft_data_0108.jsonl"
 
-OUTPUT_DIR="/data1/yubo/sft_ckpts/fim_qwen25_coder_32b_ins_0116_ckpt"
+OUTPUT_DIR="/data2/yubo/sft_ckpts/fim_qwen25_coder_32b_ins_0118_ckpt"
 
 if [ ! -d "$OUTPUT_DIR" ]; then
   mkdir -p "$OUTPUT_DIR"
 fi
 
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 
 cd ../ms-swift
 
 torchrun \
-    --nproc_per_node 4 \
+    --nproc_per_node 8 \
     --standalone \
     swift/cli/sft.py\
     --use_hf True \
@@ -47,8 +47,8 @@ torchrun \
     --logging_first_step True \
     --logging_steps 1 \
     \
-    --num_train_epochs 3 \
-    --gradient_accumulation_steps 32 \
+    --num_train_epochs 1 \
+    --gradient_accumulation_steps 16 \
     --save_strategy "steps" \
     --save_steps 500 \
     --save_only_model True \
