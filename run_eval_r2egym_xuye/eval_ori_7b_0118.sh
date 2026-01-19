@@ -100,6 +100,7 @@ is_hf_model_id() {
 }
 
 # 下载 HuggingFace 模型
+# 使用全局变量 DOWNLOADED_MODEL_PATH 返回结果，避免 stdout 污染
 download_hf_model() {
   local model_id="$1"
   local download_dir="$2"
@@ -111,12 +112,12 @@ download_hf_model() {
   mkdir -p "${download_dir}"
 
   if [[ -d "${local_path}" ]] && [[ -f "${local_path}/config.json" ]]; then
-    echo "Model already downloaded: ${local_path}"
-    echo "${local_path}"
+    echo "Model already downloaded: ${local_path}" >&2
+    DOWNLOADED_MODEL_PATH="${local_path}"
     return 0
   fi
 
-  echo "Downloading HuggingFace model: ${model_id} -> ${local_path}"
+  echo "Downloading HuggingFace model: ${model_id} -> ${local_path}" >&2
 
   python -c "
 from huggingface_hub import snapshot_download
@@ -132,18 +133,19 @@ try:
         local_dir_use_symlinks=False,
         resume_download=True
     )
-    print(f'Downloaded to: {local_dir}')
+    print(f'Downloaded to: {local_dir}', file=sys.stderr)
 except Exception as e:
     print(f'ERROR: Failed to download {model_id}: {e}', file=sys.stderr)
     sys.exit(1)
 "
 
   if [[ $? -ne 0 ]]; then
-    echo "ERROR: Failed to download model: ${model_id}"
+    echo "ERROR: Failed to download model: ${model_id}" >&2
     return 1
   fi
 
-  echo "${local_path}"
+  DOWNLOADED_MODEL_PATH="${local_path}"
+  return 0
 }
 
 wait_for_server() {
@@ -282,13 +284,15 @@ docker_login_if_configured
 
 # 处理模型路径：如果是 HuggingFace 模型 ID，先下载
 ACTUAL_MODEL_PATH="${MODEL_PATH}"
+DOWNLOADED_MODEL_PATH=""
+
 if is_hf_model_id "${MODEL_PATH}"; then
   echo "Detected HuggingFace model ID: ${MODEL_PATH}"
-  ACTUAL_MODEL_PATH="$(download_hf_model "${MODEL_PATH}" "${HF_DOWNLOAD_DIR}")"
-  if [[ $? -ne 0 ]] || [[ -z "${ACTUAL_MODEL_PATH}" ]]; then
+  if ! download_hf_model "${MODEL_PATH}" "${HF_DOWNLOAD_DIR}"; then
     echo "ERROR: Failed to download HuggingFace model: ${MODEL_PATH}"
     exit 1
   fi
+  ACTUAL_MODEL_PATH="${DOWNLOADED_MODEL_PATH}"
   echo "Using downloaded model: ${ACTUAL_MODEL_PATH}"
 else
   echo "Using local model path: ${MODEL_PATH}"
