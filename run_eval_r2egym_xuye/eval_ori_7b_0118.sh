@@ -7,7 +7,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${REPO_ROOT}"
 
-source .venv/bin/activate
+source ../R2E-Gym/.venv/bin/activate
 
 #############################################
 # 用户配置区域 - 直接在这里修改
