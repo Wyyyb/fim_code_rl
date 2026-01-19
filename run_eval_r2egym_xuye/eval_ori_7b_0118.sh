@@ -13,8 +13,13 @@ source ../R2E-Gym/.venv/bin/activate
 # 用户配置区域 - 直接在这里修改
 #############################################
 
-# 模型路径
+# 模型路径（支持本地路径或 HuggingFace 模型 ID）
+# 本地路径示例: "/home/jiarong/models/my_model"
+# HuggingFace 示例: "ubowang/ori_qwen25_coder_7b_ins_r2egym_sft_0108-ckpt_808"
 MODEL_PATH="ubowang/ori_qwen25_coder_7b_ins_r2egym_sft_0108-ckpt_808"
+
+# HuggingFace 模型下载目录
+HF_DOWNLOAD_DIR="/home/xuye_liu/yubo/models"
 
 # GPU 分配
 GPU_VERIFIED=0      # SWE-Bench-Verified 使用的 GPU
@@ -77,6 +82,68 @@ docker_login_if_configured() {
     printf '%s' "${pass}" | docker login "${registry}" -u "${user}" --password-stdin >/dev/null
   fi
   echo "docker login ok."
+}
+
+# 检查是否是 HuggingFace 模型 ID（非本地路径）
+is_hf_model_id() {
+  local path="$1"
+  # 如果路径以 / 开头或者 ./ 开头，认为是本地路径
+  if [[ "${path}" == /* ]] || [[ "${path}" == ./* ]] || [[ "${path}" == ../* ]]; then
+    return 1
+  fi
+  # 如果路径已经存在于本地，认为是本地路径
+  if [[ -d "${path}" ]]; then
+    return 1
+  fi
+  # 否则认为是 HuggingFace 模型 ID（格式: org/model 或 model）
+  return 0
+}
+
+# 下载 HuggingFace 模型
+download_hf_model() {
+  local model_id="$1"
+  local download_dir="$2"
+
+  # 将 model_id 中的 / 替换为 _，作为本地目录名
+  local local_name="${model_id//\//_}"
+  local local_path="${download_dir}/${local_name}"
+
+  mkdir -p "${download_dir}"
+
+  if [[ -d "${local_path}" ]] && [[ -f "${local_path}/config.json" ]]; then
+    echo "Model already downloaded: ${local_path}"
+    echo "${local_path}"
+    return 0
+  fi
+
+  echo "Downloading HuggingFace model: ${model_id} -> ${local_path}"
+
+  python -c "
+from huggingface_hub import snapshot_download
+import sys
+
+model_id = '${model_id}'
+local_dir = '${local_path}'
+
+try:
+    snapshot_download(
+        repo_id=model_id,
+        local_dir=local_dir,
+        local_dir_use_symlinks=False,
+        resume_download=True
+    )
+    print(f'Downloaded to: {local_dir}')
+except Exception as e:
+    print(f'ERROR: Failed to download {model_id}: {e}', file=sys.stderr)
+    sys.exit(1)
+"
+
+  if [[ $? -ne 0 ]]; then
+    echo "ERROR: Failed to download model: ${model_id}"
+    return 1
+  fi
+
+  echo "${local_path}"
 }
 
 wait_for_server() {
@@ -213,22 +280,40 @@ resolve_model_dir() {
 
 docker_login_if_configured
 
-if [[ ! -d "${MODEL_PATH}" ]]; then
-  echo "ERROR: MODEL_PATH not found: ${MODEL_PATH}"
+# 处理模型路径：如果是 HuggingFace 模型 ID，先下载
+ACTUAL_MODEL_PATH="${MODEL_PATH}"
+if is_hf_model_id "${MODEL_PATH}"; then
+  echo "Detected HuggingFace model ID: ${MODEL_PATH}"
+  ACTUAL_MODEL_PATH="$(download_hf_model "${MODEL_PATH}" "${HF_DOWNLOAD_DIR}")"
+  if [[ $? -ne 0 ]] || [[ -z "${ACTUAL_MODEL_PATH}" ]]; then
+    echo "ERROR: Failed to download HuggingFace model: ${MODEL_PATH}"
+    exit 1
+  fi
+  echo "Using downloaded model: ${ACTUAL_MODEL_PATH}"
+else
+  echo "Using local model path: ${MODEL_PATH}"
+fi
+
+if [[ ! -d "${ACTUAL_MODEL_PATH}" ]]; then
+  echo "ERROR: MODEL_PATH not found: ${ACTUAL_MODEL_PATH}"
   exit 1
 fi
 
-MODEL_DIR="$(resolve_model_dir "${MODEL_PATH}")"
+MODEL_DIR="$(resolve_model_dir "${ACTUAL_MODEL_PATH}")"
 
 if [[ ! -f "${MODEL_DIR}/config.json" ]]; then
   echo "ERROR: Model dir missing config.json: ${MODEL_DIR}"
   exit 1
 fi
 
-SERVED_NAME="$(basename "${MODEL_PATH}")"
+# SERVED_NAME 使用原始 MODEL_PATH 的 basename（保持一致性）
+SERVED_NAME="$(basename "${MODEL_PATH//\//_}")"
 
 echo "====================================================================="
 echo "Model: ${MODEL_PATH}"
+if [[ "${MODEL_PATH}" != "${ACTUAL_MODEL_PATH}" ]]; then
+  echo "  downloaded_to: ${ACTUAL_MODEL_PATH}"
+fi
 echo "  model_dir: ${MODEL_DIR}"
 echo "  served_name: ${SERVED_NAME}"
 echo "GPU allocation:"
