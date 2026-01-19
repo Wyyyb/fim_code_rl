@@ -4,8 +4,8 @@ set -euo pipefail
 # 单模型评估脚本：在 SWE-Bench-Verified 和 SWE-Bench-Lite 上评估一个模型
 # 使用 2 块 GPU，每个数据集一块 GPU
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "${REPO_ROOT}"
+#REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+#cd "${REPO_ROOT}"
 cd ../R2E-Gym
 source .venv/bin/activate
 
