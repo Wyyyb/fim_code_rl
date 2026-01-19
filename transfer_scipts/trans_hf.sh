@@ -17,6 +17,7 @@ huggingface-cli upload ubowang/fim_midtrain_data_0108_212k /data/yubo/datasets/p
 
 huggingface-cli download Qwen/Qwen2.5-Coder-14B-Instruct --local-dir /data/yubo/models/Qwen2.5-Coder-14B-Instruct
 
+huggingface-cli download Qwen/Qwen2.5-Coder-14B-Instruct --local-dir /data2/yubo/models/Qwen2.5-Coder-14B-Instruct
 
 
 
