@@ -19,7 +19,6 @@ if [ ! -d "$MERGED_DIR" ]; then
 fi
 
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
-export PYTORCH_CUDA_ALLOC_CONF='expandable_segments:True'
 
 cd ../ms-swift
 
@@ -34,7 +33,7 @@ torchrun \
     --train_type lora \
     --lora_rank 128 \
     --lora_alpha 256 \
-    --target_modules all-linear \
+    --lora_target_modules all-linear \
     --torch_dtype bfloat16 \
     \
     --dataset $DATA_PATH \
@@ -69,6 +68,7 @@ torchrun \
     --attn_impl flash_attn
 
 # ===================== 合并导出所有 checkpoint =====================
+# 找到 v0-* 目录
 V0_DIR=$(ls -dt ${OUTPUT_DIR}/v0-* 2>/dev/null | head -1)
 
 if [ -z "$V0_DIR" ]; then
@@ -78,7 +78,9 @@ fi
 
 echo "找到训练目录: $V0_DIR"
 
+# 遍历所有 checkpoint 目录
 for CKPT in $(ls -d ${V0_DIR}/checkpoint-* 2>/dev/null | sort -V); do
+    # 提取 checkpoint 编号，如 checkpoint-500 -> 500
     CKPT_NAME=$(basename $CKPT)
     CKPT_MERGED_DIR="${MERGED_DIR}/${CKPT_NAME}"
 
