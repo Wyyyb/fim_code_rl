@@ -1,4 +1,6 @@
 
+sleep 16200
+
 cd /data2/yubo/sft_ckpts/ori_qwen25_coder_14b_ins_r2egym_0122/v1-20260123-054036/checkpoint-806/
 
 huggingface-cli upload ubowang/ori_qwen25_coder_14b_ins_r2egym_0122 . --repo-type model
