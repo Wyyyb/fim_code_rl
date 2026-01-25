@@ -9,3 +9,7 @@ cd /data2/yubo/fim_code_rl/eval_r2egym_0117_scripts
 
 bash sft_r2egym_fim_ckpt_1659_qwen_14b_0122.sh
 
+huggingface-cli upload ubowang/fim_qwen25_coder_14b_ins_r2egym_0123 . --repo-type model
+
+
+
