@@ -66,8 +66,8 @@ def main():
     # Configuration
     # csv_file = Path("code_repos_csv_1223.txt")
     # target_dir = Path("/data/yubo/datasets/collected_sc_1223")
-    csv_file = Path("code_repo_csv_1228.txt")
-    target_dir = Path("/data/yubo/datasets/collected_sc_1228")
+    csv_file = Path("code_repo_csv_0215.txt")
+    target_dir = Path("/data/yubo/datasets/collected_sc_0215")
 
     # Check if CSV file exists
     if not csv_file.exists():
