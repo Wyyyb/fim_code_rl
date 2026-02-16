@@ -372,7 +372,7 @@ class FIMSelector:
         "difficulty_ceiling": 0.5,
         "difficulty_sigma": 0.20,
         # --- Hard thresholds ---
-        "score_threshold": 0.015,
+        "score_threshold": 0.03,
         "min_complexity": 0.12,
     }
 
