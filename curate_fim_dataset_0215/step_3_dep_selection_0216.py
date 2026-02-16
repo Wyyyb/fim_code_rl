@@ -612,6 +612,7 @@ def process_samples(
     results: List[Dict[str, Any]] = []
     skipped_too_long = 0
     skipped_too_short = 0
+    total_selected_functions = 0
 
     for idx, sample in tqdm(enumerate(samples[-1000:])):
         out = dict(sample)  # shallow copy
@@ -686,7 +687,7 @@ def process_samples(
             builder.functions, builder.edges, builder.ast_nodes, config
         )
         candidates = selector.select_targets()
-
+        total_selected_functions += len(candidates)
         # ---- serialize into output dict ----
         targets = [
             {
@@ -738,7 +739,7 @@ def process_samples(
               f"{skipped_too_short} too short, "
               f"{skipped_too_long} too long, "
               f"{len(results) - skipped_too_short - skipped_too_long} processed")
-
+    print("total_selected_functions", total_selected_functions)
     return results
 
 
