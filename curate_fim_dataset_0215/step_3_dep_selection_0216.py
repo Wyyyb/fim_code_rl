@@ -386,7 +386,7 @@ class FIMSelector:
         "difficulty_ceiling": 0.5,
         "difficulty_sigma": 0.20,
         # --- Hard thresholds ---
-        "score_threshold": 0.1,
+        "score_threshold": 0.08,
         "min_complexity": 0.15,
     }
 
@@ -663,13 +663,20 @@ def postprocess_results(results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     Expand sample-level results into **function-level** entries.
 
     Each mask target becomes its own dict containing:
-      - all original sample fields (except mask_targets / mask_target_count / skip_reason)
+      - all original sample fields (except mask_targets / mask_target_count / skip_reason / code_content)
       - all function-level scoring fields
       - ``masked_code_content``: the file source with that function body masked
 
+    Validation: for each target, verify that the source_text extracted
+    from code_content by [start_line, end_line] matches the stored
+    source_text.  Mismatches are logged and skipped.
+
+    The original ``code_content`` is dropped from each entry to save space.
     The returned list is sorted by ``fim_score`` descending.
     """
     function_entries: List[Dict[str, Any]] = []
+    total_targets = 0
+    skipped_targets = 0
 
     for sample in results:
         targets = sample.get("mask_targets", [])
@@ -677,15 +684,48 @@ def postprocess_results(results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             continue
 
         code_content = sample.get("code_content", "")
+        code_lines = code_content.splitlines()
 
-        # Sample-level fields to carry forward
+        # Sample-level fields to carry forward (drop heavy / internal keys)
         sample_fields = {
             k: v
             for k, v in sample.items()
-            if k not in ("mask_targets", "mask_target_count", "skip_reason")
+            if k not in (
+                "mask_targets", "mask_target_count",
+                "skip_reason", "code_content",
+            )
         }
 
         for target in targets:
+            total_targets += 1
+
+            # --- Validation: re-extract source from code_content and compare ---
+            start = target["start_line"]   # 1-indexed
+            end = target["end_line"]       # 1-indexed inclusive
+            expected_text = target.get("source_text", "")
+
+            extracted_text = "\n".join(code_lines[start - 1 : end])
+
+            if extracted_text != expected_text:
+                # Try stripping trailing whitespace per line as a lenient check
+                extracted_stripped = "\n".join(
+                    l.rstrip() for l in code_lines[start - 1 : end]
+                )
+                expected_stripped = "\n".join(
+                    l.rstrip() for l in expected_text.splitlines()
+                )
+                if extracted_stripped != expected_stripped:
+                    skipped_targets += 1
+                    sid = sample.get("sample_id", "?")
+                    fname = target.get("func_name", "?")
+                    print(
+                        f"  [WARN] sample {sid}, func {fname}: "
+                        f"source_text mismatch "
+                        f"(extracted {len(extracted_text)} chars vs "
+                        f"stored {len(expected_text)} chars) → skipped"
+                    )
+                    continue
+
             entry = dict(sample_fields)          # shallow copy of sample info
             entry.update(target)                 # overlay function-level fields
 
@@ -700,6 +740,11 @@ def postprocess_results(results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
     # Global sort by fim_score descending
     function_entries.sort(key=lambda x: x.get("fim_score", 0), reverse=True)
+
+    print(
+        f"  Post-processing: {len(function_entries)} function entries generated, "
+        f"{skipped_targets}/{total_targets} targets skipped due to validation failure"
+    )
     return function_entries
 
 
@@ -870,7 +915,7 @@ def process_samples(
                 "start_line": c.start_line,
                 "end_line": c.end_line,
                 "body_lineno": c.body_lineno,
-                "source_text": c.source_text,
+                "func_content": c.source_text,
                 "loc": c.loc,
                 "complexity": c.complexity,
                 "inferability": c.inferability,
