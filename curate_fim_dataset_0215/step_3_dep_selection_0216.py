@@ -356,7 +356,7 @@ class FIMSelector:
 
     DEFAULT_CONFIG = {
         # --- File-level bounds ---
-        "min_file_lines": 10,
+        "min_file_lines": 100,
         "max_file_lines": 1800,
         # --- Function LOC bounds ---
         "min_loc": 5,
