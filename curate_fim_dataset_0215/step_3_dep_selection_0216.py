@@ -23,6 +23,7 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Dict, List, Set, Tuple, Optional, Any
+from tqdm import tqdm
 
 
 # ================================================================
@@ -601,7 +602,7 @@ def process_samples(
     """
     results: List[Dict[str, Any]] = []
 
-    for idx, sample in enumerate(samples):
+    for idx, sample in tqdm(enumerate(samples)):
         out = dict(sample)  # shallow copy
         code = out.get("code_content", "")
         sid = out.get("sample_id", idx)
@@ -944,5 +945,5 @@ if __name__ == "__main__":
         print("Usage:")
         print("  python depfim.py                          # run demo")
         print("  python depfim.py input.json output.json   # process file")
-        # python depfim.py /data/yubo/datasets/process_data_output_0215/extracted_python_files_0215.json /data/yubo/datasets/process_data_output_0215/step_3_selected_fim_functions_0215.json
+        # python step_3_dep_selection_0216.py /data/yubo/datasets/process_data_output_0215/extracted_python_files_0215.json /data/yubo/datasets/process_data_output_0215/step_3_selected_fim_functions_0215.json
         sys.exit(1)
