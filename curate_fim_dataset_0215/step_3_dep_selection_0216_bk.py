@@ -94,8 +94,8 @@ class DependencyGraphBuilder:
         """Parse source and build graph.  Returns True on success."""
         try:
             self.tree = ast.parse(self.source)
-        # except SyntaxError:
-        #     return False
+        except SyntaxError:
+            return False
         except Exception as e:
             print(e)
             return False
@@ -355,10 +355,7 @@ class FIMSelector:
     """
 
     DEFAULT_CONFIG = {
-        # --- File-level bounds ---
-        "min_file_lines": 10,
-        "max_file_lines": 1800,
-        # --- Function LOC bounds ---
+        # --- LOC bounds ---
         "min_loc": 5,
         "max_loc": 150,
         # --- Complexity weights  (Ĥ) ---
@@ -549,6 +546,7 @@ class FIMSelector:
             i_val = self.compute_inferability(fname)
 
             # ---- information-theoretic score ----
+            # Mutual-information proxy: H * I / (H + I)
             raw_score = h * (i_val / (h + i_val + 1e-8))
 
             # Difficulty: fraction of complexity unexplained by context
@@ -598,20 +596,14 @@ def process_samples(
 ) -> List[Dict[str, Any]]:
     """
     Main entry point.  For each sample dict:
-      1. file-level pre-filter (line count bounds)
-      2. parse code_content & build dependency graph
+      1. parse code_content
+      2. build dependency graph
       3. score & select FIM targets
       4. attach 'mask_targets' list to the dict
 
     Returns a new list (input is not mutated).
     """
-    merged_cfg = {**FIMSelector.DEFAULT_CONFIG, **(config or {})}
-    min_file_lines = merged_cfg["min_file_lines"]
-    max_file_lines = merged_cfg["max_file_lines"]
-
     results: List[Dict[str, Any]] = []
-    skipped_too_long = 0
-    skipped_too_short = 0
 
     for idx, sample in tqdm(enumerate(samples)):
         out = dict(sample)  # shallow copy
@@ -622,41 +614,9 @@ def process_samples(
         if not code or not code.strip():
             out["mask_targets"] = []
             out["mask_target_count"] = 0
-            out["skip_reason"] = "empty_code"
             results.append(out)
             if verbose:
                 print(f"  [{sid}] Empty code_content → skipped")
-            continue
-
-        # ---- file-level line count filter ----
-        file_line_count = len(code.splitlines())
-
-        if file_line_count < min_file_lines:
-            out["mask_targets"] = []
-            out["mask_target_count"] = 0
-            out["file_lines"] = file_line_count
-            out["skip_reason"] = f"too_short ({file_line_count} < {min_file_lines})"
-            results.append(out)
-            skipped_too_short += 1
-            if verbose:
-                print(
-                    f"  [{sid}] File too short "
-                    f"({file_line_count} lines < {min_file_lines}) → skipped"
-                )
-            continue
-
-        if file_line_count > max_file_lines:
-            out["mask_targets"] = []
-            out["mask_target_count"] = 0
-            out["file_lines"] = file_line_count
-            out["skip_reason"] = f"too_long ({file_line_count} > {max_file_lines})"
-            results.append(out)
-            skipped_too_long += 1
-            if verbose:
-                print(
-                    f"  [{sid}] File too long "
-                    f"({file_line_count} lines > {max_file_lines}) → skipped"
-                )
             continue
 
         # ---- build dependency graph ----
@@ -664,8 +624,7 @@ def process_samples(
         if not builder.build():
             out["mask_targets"] = []
             out["mask_target_count"] = 0
-            out["file_lines"] = file_line_count
-            out["skip_reason"] = "syntax_error"
+            out["parse_error"] = True
             results.append(out)
             if verbose:
                 print(f"  [{sid}] SyntaxError → skipped")
@@ -674,8 +633,6 @@ def process_samples(
         if not builder.functions:
             out["mask_targets"] = []
             out["mask_target_count"] = 0
-            out["file_lines"] = file_line_count
-            out["skip_reason"] = "no_functions"
             results.append(out)
             if verbose:
                 print(f"  [{sid}] No functions found → skipped")
@@ -705,13 +662,10 @@ def process_samples(
 
         out["mask_targets"] = targets
         out["mask_target_count"] = len(targets)
-        out["file_lines"] = file_line_count
         out["graph_stats"] = {
             "total_functions": len(builder.functions),
             "call_edges": sum(1 for _, _, t in builder.edges if t == "call"),
-            "sibling_pairs": sum(
-                1 for _, _, t in builder.edges if t == "sibling"
-            ) // 2,
+            "sibling_pairs": sum(1 for _, _, t in builder.edges if t == "sibling") // 2,
         }
         results.append(out)
 
@@ -719,8 +673,7 @@ def process_samples(
             n_funcs = len(builder.functions)
             n_sel = len(targets)
             print(
-                f"  [{sid}] {file_line_count} lines, "
-                f"{n_funcs} functions found, "
+                f"  [{sid}] {n_funcs} functions found, "
                 f"{n_sel} selected as mask targets"
             )
             for t in targets:
@@ -731,13 +684,6 @@ def process_samples(
                     f"Î={t['inferability']:.3f}  "
                     f"diff={t['difficulty']:.3f}"
                 )
-
-    if verbose:
-        print()
-        print(f"  File-level filter summary: "
-              f"{skipped_too_short} too short, "
-              f"{skipped_too_long} too long, "
-              f"{len(results) - skipped_too_short - skipped_too_long} processed")
 
     return results
 
@@ -901,18 +847,9 @@ def divide(a, b):
     return a / b
 '''
 
-# ---- Test sample 3: monster file > 1800 lines (expect skipped) ----
-MONSTER_CODE = ("# auto-generated huge file\n" +
-                "\n".join(
-                    f"def func_{i}(x):\n"
-                    f"    '''Docstring for func_{i}'''\n"
-                    f"    return x + {i}\n"
-                    for i in range(700)
-                ))
-
 
 def run_demo():
-    """Run the built-in demo with three test samples."""
+    """Run the built-in demo with two test samples."""
     samples = [
         {
             "sample_id": 0,
@@ -929,14 +866,6 @@ def run_demo():
             "func_num": 4,
             "quality_rating": "low",
             "code_content": TRIVIAL_CODE,
-        },
-        {
-            "sample_id": 2,
-            "repo_id": "demo",
-            "file_path": "monster_generated.py",
-            "func_num": 700,
-            "quality_rating": "low",
-            "code_content": MONSTER_CODE,
         },
     ]
 
@@ -955,20 +884,14 @@ def run_demo():
         sid = r["sample_id"]
         fpath = r.get("file_path", "?")
         n_targets = r["mask_target_count"]
-        flines = r.get("file_lines", "?")
-        skip = r.get("skip_reason", None)
         gs = r.get("graph_stats", {})
-        if skip:
-            print(f"  Sample {sid} ({fpath}): SKIPPED — {skip}")
-        else:
-            print(
-                f"  Sample {sid} ({fpath}): "
-                f"{flines} lines, "
-                f"{gs.get('total_functions', '?')} funcs, "
-                f"{gs.get('call_edges', '?')} call edges, "
-                f"{gs.get('sibling_pairs', '?')} sibling pairs → "
-                f"{n_targets} mask target(s)"
-            )
+        print(
+            f"  Sample {sid} ({fpath}): "
+            f"{gs.get('total_functions', '?')} funcs, "
+            f"{gs.get('call_edges', '?')} call edges, "
+            f"{gs.get('sibling_pairs', '?')} sibling pairs → "
+            f"{n_targets} mask target(s)"
+        )
 
     print()
     print("-" * 72)
@@ -978,20 +901,14 @@ def run_demo():
         sid = r["sample_id"]
         fpath = r.get("file_path", "?")
         targets = r["mask_targets"]
-        skip = r.get("skip_reason", None)
-        if skip:
-            print(f"\n  Sample {sid} ({fpath}): SKIPPED — {skip}")
-            continue
         if not targets:
             print(f"\n  Sample {sid} ({fpath}): (no targets selected)")
             continue
         print(f"\n  Sample {sid} ({fpath}):")
         for i, t in enumerate(targets, 1):
             print(f"    [{i}] {t['func_name']}")
-            print(
-                f"        Lines {t['start_line']}–{t['end_line']}  "
-                f"(LOC={t['loc']})"
-            )
+            print(f"        Lines {t['start_line']}–{t['end_line']}  "
+                  f"(LOC={t['loc']})")
             print(f"        Ĥ(complexity)  = {t['complexity']:.4f}")
             print(f"        Î(inferability) = {t['inferability']:.4f}")
             print(f"        FIM score       = {t['fim_score']:.4f}")
@@ -1017,8 +934,10 @@ def run_demo():
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
+        # No arguments → run demo
         run_demo()
     elif len(sys.argv) == 3:
+        # input.json output.json
         input_path, output_path = sys.argv[1], sys.argv[2]
         with open(input_path, "r", encoding="utf-8") as f:
             samples = json.load(f)
@@ -1029,4 +948,5 @@ if __name__ == "__main__":
         print("Usage:")
         print("  python depfim.py                          # run demo")
         print("  python depfim.py input.json output.json   # process file")
+        # python step_3_dep_selection_0216.py /data/yubo/datasets/process_data_output_0215/extracted_python_files_0215.json /data/yubo/datasets/process_data_output_0215/step_3_selected_fim_functions_0215.json
         sys.exit(1)
