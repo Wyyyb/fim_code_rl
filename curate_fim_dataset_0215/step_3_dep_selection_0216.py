@@ -702,7 +702,7 @@ def postprocess_results(results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             # --- Validation: re-extract source from code_content and compare ---
             start = target["start_line"]   # 1-indexed
             end = target["end_line"]       # 1-indexed inclusive
-            expected_text = target.get("source_text", "")
+            expected_text = target.get("func_content", "")
 
             extracted_text = "\n".join(code_lines[start - 1 : end])
 
