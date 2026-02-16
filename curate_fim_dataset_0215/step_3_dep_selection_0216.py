@@ -356,11 +356,11 @@ class FIMSelector:
 
     DEFAULT_CONFIG = {
         # --- File-level bounds ---
-        "min_file_lines": 100,
+        "min_file_lines": 50,
         "max_file_lines": 1800,
         # --- Function LOC bounds ---
-        "min_loc": 5,
-        "max_loc": 150,
+        "min_loc": 10,
+        "max_loc": 200,
         # --- Complexity weights  (Ĥ) ---
         "w_loc": 0.4,
         "w_cc": 0.4,
