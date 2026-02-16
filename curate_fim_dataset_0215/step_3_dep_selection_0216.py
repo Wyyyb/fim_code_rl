@@ -614,7 +614,7 @@ def process_samples(
     skipped_too_short = 0
     total_selected_functions = 0
 
-    for idx, sample in tqdm(enumerate(samples[-1000:])):
+    for idx, sample in tqdm(enumerate(samples[-10000:])):
         out = dict(sample)  # shallow copy
         code = out.get("code_content", "")
         sid = out.get("sample_id", idx)
