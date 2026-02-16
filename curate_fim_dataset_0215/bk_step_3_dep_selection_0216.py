@@ -11,18 +11,14 @@ Usage:
     python depfim.py input.json output.json       # process JSON file
 
 Programmatic:
-    from depfim import process_samples, postprocess_results, save_results
+    from depfim import process_samples, save_results
     results = process_samples(samples, verbose=True)
     save_results(results, 'output.json')
-    func_entries = postprocess_results(results)
-    save_results(func_entries, 'output_functions.json')
-    print_distribution_stats(func_entries)
 """
 
 import ast
 import math
 import json
-import os
 import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -38,9 +34,8 @@ from tqdm import tqdm
 class FunctionInfo:
     """Metadata and computed metrics for a single function/method."""
     name: str                    # Qualified: "ClassName.method" or "func"
-    lineno: int                  # Start line (1-indexed, line of `def`)
+    lineno: int                  # Start line (1-indexed)
     end_lineno: int              # End line (1-indexed, inclusive)
-    body_lineno: int             # First line of function body (1-indexed)
     source_text: str             # Raw source code
     loc: int                     # Lines of code
     params: List[str]            # Parameter names (including self/cls)
@@ -62,7 +57,6 @@ class FIMCandidate:
     func_name: str
     start_line: int
     end_line: int
-    body_lineno: int
     source_text: str
     loc: int
     complexity: float
@@ -100,6 +94,8 @@ class DependencyGraphBuilder:
         """Parse source and build graph.  Returns True on success."""
         try:
             self.tree = ast.parse(self.source)
+        # except SyntaxError:
+        #     return False
         except Exception as e:
             print(e)
             return False
@@ -151,12 +147,6 @@ class DependencyGraphBuilder:
         source_text = "\n".join(self.source_lines[start_idx:end_line])
         loc = end_line - start_idx
 
-        # Body start line
-        if node.body:
-            body_lineno = node.body[0].lineno
-        else:
-            body_lineno = node.lineno + 1  # fallback for empty body
-
         # Collect all argument objects
         all_args = (
             node.args.args
@@ -192,7 +182,6 @@ class DependencyGraphBuilder:
             name=qname,
             lineno=node.lineno,
             end_lineno=end_line,
-            body_lineno=body_lineno,
             source_text=source_text,
             loc=loc,
             params=[a.arg for a in node.args.args],
@@ -445,20 +434,20 @@ class FIMSelector:
         c = self.cfg
         fi = self.functions[fname]
 
-        # 1) Caller information
+        # 1) Caller information  ──────────────────────────────────
         caller_sp = 0.0
         for caller in self.callers.get(fname, set()):
             if caller in self.functions:
                 caller_sp += self._call_site_specificity(caller, fname)
         caller_score = min(caller_sp / 3.0, 1.0)
 
-        # 2) Callee information (file-internal only)
+        # 2) Callee information (file-internal only) ──────────────
         internal_callees = [
             x for x in self.callees.get(fname, set()) if x in self.functions
         ]
         callee_score = min(len(internal_callees) / 4.0, 1.0)
 
-        # 3) Signature information
+        # 3) Signature information ────────────────────────────────
         sig_score = 0.0
         if fi.has_return_type:
             sig_score += 0.30
@@ -472,10 +461,10 @@ class FIMSelector:
         sig_score += min(len(non_self_params) / 6.0, 0.20)
         sig_score = min(sig_score, 1.0)
 
-        # 4) Documentation
+        # 4) Documentation ────────────────────────────────────────
         doc_score = 0.5 if fi.has_docstring else 0.0
 
-        # 5) Class context
+        # 5) Class context ────────────────────────────────────────
         class_score = 0.0
         if fi.class_name:
             n_sibs = len(self.siblings.get(fname, set()))
@@ -508,6 +497,7 @@ class FIMSelector:
         for child in ast.walk(node):
             if not isinstance(child, ast.Call):
                 continue
+            # Match call target
             n = None
             if isinstance(child.func, ast.Name):
                 n = child.func.id
@@ -517,16 +507,16 @@ class FIMSelector:
                 continue
 
             found = True
-            sp = 0.50
+            sp = 0.50  # base: being called at all
             for arg in child.args:
                 if isinstance(arg, ast.Constant):
-                    sp += 0.15
+                    sp += 0.15        # literal → strong constraint
                 elif isinstance(arg, ast.Name):
-                    sp += 0.05
+                    sp += 0.05        # variable → weak constraint
                 else:
-                    sp += 0.08
-            sp += 0.12 * len(child.keywords)
-            sp += 0.10
+                    sp += 0.08        # expression → medium
+            sp += 0.12 * len(child.keywords)  # keyword args are informative
+            sp += 0.10                        # return value usage (approx)
             total_sp += sp
 
         return min(total_sp, 1.5) if found else 0.5
@@ -584,7 +574,6 @@ class FIMSelector:
                     func_name=fname,
                     start_line=fi.lineno,
                     end_line=fi.end_lineno,
-                    body_lineno=fi.body_lineno,
                     source_text=fi.source_text,
                     loc=fi.loc,
                     complexity=round(h, 4),
@@ -596,169 +585,6 @@ class FIMSelector:
 
         results.sort(key=lambda x: x.fim_score, reverse=True)
         return results
-
-
-# ================================================================
-# Masking Utility
-# ================================================================
-
-def mask_function_body(
-    code_content: str,
-    start_line: int,
-    end_line: int,
-    body_lineno: int,
-) -> str:
-    """
-    Replace the body of a function with ``# <MASKED_FUNCTION_BODY>``.
-
-    Parameters
-    ----------
-    code_content : str
-        Full file source code.
-    start_line : int
-        1-indexed line of the ``def`` keyword.
-    end_line : int
-        1-indexed last line of the function (inclusive).
-    body_lineno : int
-        1-indexed first line of the function body.
-
-    Returns
-    -------
-    str
-        The code with the target function's body replaced by a single
-        comment line ``# <MASKED_FUNCTION_BODY>`` at the correct
-        indentation.
-    """
-    lines = code_content.splitlines()
-    body_idx = body_lineno - 1  # 0-indexed start of body
-
-    # Determine body indentation from the first body line
-    if body_idx < len(lines):
-        body_line = lines[body_idx]
-        indent = len(body_line) - len(body_line.lstrip())
-    else:
-        # Fallback: def-line indent + 4 spaces
-        def_idx = start_line - 1
-        if def_idx < len(lines):
-            indent = len(lines[def_idx]) - len(lines[def_idx].lstrip()) + 4
-        else:
-            indent = 4
-
-    mask_line = " " * indent + "# <MASKED_FUNCTION_BODY>"
-
-    # lines[:body_idx]  → everything up to (not including) body start
-    # [mask_line]        → the single mask placeholder
-    # lines[end_line:]   → everything after the function
-    #   (end_line is 1-indexed inclusive, so 0-indexed exclusive = end_line)
-    new_lines = lines[:body_idx] + [mask_line] + lines[end_line:]
-    return "\n".join(new_lines)
-
-
-# ================================================================
-# Post-processing
-# ================================================================
-
-def postprocess_results(results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """
-    Expand sample-level results into **function-level** entries.
-
-    Each mask target becomes its own dict containing:
-      - all original sample fields (except mask_targets / mask_target_count / skip_reason)
-      - all function-level scoring fields
-      - ``masked_code_content``: the file source with that function body masked
-
-    The returned list is sorted by ``fim_score`` descending.
-    """
-    function_entries: List[Dict[str, Any]] = []
-
-    for sample in results:
-        targets = sample.get("mask_targets", [])
-        if not targets:
-            continue
-
-        code_content = sample.get("code_content", "")
-
-        # Sample-level fields to carry forward
-        sample_fields = {
-            k: v
-            for k, v in sample.items()
-            if k not in ("mask_targets", "mask_target_count", "skip_reason")
-        }
-
-        for target in targets:
-            entry = dict(sample_fields)          # shallow copy of sample info
-            entry.update(target)                 # overlay function-level fields
-
-            # Build the masked version of the full file
-            entry["masked_code_content"] = mask_function_body(
-                code_content,
-                target["start_line"],
-                target["end_line"],
-                target["body_lineno"],
-            )
-            function_entries.append(entry)
-
-    # Global sort by fim_score descending
-    function_entries.sort(key=lambda x: x.get("fim_score", 0), reverse=True)
-    return function_entries
-
-
-def print_distribution_stats(function_entries: List[Dict[str, Any]]) -> None:
-    """
-    Print distribution statistics for key numeric metrics across all
-    function-level entries.
-    """
-    metrics = ["loc", "complexity", "inferability", "fim_score", "difficulty"]
-
-    def _percentile(sorted_vals: List[float], p: float) -> float:
-        """Linear interpolation percentile on a pre-sorted list."""
-        if not sorted_vals:
-            return 0.0
-        idx = p / 100.0 * (len(sorted_vals) - 1)
-        lower = int(math.floor(idx))
-        upper = min(lower + 1, len(sorted_vals) - 1)
-        frac = idx - lower
-        return sorted_vals[lower] * (1 - frac) + sorted_vals[upper] * frac
-
-    print()
-    print("=" * 85)
-    print("  Distribution Statistics  (function-level entries)")
-    print("=" * 85)
-
-    for metric in metrics:
-        values = sorted(
-            [float(e[metric]) for e in function_entries if metric in e]
-        )
-        if not values:
-            print(f"\n  {metric}: (no data)")
-            continue
-
-        n = len(values)
-        mean_val = sum(values) / n
-        if n % 2 == 1:
-            median_val = values[n // 2]
-        else:
-            median_val = (values[n // 2 - 1] + values[n // 2]) / 2.0
-        variance = sum((v - mean_val) ** 2 for v in values) / n
-        std_val = math.sqrt(variance)
-
-        p10 = _percentile(values, 10)
-        p25 = _percentile(values, 25)
-        p50 = _percentile(values, 50)
-        p75 = _percentile(values, 75)
-        p90 = _percentile(values, 90)
-
-        print(f"\n  {metric}:")
-        print(f"    count  = {n}")
-        print(f"    min    = {values[0]:.4f}    max    = {values[-1]:.4f}")
-        print(f"    mean   = {mean_val:.4f}    std    = {std_val:.4f}")
-        print(
-            f"    p10    = {p10:.4f}    p25    = {p25:.4f}    "
-            f"p50    = {p50:.4f}    p75    = {p75:.4f}    p90    = {p90:.4f}"
-        )
-
-    print()
-    print("=" * 85)
 
 
 # ================================================================
@@ -788,7 +614,7 @@ def process_samples(
     skipped_too_short = 0
     total_selected_functions = 0
 
-    for idx, sample in tqdm(enumerate(samples[-1000:])):
+    for idx, sample in tqdm(enumerate(samples[-10000:])):
         out = dict(sample)  # shallow copy
         code = out.get("code_content", "")
         sid = out.get("sample_id", idx)
@@ -862,14 +688,12 @@ def process_samples(
         )
         candidates = selector.select_targets()
         total_selected_functions += len(candidates)
-
         # ---- serialize into output dict ----
         targets = [
             {
                 "func_name": c.func_name,
                 "start_line": c.start_line,
                 "end_line": c.end_line,
-                "body_lineno": c.body_lineno,
                 "source_text": c.source_text,
                 "loc": c.loc,
                 "complexity": c.complexity,
@@ -911,12 +735,10 @@ def process_samples(
 
     if verbose:
         print()
-        print(
-            f"  File-level filter summary: "
-            f"{skipped_too_short} too short, "
-            f"{skipped_too_long} too long, "
-            f"{len(results) - skipped_too_short - skipped_too_long} processed"
-        )
+        print(f"  File-level filter summary: "
+              f"{skipped_too_short} too short, "
+              f"{skipped_too_long} too long, "
+              f"{len(results) - skipped_too_short - skipped_too_long} processed")
     print("total_selected_functions", total_selected_functions)
     return results
 
@@ -941,20 +763,8 @@ if __name__ == "__main__":
         with open(input_path, "r", encoding="utf-8") as f:
             samples = json.load(f)
         print(f"Loaded {len(samples)} samples from {input_path}")
-
-        # ---- Stage 1: original sample-level processing ----
         results = process_samples(samples, verbose=True)
         save_results(results, output_path)
-
-        # ---- Stage 2: function-level post-processing ----
-        func_entries = postprocess_results(results)
-        base, ext = os.path.splitext(output_path)
-        func_output_path = f"{base}_functions{ext}"
-        save_results(func_entries, func_output_path)
-
-        # ---- Stage 3: print distribution statistics ----
-        print_distribution_stats(func_entries)
-
     else:
         print("Usage:")
         print("  python depfim.py                          # run demo")
