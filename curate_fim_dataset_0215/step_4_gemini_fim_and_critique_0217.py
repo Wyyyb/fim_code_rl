@@ -1118,7 +1118,7 @@ Examples:
     parser.add_argument("--critique-temperature", type=float, default=0.3, help="Temperature for critique (default: 0.3)")
 
     # Processing options
-    parser.add_argument("--wait", "-w", type=float, default=1.0, help="Seconds to wait between API calls (default: 1.0)")
+    parser.add_argument("--wait", "-w", type=float, default=0.5, help="Seconds to wait between API calls (default: 1.0)")
     parser.add_argument("--print-response", "-p", action="store_true", help="Print API responses")
 
     # Sharding
