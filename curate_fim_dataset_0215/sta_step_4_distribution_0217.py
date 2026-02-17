@@ -373,6 +373,6 @@ def main():
 
 if __name__ == "__main__":
 
-    # python analyze_ckpts.py -i "/data/yubo/datasets/process_data_output_0215/step_4_fim_critique_0217_ckpt_shard_*100.json"
+    # python sta_step_4_distribution_0217.py -i "/data/yubo/datasets/process_data_output_0215/step_4_fim_critique_0217_checkpoint_shard*200.json"
 
     main()
