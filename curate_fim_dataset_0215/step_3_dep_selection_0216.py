@@ -1005,3 +1005,5 @@ if __name__ == "__main__":
         print("  python depfim.py                          # run demo")
         print("  python depfim.py input.json output.json   # process file")
         sys.exit(1)
+
+        # python step_3_dep_selection_0216.py /data/yubo/datasets/process_data_output_0215/extracted_python_files_0215.json /data/yubo/datasets/process_data_output_0215/step_3_selected_fim_functions_0215.json
