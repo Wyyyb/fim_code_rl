@@ -40,8 +40,7 @@ torchrun \
     \
     --output_dir $OUTPUT_DIR \
     --gradient_checkpointing True \
-    --enable_liger_kernel true \
-    --use_unsloth_gc true \
+    --use_liger_kernel true \
     --packing true \
     --per_device_train_batch_size 1 \
     --weight_decay 0.05 \
