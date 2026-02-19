@@ -58,9 +58,10 @@ torchrun \
     \
     --freeze_llm False \
     --freeze_vit False \
-    --freeze_aligner False\
+    --freeze_aligner False \
     --attn_impl flash_attn \
-
+    --use_liger_kernel true \
+    --packing true
     #     --use_liger_kernel true \
     #     --packing true \
     # --attn_impl flash_attn \
