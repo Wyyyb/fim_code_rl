@@ -4,7 +4,7 @@ set -x
 
 MODEL_PATH="/data/yubo/models/Qwen2.5-Coder-7B-Instruct"
 
-DATA_PATH_1="/data/yubo/datasets/process_data_output_0215/step_5_sft_data/fim_sft_data_0108.jsonl"
+DATA_PATH_1="/data/yubo/datasets/process_data_output_1228/step_5_sft_data_0105/fim_sft_data_0108.jsonl"
 DATA_PATH_2="/data/yubo/datasets/process_data_output_0215/step_5_sft_data/fim_sft_data_temp_0219.jsonl"
 
 OUTPUT_DIR="/data/yubo/sft_ckpts_0215/fim_qwen25_coder_7b_ins_0219_ckpt"
