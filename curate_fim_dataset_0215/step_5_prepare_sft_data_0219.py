@@ -387,7 +387,7 @@ Examples:
     )
     parser.add_argument(
         "--output", "-o",
-        default="/data/yubo/datasets/process_data_output_0215/step_5_sft_data/fim_sft_data_temp_0219.jsonl",
+        default="/data/yubo/datasets/process_data_output_0215/step_5_sft_data/fim_sft_data_temp_0220.jsonl",
         help="Output JSONL file path"
     )
     parser.add_argument(
