@@ -73,8 +73,6 @@ torchrun \
     # --eval_strategy None \
     # --custom_dataset_in
 
-export HF_TOKEN=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
-
 cd /data/yubo/sft_ckpts_0215/r2egym_fim_qwen25_coder_7b_ins_0223_ckpt
 
 huggingface-cli upload ubowang/r2egym_fim_qwen25_coder_7b_ins_0223_ckpt . --repo-type model
