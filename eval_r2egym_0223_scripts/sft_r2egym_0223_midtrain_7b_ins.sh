@@ -75,6 +75,6 @@ torchrun \
 
 cd /data/yubo/sft_ckpts_0215/r2egym_fim_qwen25_coder_7b_ins_0223_ckpt
 
-huggingface-cli upload ubowang/r2egym_fim_qwen25_coder_7b_ins_0223_ckpt . --repo-type model
+# huggingface-cli upload ubowang/r2egym_fim_qwen25_coder_7b_ins_0223_ckpt /data/yubo/sft_ckpts_0215/r2egym_fim_qwen25_coder_7b_ins_0223_ckpt/v0-20260223-071633/checkpoint-808/ --repo-type model
 
 
