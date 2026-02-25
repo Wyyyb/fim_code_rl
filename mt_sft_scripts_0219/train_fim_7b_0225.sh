@@ -61,7 +61,7 @@ torchrun \
     --freeze_aligner False\
     --attn_impl flash_attn \
     --use_liger_kernel true \
-#    --packing true
+    --packing true
 
     # --attn_impl flash_attn \
 
