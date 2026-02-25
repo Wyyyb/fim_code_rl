@@ -13,7 +13,7 @@ if [ ! -d "$OUTPUT_DIR" ]; then
   mkdir -p "$OUTPUT_DIR"
 fi
 
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 
 cd ../ms-swift
 
@@ -49,9 +49,9 @@ torchrun \
     --logging_steps 1 \
     \
     --num_train_epochs 1 \
-    --gradient_accumulation_steps 32 \
+    --gradient_accumulation_steps 8 \
     --save_strategy "steps" \
-    --save_steps 100 \
+    --save_steps 200 \
     --save_only_model True \
     --warmup_ratio 0.1 \
     --ddp_backend "nccl" \
