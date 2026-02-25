@@ -26,5 +26,8 @@ huggingface-cli download Qwen/Qwen3-Coder-30B-A3B-Instruct --local-dir /data/yub
 
 huggingface-cli download Qwen/Qwen2.5-Coder-14B-Instruct --local-dir /data/yubo/models/Qwen2.5-Coder-14B-Instruct
 
-
 huggingface-cli upload ubowang/fim_qwen25_coder_7b_ins_0223_midtrain . --repo-type model
+
+huggingface-cli download Qwen/Qwen3.5-35B-A3B --local-dir /data/yubo/models/Qwen3.5-35B-A3B
+
+

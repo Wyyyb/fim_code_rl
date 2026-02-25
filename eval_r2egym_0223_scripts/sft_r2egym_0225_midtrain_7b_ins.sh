@@ -2,22 +2,22 @@ set -x
 
 # conda activate YOUR_ENV
 
-MODEL_PATH="/data/yubo/sft_ckpts_0215/fim_qwen25_coder_7b_ins_0219_ckpt/v4-20260220-073100/checkpoint-364"
+MODEL_PATH="/data/yubo/sft_ckpts_0215/fim_qwen25_coder_7b_ins_0225_ckpt/v4-20260225-013838/checkpoint-1038"
 
 DATA_PATH="/data/yubo/datasets/R2EGym-Data/R2EGym-SFT-Trajectories.jsonl"
 
-OUTPUT_DIR="/data/yubo/sft_ckpts_0215/r2egym_fim_qwen25_coder_7b_ins_0223_ckpt"
+OUTPUT_DIR="/data/yubo/sft_ckpts_0215/r2egym_fim_qwen25_coder_7b_ins_0226_1038_ckpt"
 
 if [ ! -d "$OUTPUT_DIR" ]; then
   mkdir -p "$OUTPUT_DIR"
 fi
 
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 
 cd ../ms-swift
 
 torchrun \
-    --nproc_per_node 4 \
+    --nproc_per_node 8 \
     --standalone \
     swift/cli/sft.py\
     --use_hf True \
@@ -48,7 +48,7 @@ torchrun \
     --logging_steps 1 \
     \
     --num_train_epochs 2 \
-    --gradient_accumulation_steps 2 \
+    --gradient_accumulation_steps 1 \
     --save_strategy "steps" \
     --save_steps 400 \
     --save_only_model True \
