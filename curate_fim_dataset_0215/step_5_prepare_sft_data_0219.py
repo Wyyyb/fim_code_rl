@@ -382,12 +382,12 @@ Examples:
 
     parser.add_argument(
         "--checkpoint-dir", "-d",
-        default="/data/yubo/datasets/temp_data_0219",
+        default="/data/yubo/datasets/temp_data_0225",
         help="Directory containing shard checkpoint files"
     )
     parser.add_argument(
         "--output", "-o",
-        default="/data/yubo/datasets/process_data_output_0215/step_5_sft_data/fim_sft_data_temp_0220.jsonl",
+        default="/data/yubo/datasets/process_data_output_0215/step_5_sft_data/fim_sft_data_temp_0225.jsonl",
         help="Output JSONL file path"
     )
     parser.add_argument(
