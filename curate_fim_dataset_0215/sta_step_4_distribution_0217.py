@@ -335,21 +335,21 @@ def analyze(all_ckpts: list[dict]):
     print()
 
     # ========== 8. Discard Reason 统计 ==========
-    print("=" * 100)
-    print("8. Discard Reason 统计")
-    print("=" * 100)
-
-    discard_reasons = Counter()
-    for r in all_results:
-        reason = r.get("discard_reason", "")
-        if r.get("should_discard", False):
-            discard_reasons[reason if reason else "(empty)"] += 1
-
-    n_discarded = sum(discard_reasons.values())
-    if n_discarded > 0:
-        print_counter(discard_reasons, "Discard Reasons (仅 should_discard=True)", n_discarded)
-    else:
-        print("  无需丢弃的样本")
+    # print("=" * 100)
+    # print("8. Discard Reason 统计")
+    # print("=" * 100)
+    #
+    # discard_reasons = Counter()
+    # for r in all_results:
+    #     reason = r.get("discard_reason", "")
+    #     if r.get("should_discard", False):
+    #         discard_reasons[reason if reason else "(empty)"] += 1
+    #
+    # n_discarded = sum(discard_reasons.values())
+    # if n_discarded > 0:
+    #     print_counter(discard_reasons, "Discard Reasons (仅 should_discard=True)", n_discarded)
+    # else:
+    #     print("  无需丢弃的样本")
     print()
 
 
@@ -374,5 +374,5 @@ def main():
 if __name__ == "__main__":
 
     # python sta_step_4_distribution_0217.py -i "/data/yubo/datasets/process_data_output_0215/step_4_fim_critique_0217_checkpoint_shard*200.json"
-
+    # python sta_step_4_distribution_0217.py -i "/data/yubo/datasets/process_data_output_0215/try_step_4/step_4_fim_critique_0217_try_0218_checkpoint_shard*.json"
     main()
