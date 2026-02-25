@@ -51,7 +51,7 @@ torchrun \
     --num_train_epochs 1 \
     --gradient_accumulation_steps 32 \
     --save_strategy "steps" \
-    --save_steps 1500 \
+    --save_steps 100 \
     --save_only_model True \
     --warmup_ratio 0.1 \
     --ddp_backend "nccl" \
