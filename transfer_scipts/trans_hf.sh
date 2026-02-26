@@ -30,4 +30,6 @@ huggingface-cli upload ubowang/fim_qwen25_coder_7b_ins_0223_midtrain . --repo-ty
 
 huggingface-cli download Qwen/Qwen3.5-35B-A3B --local-dir /data/yubo/models/Qwen3.5-35B-A3B
 
+huggingface-cli upload ubowang/fim_qwen25_coder_7b_ins_midtrain_r2e-gym_pt_0226 . --repo-type model
 
+huggingface-cli upload ubowang/fim_midtrain_data_0226_212k /data/yubo/datasets/process_data_output_0215/step_5_sft_data/fim_midtrain_data_0226.jsonl --repo-type dataset
