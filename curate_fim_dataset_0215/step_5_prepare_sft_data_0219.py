@@ -392,7 +392,7 @@ Examples:
     )
     parser.add_argument(
         "--checkpoint-pattern", "-p",
-        default="",
+        default="step_4_fim_critique_0217*.json",
         help="Glob pattern for shard files"
     )
     parser.add_argument(
