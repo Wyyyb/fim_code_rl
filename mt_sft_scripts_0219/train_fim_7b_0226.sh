@@ -40,7 +40,7 @@ torchrun \
     \
     --output_dir $OUTPUT_DIR \
     --gradient_checkpointing True \
-    --per_device_train_batch_size 1 \
+    --per_device_train_batch_size 2 \
     --weight_decay 0.05 \
     --learning_rate 1e-5 \
     --lr_scheduler_type "cosine" \
@@ -49,7 +49,7 @@ torchrun \
     --logging_steps 1 \
     \
     --num_train_epochs 1 \
-    --gradient_accumulation_steps 16 \
+    --gradient_accumulation_steps 8 \
     --save_strategy "steps" \
     --save_steps 500 \
     --save_only_model True \
