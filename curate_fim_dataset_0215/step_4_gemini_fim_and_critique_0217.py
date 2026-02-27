@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-FIM Completion and Critique Pipeline (v2)
+FIM Completion and Critique Pipeline
 
 This script processes the selected functions and:
 1. Calls Gemini to complete the masked function (with CoT reasoning)
