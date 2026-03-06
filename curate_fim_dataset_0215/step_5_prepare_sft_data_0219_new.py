@@ -460,7 +460,7 @@ Examples:
     )
     parser.add_argument(
         "--output", "-o",
-        default="/data/yubo/datasets/fim_mt_single_function_data_v2_0228/fim_mt_single_function_data_v2_0228.jsonl",
+        default="/data/yubo/datasets/hf_fim_mt_single_function_data_v2_0228/fim_mt_single_function_data_v2_0228.jsonl",
         help="Output JSONL file path"
     )
     parser.add_argument(
@@ -483,7 +483,7 @@ Examples:
     parser.add_argument(
         "--save-stats",
         type=str,
-        default="/data/yubo/datasets/fim_mt_single_function_data_v2_0228/stats.json",
+        default="/data/yubo/datasets/hf_fim_mt_single_function_data_v2_0228/stats.json",
         help="Path to save statistics as JSON (optional)"
     )
 

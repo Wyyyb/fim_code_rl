@@ -761,12 +761,12 @@ Examples:
     )
     parser.add_argument(
         "--output-pairs",
-        default="/data/yubo/datasets/multi_functions_fim_sft_pairs_0227/multi_functions_fim_sft_pairs_0227.jsonl",
+        default="/data/yubo/datasets/hf_multi_functions_fim_sft_0227/multi_functions_fim_sft_pairs_0227.jsonl",
         help="Output JSONL for pair SFT data"
     )
     parser.add_argument(
         "--output-triples",
-        default="/data/yubo/datasets/multi_functions_fim_sft_triples_0227.jsonl",
+        default="/data/yubo/datasets/hf_multi_functions_fim_sft_0227/multi_functions_fim_sft_triples_0227.jsonl",
         help="Output JSONL for triple SFT data"
     )
 
@@ -779,7 +779,7 @@ Examples:
                         help="Min group coherence_score (default: 3)")
 
     # Optional
-    parser.add_argument("--save-stats", type=str, default="/data/yubo/datasets/multi_functions_fim_sft_pairs_0227/stats.json",
+    parser.add_argument("--save-stats", type=str, default="/data/yubo/datasets/hf_multi_functions_fim_sft_pairs_0227/stats.json",
                         help="Base path for stats JSON (appends _pairs/_triples)")
 
     args = parser.parse_args()
