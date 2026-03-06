@@ -460,12 +460,12 @@ Examples:
     )
     parser.add_argument(
         "--output", "-o",
-        default="/data/yubo/datasets/fim_mt_single_function_data_v2_0228.jsonl",
+        default="/data/yubo/datasets/fim_mt_single_function_data_v2_0228/fim_mt_single_function_data_v2_0228.jsonl",
         help="Output JSONL file path"
     )
     parser.add_argument(
         "--checkpoint-pattern", "-p",
-        default="step_4_fim_critique_0217*.json",
+        default="step_4_fim_critique_0217_shard*.json",
         help="Glob pattern for shard files"
     )
     parser.add_argument(
@@ -483,7 +483,7 @@ Examples:
     parser.add_argument(
         "--save-stats",
         type=str,
-        default=None,
+        default="/data/yubo/datasets/fim_mt_single_function_data_v2_0228/stats.json",
         help="Path to save statistics as JSON (optional)"
     )
 
