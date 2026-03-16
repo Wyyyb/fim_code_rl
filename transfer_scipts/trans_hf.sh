@@ -38,4 +38,6 @@ huggingface-cli upload ubowang/fim_midtrain_data_0226_mix_314k /data/yubo/datase
 
 huggingface-cli upload ubowang/fim_midtrain_data_single_function_342k_v2 /data/yubo/datasets/fim_mt_single_function_data_v2_0228.jsonl --repo-type dataset
 
+huggingface-cli upload ubowang/fim_midtrain_data_single_function_342k_v2 /data/yubo/datasets/hf_fim_mt_single_function_data_v2_0228 --repo-type dataset
 
+huggingface-cli upload ubowang/fim_midtrain_data_multi_function_v3 /data/yubo/datasets/hf_multi_functions_fim_sft_0227 --repo-type dataset
