@@ -1,0 +1,991 @@
+sample_id,repository_url,category,description,notes
+0,https://github.com/eriklindernoren/ML-From-Scratch,Category 1: From Scratch,Bare bones NumPy implementations of ML models from linear regression to deep learning,"Excellent code structure, clear separation of concerns, well-documented"
+1,https://github.com/hyunwoongko/transformer,Category 1: From Scratch,Clean PyTorch implementation of Transformer (Attention Is All You Need),"Excellent code clarity, well-structured, educational"
+2,https://github.com/karpathy/minbpe,Category 1: From Scratch,Minimal BPE tokenizer implementation,"Clean code by Karpathy, minimal dependencies, educational"
+3,https://github.com/karpathy/nanoGPT,Category 1: From Scratch,Simplest GPT implementation for training,"Extremely clean, self-contained, perfect for learning"
+4,https://github.com/karpathy/micrograd,Category 1: From Scratch,Tiny autograd engine with neural nets,"Only stdlib, educational masterpiece, very small"
+5,https://github.com/karpathy/minGPT,Category 1: From Scratch,Minimal GPT implementation in PyTorch,"Clean architecture, well-documented, medium size"
+6,https://github.com/geohot/tinygrad,Category 1: From Scratch,Simple deep learning framework from scratch,"Minimal dependencies, framework implementation"
+7,https://github.com/yunjey/pytorch-tutorial,Category 1: From Scratch,PyTorch tutorial with clean examples,"Educational, clear code structure, various models"
+8,https://github.com/eriklindernoren/PyTorch-GAN,Category 1: From Scratch,Minimal PyTorch GAN implementations,"Collection of GAN models, very clean"
+9,https://github.com/TheAlgorithms/Python,Category 3: Algorithms,Comprehensive collection of algorithms in Python,"Massive collection, well-organized, community-driven"
+10,https://github.com/keon/algorithms,Category 3: Algorithms,Minimal and clean implementations of data structures and algorithms,"Extremely clean code, minimal dependencies, excellent for learning"
+11,https://github.com/dennybritz/reinforcement-learning,Category 4: Scientific Computing,"RL algorithms with OpenAI Gym, TensorFlow, exercises and solutions","Comprehensive learning resource, well-documented"
+12,https://github.com/ahmedfgad/GeneticAlgorithmPython,Category 4: Scientific Computing,PyGAD - comprehensive genetic algorithm library,"Supports Keras, PyTorch, well-documented"
+13,https://github.com/pymc-devs/pymc,Category 4: Scientific Computing,Bayesian modeling and probabilistic programming,"MCMC implementations, statistical models"
+14,https://github.com/davidhalter/parso,Category 5: Small Frameworks,Python parser supporting error recovery,"Used by Jedi, supports multiple Python versions"
+15,https://github.com/eliben/pycparser,Category 5: Small Frameworks,Complete C99 parser in pure Python,"Used by CFFI, no external dependencies"
+16,https://github.com/lark-parser/lark,Category 5: Small Frameworks,Parsing toolkit for Python,"LALR(1) and Earley parsers, pure Python"
+17,https://github.com/pallets/click,Category 5: Small Frameworks,Command line interface creation kit,"Clean CLI framework, well-architected"
+18,https://github.com/pallets/jinja,Category 5: Small Frameworks,Template engine for Python,Clean template parsing and rendering
+19,https://github.com/tiangolo/fastapi,Category 5: Small Frameworks,Modern async web framework,"Clean async patterns, type hints, well-designed"
+20,https://github.com/pydantic/pydantic,Category 5: Small Frameworks,Data validation using type hints,"Clean validation logic, type-driven"
+21,https://github.com/explosion/spaCy,Category 2: Domain Specific,Industrial-strength NLP library,"High-quality NLP pipelines, well-architected"
+22,https://github.com/scrapy/scrapy,Category 2: Domain Specific,Web crawling and scraping framework,"Excellent architecture, async spiders"
+23,https://github.com/Girrajjangid/Machine-Learning-from-Scratch,Category 1: From Scratch,ML algorithms from scratch with Jupyter demos and mathematical explanations,"Interactive notebooks, good for understanding implementations"
+24,https://github.com/jadore801120/attention-is-all-you-need-pytorch,Category 1: From Scratch,PyTorch implementation of Transformer with training support,Complete implementation with training pipeline
+25,https://github.com/juho-lee/set_transformer,Category 1: From Scratch,Set Transformer implementation,"Research paper implementation, clean code"
+26,https://github.com/karpathy/pytorch-made,Category 1: From Scratch,MADE autoregressive model implementation,Clean implementation of density estimation
+27,https://github.com/karpathy/pytorch-normalizing-flows,Category 1: From Scratch,Normalizing flows in PyTorch,Clear implementation of generative models
+28,https://github.com/joeynmt/joeynmt,Category 1: From Scratch,Minimalist NMT toolkit,Clean neural machine translation code
+29,https://github.com/kuangliu/pytorch-cifar,Category 1: From Scratch,CIFAR models in PyTorch playground,Clean implementations of vision models
+30,https://github.com/lucidrains/vit-pytorch,Category 1: From Scratch,Vision Transformer implementations,"Clean ViT implementations, well-organized"
+31,https://github.com/lucidrains/x-transformers,Category 1: From Scratch,Experimental transformer architectures,"Advanced transformer variants, clean code"
+32,https://github.com/eriklindernoren/PyTorch-YOLOv3,Category 2: Domain Specific,Minimal PyTorch YOLOv3 implementation,Clean object detection code
+33,https://github.com/johnnycode8/gym_solutions,Category 4: Scientific Computing,Gymnasium RL environments solutions with YouTube tutorials,"Step-by-step tutorials, beginner-friendly"
+34,https://github.com/rmsolgi/geneticalgorithm,Category 4: Scientific Computing,Genetic algorithm package for Python,"Handles continuous, discrete, mixed variables"
+35,https://github.com/ericmjl/Network-Analysis-Made-Simple,Category 4: Scientific Computing,Network analysis tutorial with NetworkX,Educational resource with workshops
+36,https://github.com/pallets/werkzeug,Category 5: Small Frameworks,WSGI utility library,"HTTP utilities, well-structured"
+37,https://github.com/encode/starlette,Category 5: Small Frameworks,Async web framework toolkit,"Lightweight ASGI framework, clean code"
+38,https://github.com/encode/httpx,Category 5: Small Frameworks,Next-gen HTTP client,"Async HTTP client, clean implementation"
+39,https://github.com/google/python-fire,Category 5: Small Frameworks,Auto-generate CLIs from any Python object,"Clean metaprogramming, reflection-based"
+40,https://github.com/streamlit/streamlit,Category 5: Small Frameworks,App framework for ML/data science,Clean reactive programming model
+41,https://github.com/karpathy/llama2.c,Category 1: From Scratch,Pure C inference for Llama 2 with Python training code,"Minimal implementation, excellent for learning LLM internals"
+42,https://github.com/karpathy/nn-zero-to-hero,Category 1: From Scratch,Neural networks from scratch video series code,Educational masterpiece with videos
+43,https://github.com/labmlai/annotated_deep_learning_paper_implementations,Category 1: From Scratch,Paper implementations with annotations,"Excellent documentation, many architectures"
+44,https://github.com/lucidrains/DALLE2-pytorch,Category 1: From Scratch,DALL-E 2 implementation in PyTorch,Clean diffusion model code
+45,https://github.com/lucidrains/imagen-pytorch,Category 1: From Scratch,Google Imagen implementation,Text-to-image diffusion model
+46,https://github.com/suno-ai/bark,Category 1: From Scratch,Text-to-audio model,Transformer-based audio generation
+47,https://github.com/coqui-ai/TTS,Category 1: From Scratch,Text-to-speech library,Multiple TTS models implemented
+48,https://github.com/xinntao/Real-ESRGAN,Category 1: From Scratch,Practical image restoration,Super-resolution implementation
+49,https://github.com/TencentARC/GFPGAN,Category 1: From Scratch,Face restoration GAN,Face enhancement model
+50,https://github.com/sczhou/CodeFormer,Category 1: From Scratch,Face restoration with codebook,Transformer-based face restoration
+51,https://github.com/lllyasviel/ControlNet,Category 1: From Scratch,Adding control to diffusion,Conditional image generation
+52,https://github.com/mlfoundations/open_clip,Category 1: From Scratch,Open source CLIP implementation,Reproducible CLIP training
+53,https://github.com/facebookresearch/mae,Category 1: From Scratch,Masked Autoencoders,Self-supervised vision learning
+54,https://github.com/facebookresearch/dino,Category 1: From Scratch,Self-distillation with no labels,Vision transformer training
+55,https://github.com/facebookresearch/dinov2,Category 1: From Scratch,DINOv2 self-supervised,Improved self-supervised vision
+56,https://github.com/EleutherAI/gpt-neox,Category 1: From Scratch,GPT-NeoX-20B implementation,Large-scale LLM training
+57,https://github.com/EleutherAI/gpt-neo,Category 1: From Scratch,GPT-Neo implementation,Open source GPT alternative
+58,https://github.com/bigscience-workshop/petals,Category 1: From Scratch,Distributed LLM inference,Run LLMs collaboratively
+59,https://github.com/facebookresearch/detr,Category 1: From Scratch,Detection Transformer,End-to-end object detection
+60,https://github.com/microsoft/Swin-Transformer,Category 1: From Scratch,Swin Transformer implementation,Hierarchical vision transformer
+61,https://github.com/facebookresearch/ConvNeXt,Category 1: From Scratch,Modernized ConvNet,A ConvNet for the 2020s
+62,https://github.com/haotian-liu/LLaVA,Category 1: From Scratch,Large Language and Vision Assistant,Visual instruction tuning
+63,https://github.com/clovaai/deep-text-recognition-benchmark,Category 1: From Scratch,Text recognition benchmark,STR model collection
+64,https://github.com/JaidedAI/EasyOCR,Category 1: From Scratch,Easy-to-use OCR,Multi-language OCR
+65,https://github.com/clovaai/CRAFT-pytorch,Category 1: From Scratch,Text detection model,Character region awareness
+66,https://github.com/ytdl-org/youtube-dl,Category 2: Domain Specific,Download videos from YouTube,Comprehensive video downloader
+67,https://github.com/yt-dlp/yt-dlp,Category 2: Domain Specific,Feature-rich youtube-dl fork,"Active development, more features"
+68,https://github.com/3b1b/manim,Category 2: Domain Specific,Math animation engine,Mathematical animations
+69,https://github.com/ManimCommunity/manim,Category 2: Domain Specific,Community fork of manim,Improved manim version
+70,https://github.com/sherlock-project/sherlock,Category 2: Domain Specific,Hunt usernames across social networks,OSINT tool
+71,https://github.com/locustio/locust,Category 2: Domain Specific,Load testing tool,Scalable user simulation
+72,https://github.com/mitmproxy/mitmproxy,Category 2: Domain Specific,Interactive HTTPS proxy,Network debugging tool
+73,https://github.com/sqlmapproject/sqlmap,Category 2: Domain Specific,SQL injection tool,Security testing
+74,https://github.com/s0md3v/XSStrike,Category 2: Domain Specific,XSS scanner,Cross-site scripting detection
+75,https://github.com/maurosoria/dirsearch,Category 2: Domain Specific,Web path scanner,Directory brute forcing
+76,https://github.com/laramies/theHarvester,Category 2: Domain Specific,Email and subdomain harvester,OSINT gathering
+77,https://github.com/Gallopsled/pwntools,Category 2: Domain Specific,CTF toolkit,Exploit development
+78,https://github.com/python-telegram-bot/python-telegram-bot,Category 2: Domain Specific,Telegram bot API,Bot development
+79,https://github.com/Rapptz/discord.py,Category 2: Domain Specific,Discord API wrapper,Discord bot development
+80,https://github.com/tweepy/tweepy,Category 2: Domain Specific,Twitter API library,Twitter integration
+81,https://github.com/praw-dev/praw,Category 2: Domain Specific,Reddit API wrapper,Reddit integration
+82,https://github.com/burnash/gspread,Category 2: Domain Specific,Google Sheets API,Spreadsheet automation
+83,https://github.com/RaRe-Technologies/gensim,Category 2: Domain Specific,Topic modelling library,NLP topic models
+84,https://github.com/nltk/nltk,Category 2: Domain Specific,Natural Language Toolkit,Classic NLP library
+85,https://github.com/sloria/TextBlob,Category 2: Domain Specific,Simple NLP library,Easy text processing
+86,https://github.com/stanfordnlp/stanza,Category 2: Domain Specific,Stanford NLP library,Multi-language NLP
+87,https://github.com/flairNLP/flair,Category 2: Domain Specific,State-of-art NLP,"NER, POS tagging"
+88,https://github.com/deepset-ai/haystack,Category 2: Domain Specific,NLP framework,"Question answering, RAG"
+89,https://github.com/chroma-core/chroma,Category 2: Domain Specific,Vector database,AI-native embedding database
+90,https://github.com/facebookresearch/faiss,Category 2: Domain Specific,Similarity search library,Efficient similarity search
+91,https://github.com/spotify/annoy,Category 2: Domain Specific,Approximate nearest neighbors,Memory-efficient ANN
+92,https://github.com/celery/celery,Category 2: Domain Specific,Distributed task queue,Async task processing
+93,https://github.com/rq/rq,Category 2: Domain Specific,Simple job queue,Redis-based queue
+94,https://github.com/fabric/fabric,Category 2: Domain Specific,SSH command execution,Remote administration
+95,https://github.com/paramiko/paramiko,Category 2: Domain Specific,SSH2 protocol library,SSH implementation
+96,https://github.com/donnemartin/interactive-coding-challenges,Category 3: Algorithms,Interactive coding challenges,Jupyter notebooks with solutions
+97,https://github.com/faif/python-patterns,Category 3: Algorithms,Design patterns in Python,Comprehensive pattern collection
+98,https://github.com/networkx/networkx,Category 3: Algorithms,Graph algorithms library,Comprehensive graph library
+99,https://github.com/pytransitions/transitions,Category 3: Algorithms,State machine library,Lightweight FSM
+100,https://github.com/grantjenks/python-sortedcontainers,Category 3: Algorithms,Sorted collections,"SortedList, SortedDict"
+101,https://github.com/seperman/deepdiff,Category 3: Algorithms,Deep difference calculator,Object comparison
+102,https://github.com/mahmoud/boltons,Category 3: Algorithms,Python utilities,Stdlib extensions
+103,https://github.com/pytoolz/toolz,Category 3: Algorithms,Functional utilities,Functional programming helpers
+104,https://github.com/more-itertools/more-itertools,Category 3: Algorithms,Extended itertools,Iterator utilities
+105,https://github.com/jd/tenacity,Category 3: Algorithms,Retry library,Flexible retry mechanism
+106,https://github.com/omry/omegaconf,Category 3: Algorithms,Hierarchical configuration,YAML/dataclass configs
+107,https://github.com/facebookresearch/hydra,Category 3: Algorithms,Configuration framework,Dynamic config composition
+108,https://github.com/dry-python/returns,Category 3: Algorithms,Typed functional primitives,"Maybe, Result types"
+109,https://github.com/tobgu/pyrsistent,Category 3: Algorithms,Persistent data structures,Immutable collections
+110,https://github.com/tkem/cachetools,Category 3: Algorithms,Extensible memoizing,Various cache algorithms
+111,https://github.com/hynek/attrs,Category 3: Algorithms,Classes without boilerplate,Attribute management
+112,https://github.com/python-attrs/cattrs,Category 3: Algorithms,Complex objects structuring,Serialization/deserialization
+113,https://github.com/Farama-Foundation/Gymnasium,Category 4: Scientific Computing,Maintained Gym fork,Active RL environment library
+114,https://github.com/DLR-RM/stable-baselines3,Category 4: Scientific Computing,PyTorch RL algorithms,Production-ready RL
+115,https://github.com/thu-ml/tianshou,Category 4: Scientific Computing,RL library,PyTorch RL platform
+116,https://github.com/google/dopamine,Category 4: Scientific Computing,RL research framework,TensorFlow RL research
+117,https://github.com/AI4Finance-Foundation/FinRL,Category 4: Scientific Computing,Financial RL,Trading with RL
+118,https://github.com/scipy/scipy,Category 4: Scientific Computing,Scientific computing,Core scientific library
+119,https://github.com/statsmodels/statsmodels,Category 4: Scientific Computing,Statistical models,Statistics library
+120,https://github.com/arviz-devs/arviz,Category 4: Scientific Computing,Bayesian visualization,Exploratory Bayesian analysis
+121,https://github.com/pyro-ppl/pyro,Category 4: Scientific Computing,Probabilistic programming,Deep probabilistic modeling
+122,https://github.com/pyro-ppl/numpyro,Category 4: Scientific Computing,NumPyro,JAX-based probabilistic
+123,https://github.com/cornellius-gp/gpytorch,Category 4: Scientific Computing,Gaussian processes,GP implementation
+124,https://github.com/pytorch/botorch,Category 4: Scientific Computing,Bayesian optimization,BO library
+125,https://github.com/facebookresearch/nevergrad,Category 4: Scientific Computing,Gradient-free optimization,Derivative-free optimization
+126,https://github.com/optuna/optuna,Category 4: Scientific Computing,Hyperparameter optimization,AutoML framework
+127,https://github.com/hyperopt/hyperopt,Category 4: Scientific Computing,Hyperparameter optimization,Distributed optimization
+128,https://github.com/pycaret/pycaret,Category 4: Scientific Computing,Low-code ML,Easy ML workflows
+129,https://github.com/EpistasisLab/tpot,Category 4: Scientific Computing,Automated ML,Genetic programming ML
+130,https://github.com/dask/dask,Category 4: Scientific Computing,Parallel computing,Scalable analytics
+131,https://github.com/modin-project/modin,Category 4: Scientific Computing,Parallel pandas,Scalable dataframes
+132,https://github.com/pola-rs/polars,Category 4: Scientific Computing,Fast DataFrames,Rust-based DataFrames
+133,https://github.com/numba/numba,Category 4: Scientific Computing,JIT compiler,Fast numerical code
+134,https://github.com/cupy/cupy,Category 4: Scientific Computing,GPU NumPy,CUDA arrays
+135,https://github.com/taichi-dev/taichi,Category 4: Scientific Computing,Graphics programming,High-performance computing
+136,https://github.com/pallets/itsdangerous,Category 5: Small Frameworks,Data signing library,Cryptographic signing
+137,https://github.com/Textualize/rich,Category 5: Small Frameworks,Rich text terminal,Beautiful terminal output
+138,https://github.com/tqdm/tqdm,Category 5: Small Frameworks,Progress bar,Fast progress bars
+139,https://github.com/Textualize/textual,Category 5: Small Frameworks,TUI framework,Terminal UI
+140,https://github.com/prompt-toolkit/python-prompt-toolkit,Category 5: Small Frameworks,Interactive CLI,Command line toolkit
+141,https://github.com/tartley/colorama,Category 5: Small Frameworks,Cross-platform colored terminal,Terminal colors
+142,https://github.com/Delgan/loguru,Category 5: Small Frameworks,Logging made simple,Better logging
+143,https://github.com/hynek/structlog,Category 5: Small Frameworks,Structured logging,Structured log events
+144,https://github.com/gruns/icecream,Category 5: Small Frameworks,Print debugging,Better print debugging
+145,https://github.com/cool-RR/PySnooper,Category 5: Small Frameworks,Debug decorator,Never use print again
+146,https://github.com/inducer/pudb,Category 5: Small Frameworks,Visual debugger,Full-screen debugger
+147,https://github.com/HypothesisWorks/hypothesis,Category 5: Small Frameworks,Property-based testing,Generative testing
+148,https://github.com/spulec/moto,Category 5: Small Frameworks,AWS mocking,Mock AWS services
+149,https://github.com/kevin1024/vcrpy,Category 5: Small Frameworks,HTTP recording,Record HTTP interactions
+150,https://github.com/getsentry/responses,Category 5: Small Frameworks,Requests mocking,Mock HTTP responses
+151,https://github.com/aio-libs/aiohttp,Category 5: Small Frameworks,Async HTTP,Async web framework
+152,https://github.com/MagicStack/uvloop,Category 5: Small Frameworks,Fast event loop,Drop-in asyncio replacement
+153,https://github.com/python-trio/trio,Category 5: Small Frameworks,Async I/O library,Alternative to asyncio
+154,https://github.com/agronholm/anyio,Category 5: Small Frameworks,Async compatibility,Backend-agnostic async
+155,https://github.com/benoitc/gunicorn,Category 5: Small Frameworks,WSGI HTTP server,Production web server
+156,https://github.com/encode/uvicorn,Category 5: Small Frameworks,ASGI server,Fast ASGI server
+157,https://github.com/falconry/falcon,Category 5: Small Frameworks,REST framework,Minimal REST API
+158,https://github.com/bottlepy/bottle,Category 5: Small Frameworks,Micro web framework,Single file framework
+159,https://github.com/cherrypy/cherrypy,Category 5: Small Frameworks,Web framework,Object-oriented framework
+160,https://github.com/sanic-org/sanic,Category 5: Small Frameworks,Async web framework,Fast async HTTP
+161,https://github.com/marshmallow-code/marshmallow,Category 5: Small Frameworks,Serialization library,Object serialization
+162,https://github.com/pygame/pygame,Category 6: Visualization and Games,Game development library,Python game framework
+163,https://github.com/pythonarcade/arcade,Category 6: Visualization and Games,2D game library,Modern game library
+164,https://github.com/pyglet/pyglet,Category 6: Visualization and Games,OpenGL library,Windowing and multimedia
+165,https://github.com/kitao/pyxel,Category 6: Visualization and Games,Retro game engine,Fantasy console
+166,https://github.com/lordmauve/pgzero,Category 6: Visualization and Games,Pygame Zero,Simplified pygame
+167,https://github.com/PySimpleGUI/PySimpleGUI,Category 6: Visualization and Games,Simple GUI,Easy GUI creation
+168,https://github.com/kivy/kivy,Category 6: Visualization and Games,Cross-platform UI,Mobile/desktop UI
+169,https://github.com/niklasf/python-chess,Category 6: Visualization and Games,Chess library,Move generation
+170,https://github.com/plotly/plotly.py,Category 6: Visualization and Games,Interactive visualization,Interactive plots
+171,https://github.com/bokeh/bokeh,Category 6: Visualization and Games,Interactive visualization,Browser-based plots
+172,https://github.com/altair-viz/altair,Category 6: Visualization and Games,Declarative visualization,Vega-Lite wrapper
+173,https://github.com/holoviz/holoviews,Category 6: Visualization and Games,High-level visualization,Data-driven plotting
+174,https://github.com/has2k1/plotnine,Category 6: Visualization and Games,Grammar of graphics,ggplot2 for Python
+175,https://github.com/pyqtgraph/pyqtgraph,Category 6: Visualization and Games,Scientific graphics,Fast plotting
+176,https://github.com/pyvista/pyvista,Category 6: Visualization and Games,3D visualization,VTK wrapper
+177,https://github.com/jakevdp/PythonDataScienceHandbook,Category 7: Educational,Data science book,Jupyter notebooks
+178,https://github.com/ageron/handson-ml2,Category 7: Educational,ML book code,Hands-on ML book
+179,https://github.com/ageron/handson-ml3,Category 7: Educational,ML book 3rd edition,Updated ML book
+180,https://github.com/wesm/pydata-book,Category 7: Educational,Python for Data Analysis,Classic data book
+181,https://github.com/fchollet/deep-learning-with-python-notebooks,Category 7: Educational,Deep learning book,Keras creator's book
+182,https://github.com/fastai/fastbook,Category 7: Educational,FastAI book,Practical deep learning
+183,https://github.com/fastai/fastai,Category 7: Educational,FastAI library,Deep learning library
+184,https://github.com/d2l-ai/d2l-en,Category 7: Educational,Dive into Deep Learning,Interactive DL book
+185,https://github.com/probml/pyprobml,Category 7: Educational,Probabilistic ML book,Murphy's book code
+186,https://github.com/joelgrus/data-science-from-scratch,Category 7: Educational,Data science book,From scratch implementations
+187,https://github.com/trekhleb/learn-python,Category 7: Educational,Python learning,Language features
+188,https://github.com/jerry-git/learn-python3,Category 7: Educational,Python 3 learning,Jupyter tutorials
+189,https://github.com/micropython/micropython,Category 8: Compilers,MicroPython,Python for microcontrollers
+190,https://github.com/cython/cython,Category 8: Compilers,Python to C compiler,Optimizing compiler
+191,https://github.com/Nuitka/Nuitka,Category 8: Compilers,Python compiler,Compiles to C
+192,https://github.com/RustPython/RustPython,Category 8: Compilers,Python in Rust,Rust implementation
+193,https://github.com/dabeaz/ply,Category 8: Compilers,Python lex-yacc,Classic parser tools
+194,https://github.com/pyparsing/pyparsing,Category 8: Compilers,Parsing module,Grammar-based parsing
+195,https://github.com/erikrose/parsimonious,Category 8: Compilers,PEG parser,Clean PEG parser
+196,https://github.com/pandas-dev/pandas,Category 9: Data Processing,Data analysis library,Core data library
+197,https://github.com/numpy/numpy,Category 9: Data Processing,Numerical computing,Core numerical library
+198,https://github.com/apache/airflow,Category 9: Data Processing,Workflow management,DAG scheduling
+199,https://github.com/prefecthq/prefect,Category 9: Data Processing,Modern workflow,Dataflow automation
+200,https://github.com/dagster-io/dagster,Category 9: Data Processing,Data orchestrator,Data pipeline tool
+201,https://github.com/spotify/luigi,Category 9: Data Processing,Pipeline framework,Batch processing
+202,https://github.com/great-expectations/great_expectations,Category 9: Data Processing,Data validation,Data quality
+203,https://github.com/pandera-dev/pandera,Category 9: Data Processing,DataFrame validation,Type checking for data
+204,https://github.com/mlflow/mlflow,Category 9: Data Processing,ML lifecycle,Experiment tracking
+205,https://github.com/wandb/wandb,Category 9: Data Processing,ML experiment tracking,Experiment management
+206,https://github.com/iterative/dvc,Category 9: Data Processing,Data version control,ML data versioning
+207,https://github.com/evidentlyai/evidently,Category 9: Data Processing,ML monitoring,Model monitoring
+208,https://github.com/secdev/scapy,Category 10: Networking and Security,Packet manipulation,Network tool
+209,https://github.com/gevent/gevent,Category 10: Networking and Security,Coroutine networking,Green threads
+210,https://github.com/pyca/cryptography,Category 10: Networking and Security,Cryptographic recipes,Crypto library
+211,https://github.com/Legrandin/pycryptodome,Category 10: Networking and Security,Cryptography library,PyCrypto fork
+212,https://github.com/lucidrains/denoising-diffusion-pytorch,Category 1: From Scratch,Denoising diffusion implementation,Clean diffusion model
+213,https://github.com/lucidrains/perceiver-pytorch,Category 1: From Scratch,Perceiver implementation,General perception model
+214,https://github.com/lucidrains/reformer-pytorch,Category 1: From Scratch,Reformer implementation,Efficient transformer
+215,https://github.com/lucidrains/linear-attention-transformer,Category 1: From Scratch,Linear attention transformer,Efficient attention
+216,https://github.com/lucidrains/performer-pytorch,Category 1: From Scratch,Performer implementation,FAVOR+ attention
+217,https://github.com/lucidrains/lambda-networks,Category 1: From Scratch,Lambda Networks,Attention alternative
+218,https://github.com/lucidrains/bottleneck-transformer-pytorch,Category 1: From Scratch,Bottleneck Transformer,Vision transformer variant
+219,https://github.com/lucidrains/g-mlp-pytorch,Category 1: From Scratch,gMLP implementation,MLP-based architecture
+220,https://github.com/lucidrains/mlp-mixer-pytorch,Category 1: From Scratch,MLP-Mixer implementation,All-MLP architecture
+221,https://github.com/lucidrains/res-mlp-pytorch,Category 1: From Scratch,ResMLP implementation,Residual MLP
+222,https://github.com/lucidrains/memory-efficient-attention-pytorch,Category 1: From Scratch,Memory efficient attention,Flash attention style
+223,https://github.com/lucidrains/flash-attention-jax,Category 1: From Scratch,Flash attention in JAX,Efficient attention JAX
+224,https://github.com/arogozhnikov/einops,Category 5: Small Frameworks,Tensor operations,Flexible tensor manipulation
+225,https://github.com/google/trax,Category 1: From Scratch,Deep learning library,"Clear code, Reformer"
+226,https://github.com/facebookresearch/xformers,Category 1: From Scratch,Transformers building blocks,Efficient transformers
+227,https://github.com/kingoflolz/mesh-transformer-jax,Category 1: From Scratch,GPT-J implementation,Large scale JAX training
+228,https://github.com/BlinkDL/RWKV-LM,Category 1: From Scratch,RWKV language model,RNN-Transformer hybrid
+229,https://github.com/BlinkDL/ChatRWKV,Category 1: From Scratch,ChatRWKV,RWKV chat model
+230,https://github.com/alpa-projects/alpa,Category 1: From Scratch,Auto parallelization,JAX auto parallelism
+231,https://github.com/young-geng/EasyLM,Category 1: From Scratch,Easy LLM training,JAX LLM framework
+232,https://github.com/CarperAI/trlx,Category 1: From Scratch,RLHF library,Reinforcement learning from human feedback
+233,https://github.com/lvwerra/trl,Category 1: From Scratch,Transformer RL,PPO for LLMs
+234,https://github.com/huggingface/peft,Category 1: From Scratch,Parameter-efficient fine-tuning,"LoRA, prefix tuning"
+235,https://github.com/TimDettmers/bitsandbytes,Category 1: From Scratch,8-bit optimizers,Quantization library
+236,https://github.com/IST-DASLab/gptq,Category 1: From Scratch,GPT quantization,4-bit quantization
+237,https://github.com/ggerganov/llama.cpp,Category 1: From Scratch,LLaMA in C++,CPU inference
+238,https://github.com/abetlen/llama-cpp-python,Category 1: From Scratch,Python bindings for llama.cpp,Python LLaMA interface
+239,https://github.com/vllm-project/vllm,Category 1: From Scratch,Fast LLM inference,PagedAttention
+240,https://github.com/huggingface/text-generation-inference,Category 1: From Scratch,Text generation server,Production LLM serving
+241,https://github.com/oobabooga/text-generation-webui,Category 1: From Scratch,Text generation UI,LLM web interface
+242,https://github.com/lm-sys/FastChat,Category 1: From Scratch,FastChat,Training and serving
+243,https://github.com/imartinez/privateGPT,Category 1: From Scratch,Private GPT,Local document QA
+244,https://github.com/Significant-Gravitas/Auto-GPT,Category 1: From Scratch,Auto-GPT,Autonomous GPT
+245,https://github.com/microsoft/guidance,Category 1: From Scratch,Guidance language,LLM control
+246,https://github.com/microsoft/semantic-kernel,Category 1: From Scratch,Semantic Kernel,LLM orchestration
+247,https://github.com/langchain-ai/langchain,Category 1: From Scratch,LangChain,LLM application framework
+248,https://github.com/run-llama/llama_index,Category 1: From Scratch,LlamaIndex,Data framework for LLMs
+249,https://github.com/openai/whisper,Category 1: From Scratch,Whisper ASR,Speech recognition
+250,https://github.com/guillaumekln/faster-whisper,Category 1: From Scratch,Faster Whisper,CTranslate2 Whisper
+251,https://github.com/m-bain/whisperX,Category 1: From Scratch,WhisperX,Whisper with alignment
+252,https://github.com/Vaibhavs10/insanely-fast-whisper,Category 1: From Scratch,Fast Whisper,Optimized Whisper
+253,https://github.com/sanchit-gandhi/whisper-jax,Category 1: From Scratch,Whisper JAX,JAX Whisper
+254,https://github.com/jantic/DeOldify,Category 1: From Scratch,DeOldify,Image colorization
+255,https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix,Category 1: From Scratch,CycleGAN pix2pix,Image translation
+256,https://github.com/NVlabs/stylegan2,Category 1: From Scratch,StyleGAN2,Official TF impl
+257,https://github.com/NVlabs/stylegan3,Category 1: From Scratch,StyleGAN3,Alias-free GAN
+258,https://github.com/rosinality/stylegan2-pytorch,Category 1: From Scratch,StyleGAN2 PyTorch,Clean PyTorch impl
+259,https://github.com/AliaksandrSiarohin/first-order-model,Category 1: From Scratch,First Order Motion,Motion transfer
+260,https://github.com/deepfakes/faceswap,Category 1: From Scratch,Faceswap,Face swapping
+261,https://github.com/iperov/DeepFaceLab,Category 1: From Scratch,DeepFaceLab,Face manipulation
+262,https://github.com/serengil/deepface,Category 1: From Scratch,DeepFace,Face recognition
+263,https://github.com/ageitgey/face_recognition,Category 1: From Scratch,Face recognition,Simple face rec
+264,https://github.com/1adrianb/face-alignment,Category 1: From Scratch,Face alignment,2D/3D face landmarks
+265,https://github.com/timesler/facenet-pytorch,Category 1: From Scratch,FaceNet PyTorch,Face recognition
+266,https://github.com/deepinsight/insightface,Category 1: From Scratch,InsightFace,Face analysis
+267,https://github.com/minivision-ai/photo2cartoon,Category 1: From Scratch,Photo2Cartoon,Image stylization
+268,https://github.com/danielgatis/rembg,Category 1: From Scratch,Remove background,Background removal
+269,https://github.com/nadermx/backgroundremover,Category 1: From Scratch,Background remover,Video bg removal
+270,https://github.com/PeterL1n/RobustVideoMatting,Category 1: From Scratch,Robust Video Matting,Video matting
+271,https://github.com/sberbank-ai/sber-swap,Category 1: From Scratch,SberSwap,Face swap
+272,https://github.com/s0md3v/roop,Category 1: From Scratch,Roop,One-click face swap
+273,https://github.com/facefusion/facefusion,Category 1: From Scratch,FaceFusion,Face manipulation
+274,https://github.com/facebookresearch/audiocraft,Category 1: From Scratch,AudioCraft,Audio generation
+275,https://github.com/facebookresearch/encodec,Category 1: From Scratch,EnCodec,Neural audio codec
+276,https://github.com/svc-develop-team/so-vits-svc,Category 1: From Scratch,SO-VITS-SVC,Singing voice conversion
+277,https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI,Category 1: From Scratch,RVC,Voice conversion
+278,https://github.com/jik876/hifi-gan,Category 1: From Scratch,HiFi-GAN,Speech synthesis
+279,https://github.com/jaywalnut310/vits,Category 1: From Scratch,VITS,End-to-end TTS
+280,https://github.com/Plachtaa/VITS-fast-fine-tuning,Category 1: From Scratch,VITS fine-tuning,Fast TTS training
+281,https://github.com/cmu-db/ottertune,Category 2: Domain Specific,OtterTune,Database tuning ML
+282,https://github.com/OpenBB-finance/OpenBBTerminal,Category 2: Domain Specific,OpenBB Terminal,Investment research
+283,https://github.com/ranaroussi/yfinance,Category 2: Domain Specific,yfinance,Yahoo Finance API
+284,https://github.com/pmorissette/bt,Category 2: Domain Specific,bt backtest,Backtesting
+285,https://github.com/pmorissette/ffn,Category 2: Domain Specific,ffn,Financial functions
+286,https://github.com/erdewit/ib_insync,Category 2: Domain Specific,IB Insync,Interactive Brokers
+287,https://github.com/kernc/backtesting.py,Category 2: Domain Specific,Backtesting.py,Simple backtesting
+288,https://github.com/google/timesketch,Category 2: Domain Specific,Timesketch,Forensic timeline
+289,https://github.com/zulip/zulip,Category 2: Domain Specific,Zulip,Team chat
+290,https://github.com/healthchecks/healthchecks,Category 2: Domain Specific,Healthchecks,Cron monitoring
+291,https://github.com/netbox-community/netbox,Category 2: Domain Specific,NetBox,Network documentation
+292,https://github.com/ArchiveBox/ArchiveBox,Category 2: Domain Specific,ArchiveBox,Web archiving
+293,https://github.com/wagtail/wagtail,Category 2: Domain Specific,Wagtail CMS,Django CMS
+294,https://github.com/joke2k/faker,Category 5: Small Frameworks,Fake data generator,Test data generation
+295,https://github.com/samuelcolvin/watchfiles,Category 5: Small Frameworks,File watching,Rust-backed file watcher
+296,https://github.com/snok/httpx-auth,Category 5: Small Frameworks,HTTPX authentication,Auth for httpx
+297,https://github.com/python-jsonschema/jsonschema,Category 5: Small Frameworks,JSON Schema validator,Schema validation
+298,https://github.com/Julian/jsonschema,Category 5: Small Frameworks,JSON Schema implementation,Full JSON Schema support
+299,https://github.com/ijl/orjson,Category 5: Small Frameworks,Fast JSON library,Rust-based JSON
+300,https://github.com/ultrajson/ultrajson,Category 5: Small Frameworks,Ultra fast JSON,C-based JSON
+301,https://github.com/msgspec/msgspec,Category 5: Small Frameworks,Fast serialization,MessagePack/JSON
+302,https://github.com/samuelcolvin/dirty-equals,Category 5: Small Frameworks,Dirty equals,Testing utility
+303,https://github.com/pydantic/pydantic-settings,Category 5: Small Frameworks,Pydantic settings,Settings management
+304,https://github.com/unionai-oss/pandera,Category 5: Small Frameworks,DataFrame validation,Data validation
+305,https://github.com/tiangolo/typer,Category 5: Small Frameworks,CLI framework,Modern CLI building
+306,https://github.com/tiangolo/sqlmodel,Category 5: Small Frameworks,SQL databases in Python,SQLAlchemy + Pydantic
+307,https://github.com/samuelcolvin/arq,Category 5: Small Frameworks,Async job queue,Redis job queue
+308,https://github.com/encode/databases,Category 5: Small Frameworks,Async database support,Async DB interface
+309,https://github.com/piccolo-orm/piccolo,Category 5: Small Frameworks,Async ORM,Modern async ORM
+310,https://github.com/tortoise/tortoise-orm,Category 5: Small Frameworks,Async ORM,Django-like async ORM
+311,https://github.com/sqlalchemy/sqlalchemy,Category 5: Small Frameworks,SQL toolkit and ORM,Database toolkit
+312,https://github.com/MagicStack/asyncpg,Category 5: Small Frameworks,Async PostgreSQL,Fast PostgreSQL driver
+313,https://github.com/encode/orm,Category 5: Small Frameworks,Async ORM,Simple async ORM
+314,https://github.com/ponyorm/pony,Category 5: Small Frameworks,Pony ORM,Pythonic ORM
+315,https://github.com/coleifer/peewee,Category 5: Small Frameworks,Simple ORM,Lightweight ORM
+316,https://github.com/mongodb/motor,Category 5: Small Frameworks,Async MongoDB driver,MongoDB async
+317,https://github.com/redis/redis-py,Category 5: Small Frameworks,Redis client,Python Redis client
+318,https://github.com/aio-libs/aioredis-py,Category 5: Small Frameworks,Async Redis,Async Redis client
+319,https://github.com/miguelgrinberg/python-socketio,Category 5: Small Frameworks,Socket.IO,Real-time communication
+320,https://github.com/miguelgrinberg/Flask-SocketIO,Category 5: Small Frameworks,Flask-SocketIO,Flask WebSocket
+321,https://github.com/aaugustin/websockets,Category 5: Small Frameworks,WebSocket library,Async WebSockets
+322,https://github.com/python-websockets/websockets,Category 5: Small Frameworks,WebSocket implementation,WebSocket protocol
+323,https://github.com/graphql-python/graphene,Category 5: Small Frameworks,GraphQL framework,GraphQL in Python
+324,https://github.com/strawberry-graphql/strawberry,Category 5: Small Frameworks,GraphQL library,Type-first GraphQL
+325,https://github.com/mirumee/ariadne,Category 5: Small Frameworks,Schema-first GraphQL,GraphQL framework
+326,https://github.com/graphql-python/graphql-core,Category 5: Small Frameworks,GraphQL core,GraphQL implementation
+327,https://github.com/python-restx/flask-restx,Category 5: Small Frameworks,Flask REST extensions,REST API building
+328,https://github.com/flask-restful/flask-restful,Category 5: Small Frameworks,Flask RESTful,REST API framework
+329,https://github.com/dpgaspar/Flask-AppBuilder,Category 5: Small Frameworks,Flask app builder,Rapid app development
+330,https://github.com/pyeve/eve,Category 5: Small Frameworks,REST API framework,MongoDB REST
+331,https://github.com/sloria/flask-marshmallow,Category 5: Small Frameworks,Flask + Marshmallow,Serialization integration
+332,https://github.com/python-babel/babel,Category 5: Small Frameworks,Internationalization,i18n utilities
+333,https://github.com/mitsuhiko/flask-babel,Category 5: Small Frameworks,Flask i18n,Flask internationalization
+334,https://github.com/django-extensions/django-extensions,Category 5: Small Frameworks,Django extensions,Django utilities
+335,https://github.com/jazzband/django-debug-toolbar,Category 5: Small Frameworks,Django debug toolbar,Debugging tool
+336,https://github.com/jazzband/django-redis,Category 5: Small Frameworks,Django Redis,Redis cache backend
+337,https://github.com/django-oscar/django-oscar,Category 2: Domain Specific,Django e-commerce,E-commerce framework
+338,https://github.com/saleor/saleor,Category 2: Domain Specific,E-commerce platform,GraphQL e-commerce
+339,https://github.com/pretix/pretix,Category 2: Domain Specific,Ticket sales,Event ticketing
+340,https://github.com/django-cms/django-cms,Category 2: Domain Specific,Django CMS,Content management
+341,https://github.com/mezzanine/mezzanine,Category 2: Domain Specific,Django CMS,Content management
+342,https://github.com/stephenmcd/mezzanine,Category 2: Domain Specific,Mezzanine CMS,Blog/CMS platform
+343,https://github.com/edx/edx-platform,Category 2: Domain Specific,edX platform,Online learning
+344,https://github.com/overhangio/tutor,Category 2: Domain Specific,Open edX Docker,edX deployment
+345,https://github.com/frappe/frappe,Category 2: Domain Specific,Frappe framework,Web framework
+346,https://github.com/frappe/erpnext,Category 2: Domain Specific,ERPNext,ERP system
+347,https://github.com/odoo/odoo,Category 2: Domain Specific,Odoo ERP,Business apps
+348,https://github.com/tryton/tryton,Category 2: Domain Specific,Tryton,Business platform
+349,https://github.com/indico/indico,Category 2: Domain Specific,Indico,Event management
+350,https://github.com/Miserlou/Zappa,Category 2: Domain Specific,Serverless Python,AWS Lambda deploy
+351,https://github.com/aws/chalice,Category 2: Domain Specific,AWS Chalice,Serverless framework
+352,https://github.com/serverless/serverless,Category 2: Domain Specific,Serverless Framework,Multi-cloud serverless
+353,https://github.com/pulumi/pulumi,Category 2: Domain Specific,Pulumi IaC,Infrastructure as code
+354,https://github.com/hashicorp/terraform,Category 2: Domain Specific,Terraform,Infrastructure provisioning
+355,https://github.com/ansible/ansible,Category 2: Domain Specific,Ansible automation,IT automation
+356,https://github.com/saltstack/salt,Category 2: Domain Specific,SaltStack,Configuration management
+357,https://github.com/ray-project/ray,Category 4: Scientific Computing,Ray distributed computing,Distributed Python
+358,https://github.com/vaexio/vaex,Category 4: Scientific Computing,Out-of-core DataFrames,Big data analysis
+359,https://github.com/rapidsai/cudf,Category 4: Scientific Computing,GPU DataFrames,CUDA DataFrames
+360,https://github.com/h2oai/h2o-3,Category 4: Scientific Computing,H2O ML platform,AutoML platform
+361,https://github.com/autogluon/autogluon,Category 4: Scientific Computing,AutoGluon,AutoML toolkit
+362,https://github.com/microsoft/FLAML,Category 4: Scientific Computing,FLAML AutoML,Fast AutoML
+363,https://github.com/automl/auto-sklearn,Category 4: Scientific Computing,Auto-sklearn,Automated ML
+364,https://github.com/alteryx/featuretools,Category 4: Scientific Computing,Featuretools,Feature engineering
+365,https://github.com/feature-engine/feature_engine,Category 4: Scientific Computing,Feature Engine,Feature engineering
+366,https://github.com/scikit-learn-contrib/category_encoders,Category 4: Scientific Computing,Category Encoders,Categorical encoding
+367,https://github.com/scikit-learn-contrib/imbalanced-learn,Category 4: Scientific Computing,Imbalanced Learn,Imbalanced data
+368,https://github.com/scikit-optimize/scikit-optimize,Category 4: Scientific Computing,Scikit-Optimize,Sequential optimization
+369,https://github.com/fmfn/BayesianOptimization,Category 4: Scientific Computing,Bayesian Optimization,Bayesian optimization
+370,https://github.com/SheffieldML/GPy,Category 4: Scientific Computing,GPy,Gaussian processes
+371,https://github.com/dfm/emcee,Category 4: Scientific Computing,emcee,MCMC sampler
+372,https://github.com/hmmlearn/hmmlearn,Category 4: Scientific Computing,hmmlearn,Hidden Markov Models
+373,https://github.com/pgmpy/pgmpy,Category 4: Scientific Computing,pgmpy,Probabilistic graphical models
+374,https://github.com/jmschrei/pomegranate,Category 4: Scientific Computing,pomegranate,Probabilistic models
+375,https://github.com/stan-dev/pystan,Category 4: Scientific Computing,PyStan,Stan interface
+376,https://github.com/tensorflow/probability,Category 4: Scientific Computing,TensorFlow Probability,Probabilistic reasoning
+377,https://github.com/zarr-developers/zarr-python,Category 4: Scientific Computing,Zarr,Chunked arrays
+378,https://github.com/h5py/h5py,Category 4: Scientific Computing,h5py,HDF5 interface
+379,https://github.com/sunpy/sunpy,Category 4: Scientific Computing,SunPy,Solar data analysis
+380,https://github.com/plasmapy/plasmapy,Category 4: Scientific Computing,PlasmaPy,Plasma physics
+381,https://github.com/mdtraj/mdtraj,Category 4: Scientific Computing,MDTraj,Molecular dynamics
+382,https://github.com/rdkit/rdkit,Category 4: Scientific Computing,RDKit,Cheminformatics
+383,https://github.com/deepchem/deepchem,Category 4: Scientific Computing,DeepChem,Drug discovery
+384,https://github.com/openforcefield/openff-toolkit,Category 4: Scientific Computing,OpenFF Toolkit,Molecular simulations
+385,https://github.com/materialsproject/pymatgen,Category 4: Scientific Computing,Pymatgen,Materials science
+386,https://github.com/aiqm/torchani,Category 4: Scientific Computing,TorchANI,Neural network potentials
+387,https://github.com/e3nn/e3nn,Category 4: Scientific Computing,e3nn,Euclidean neural networks
+388,https://github.com/qiskit/qiskit,Category 4: Scientific Computing,Qiskit,Quantum computing
+389,https://github.com/quantumlib/Cirq,Category 4: Scientific Computing,Cirq,Quantum circuits
+390,https://github.com/PennyLaneAI/pennylane,Category 4: Scientific Computing,PennyLane,Quantum ML
+391,https://github.com/strawberryfields/strawberryfields,Category 4: Scientific Computing,Strawberry Fields,Photonic quantum
+392,https://github.com/pyquil/pyquil,Category 4: Scientific Computing,pyQuil,Quantum programming
+393,https://github.com/QuTech-Delft/quantumsim,Category 4: Scientific Computing,QuantumSim,Quantum simulation
+394,https://github.com/uber/causalml,Category 4: Scientific Computing,CausalML,Causal inference
+395,https://github.com/microsoft/dowhy,Category 4: Scientific Computing,DoWhy,Causal inference
+396,https://github.com/py-why/EconML,Category 4: Scientific Computing,EconML,Heterogeneous treatment
+397,https://github.com/CamDavidsonPilon/lifelines,Category 4: Scientific Computing,Lifelines,Survival analysis
+398,https://github.com/scikit-survival/scikit-survival,Category 4: Scientific Computing,Scikit-Survival,Survival analysis
+399,https://github.com/facebookresearch/prophet,Category 4: Scientific Computing,Prophet,Time series forecasting
+400,https://github.com/alkaline-ml/pmdarima,Category 4: Scientific Computing,pmdarima,ARIMA modeling
+401,https://github.com/blue-yonder/tsfresh,Category 4: Scientific Computing,tsfresh,Time series features
+402,https://github.com/tslearn-team/tslearn,Category 4: Scientific Computing,tslearn,Time series ML
+403,https://github.com/sktime/sktime,Category 4: Scientific Computing,sktime,Time series toolkit
+404,https://github.com/alan-turing-institute/sktime,Category 4: Scientific Computing,sktime unified,Time series ML
+405,https://github.com/unit8co/darts,Category 4: Scientific Computing,Darts,Time series library
+406,https://github.com/awslabs/gluonts,Category 4: Scientific Computing,GluonTS,Probabilistic TS
+407,https://github.com/nixtla/neuralforecast,Category 4: Scientific Computing,NeuralForecast,Neural forecasting
+408,https://github.com/nixtla/statsforecast,Category 4: Scientific Computing,StatsForecast,Statistical forecasting
+409,https://github.com/ourownstory/neural_prophet,Category 4: Scientific Computing,NeuralProphet,Neural Prophet
+410,https://github.com/uber/orbit,Category 4: Scientific Computing,Orbit,Bayesian forecasting
+411,https://github.com/salesforce/Merlion,Category 4: Scientific Computing,Merlion,Time series library
+412,https://github.com/linkedin/greykite,Category 4: Scientific Computing,Greykite,Forecasting library
+413,https://github.com/Nixtla/nixtla,Category 4: Scientific Computing,Nixtla,Time series API
+414,https://github.com/python-visualization/folium,Category 6: Visualization and Games,Folium maps,Leaflet.js maps
+415,https://github.com/geopandas/geopandas,Category 6: Visualization and Games,GeoPandas,Geospatial data
+416,https://github.com/Toblerity/Shapely,Category 6: Visualization and Games,Shapely,Geometric objects
+417,https://github.com/Toblerity/Fiona,Category 6: Visualization and Games,Fiona,Geospatial data I/O
+418,https://github.com/pyproj4/pyproj,Category 6: Visualization and Games,pyproj,Cartographic projections
+419,https://github.com/rasterio/rasterio,Category 6: Visualization and Games,Rasterio,Raster data
+420,https://github.com/ResidentMario/geoplot,Category 6: Visualization and Games,Geoplot,Geospatial plotting
+421,https://github.com/holoviz/datashader,Category 6: Visualization and Games,Datashader,Big data visualization
+422,https://github.com/holoviz/hvplot,Category 6: Visualization and Games,hvPlot,High-level plotting
+423,https://github.com/holoviz/panel,Category 6: Visualization and Games,Panel,App building
+424,https://github.com/ydataai/ydata-profiling,Category 6: Visualization and Games,ydata-profiling,Data profiling
+425,https://github.com/lux-org/lux,Category 6: Visualization and Games,Lux,Automated visualization
+426,https://github.com/man-group/dtale,Category 6: Visualization and Games,D-Tale,DataFrame visualization
+427,https://github.com/fbdesignpro/sweetviz,Category 6: Visualization and Games,Sweetviz,EDA visualization
+428,https://github.com/PAIR-code/facets,Category 6: Visualization and Games,Facets,Data visualization
+429,https://github.com/tensorflow/tensorboard,Category 6: Visualization and Games,TensorBoard,ML visualization
+430,https://github.com/lanpa/tensorboardX,Category 6: Visualization and Games,TensorBoardX,TensorBoard for PyTorch
+431,https://github.com/fossasia/visdom,Category 6: Visualization and Games,Visdom,Flexible visualization
+432,https://github.com/Netflix/metaflow,Category 9: Data Processing,Metaflow,ML infrastructure
+433,https://github.com/zenml-io/zenml,Category 9: Data Processing,ZenML,MLOps framework
+434,https://github.com/kubeflow/kubeflow,Category 9: Data Processing,Kubeflow,ML on Kubernetes
+435,https://github.com/feast-dev/feast,Category 9: Data Processing,Feast,Feature store
+436,https://github.com/combust/mleap,Category 9: Data Processing,MLeap,ML serialization
+437,https://github.com/bentoml/BentoML,Category 9: Data Processing,BentoML,ML serving
+438,https://github.com/SeldonIO/seldon-core,Category 9: Data Processing,Seldon Core,ML deployment
+439,https://github.com/cortexlabs/cortex,Category 9: Data Processing,Cortex,ML deployment
+440,https://github.com/bodywork-ml/bodywork-core,Category 9: Data Processing,Bodywork,ML pipelines
+441,https://github.com/ploomber/ploomber,Category 9: Data Processing,Ploomber,Data pipelines
+442,https://github.com/mage-ai/mage-ai,Category 9: Data Processing,Mage,Data pipeline tool
+443,https://github.com/kedro-org/kedro,Category 9: Data Processing,Kedro,ML pipelines
+444,https://github.com/PrefectHQ/marvin,Category 9: Data Processing,Marvin,AI engineering
+445,https://github.com/kubeflow/pipelines,Category 9: Data Processing,Kubeflow Pipelines,ML workflows
+446,https://github.com/flyteorg/flyte,Category 9: Data Processing,Flyte,Workflow orchestration
+447,https://github.com/stitchfix/hamilton,Category 9: Data Processing,Hamilton,DAG framework
+448,https://github.com/erikbern/ann-benchmarks,Category 3: Algorithms,ANN Benchmarks,Algorithm benchmarks
+449,https://github.com/nmslib/nmslib,Category 3: Algorithms,NMSLIB,Similarity search
+450,https://github.com/nmslib/hnswlib,Category 3: Algorithms,hnswlib,Approximate NN
+451,https://github.com/lmcinnes/umap,Category 3: Algorithms,UMAP,Dimensionality reduction
+452,https://github.com/lmcinnes/pynndescent,Category 3: Algorithms,PyNNDescent,Nearest neighbors
+453,https://github.com/lmcinnes/hdbscan,Category 3: Algorithms,HDBSCAN,Clustering
+454,https://github.com/scikit-learn-contrib/hdbscan,Category 3: Algorithms,HDBSCAN contrib,Hierarchical clustering
+455,https://github.com/dmlc/xgboost,Category 4: Scientific Computing,XGBoost,Gradient boosting
+456,https://github.com/microsoft/LightGBM,Category 4: Scientific Computing,LightGBM,Gradient boosting
+457,https://github.com/catboost/catboost,Category 4: Scientific Computing,CatBoost,Gradient boosting
+458,https://github.com/linkedin/luminol,Category 4: Scientific Computing,Luminol,Anomaly detection
+459,https://github.com/yzhao062/pyod,Category 4: Scientific Computing,PyOD,Outlier detection
+460,https://github.com/salesforce/PyTorch-LBFGS,Category 4: Scientific Computing,PyTorch-LBFGS,L-BFGS optimizer
+461,https://github.com/pytorch/captum,Category 4: Scientific Computing,Captum,Model interpretability
+462,https://github.com/interpretml/interpret,Category 4: Scientific Computing,InterpretML,ML interpretability
+463,https://github.com/slundberg/shap,Category 4: Scientific Computing,SHAP,Explainability
+464,https://github.com/marcotcr/lime,Category 4: Scientific Computing,LIME,Local explanations
+465,https://github.com/SeldonIO/alibi,Category 4: Scientific Computing,Alibi,ML explanations
+466,https://github.com/EthicalML/xai,Category 4: Scientific Computing,XAI,Explainable AI
+467,https://github.com/fairlearn/fairlearn,Category 4: Scientific Computing,Fairlearn,ML fairness
+468,https://github.com/Trusted-AI/AIF360,Category 4: Scientific Computing,AI Fairness 360,Fairness toolkit
+469,https://github.com/PAIR-code/what-if-tool,Category 4: Scientific Computing,What-If Tool,ML inspection
+470,https://github.com/tensorflow/model-analysis,Category 4: Scientific Computing,TF Model Analysis,Model evaluation
+471,https://github.com/cleanlab/cleanlab,Category 4: Scientific Computing,Cleanlab,Data-centric AI
+472,https://github.com/snorkel-team/snorkel,Category 4: Scientific Computing,Snorkel,Weak supervision
+473,https://github.com/diffgram/diffgram,Category 4: Scientific Computing,Diffgram,Training data
+474,https://github.com/heartexlabs/label-studio,Category 4: Scientific Computing,Label Studio,Data labeling
+475,https://github.com/doccano/doccano,Category 4: Scientific Computing,doccano,Text annotation
+476,https://github.com/explosion/prodigy-recipes,Category 4: Scientific Computing,Prodigy Recipes,Annotation recipes
+477,https://github.com/argilla-io/argilla,Category 4: Scientific Computing,Argilla,Data labeling
+478,https://github.com/uber/ludwig,Category 4: Scientific Computing,Ludwig,Low-code ML
+479,https://github.com/ludwig-ai/ludwig,Category 4: Scientific Computing,Ludwig AI,Declarative ML
+480,https://github.com/aimhubio/aim,Category 4: Scientific Computing,Aim,ML experiment tracking
+481,https://github.com/neptune-ai/neptune-client,Category 4: Scientific Computing,Neptune,Experiment tracking
+482,https://github.com/allegroai/clearml,Category 4: Scientific Computing,ClearML,MLOps platform
+483,https://github.com/polyaxon/polyaxon,Category 4: Scientific Computing,Polyaxon,ML platform
+484,https://github.com/determined-ai/determined,Category 4: Scientific Computing,Determined,Deep learning platform
+485,https://github.com/replicate/cog,Category 4: Scientific Computing,Cog,ML containers
+486,https://github.com/huggingface/diffusers,Category 1: From Scratch,Diffusers,Diffusion models
+487,https://github.com/CompVis/stable-diffusion,Category 1: From Scratch,Stable Diffusion,Text-to-image
+488,https://github.com/Stability-AI/stablediffusion,Category 1: From Scratch,SD official,Official SD repo
+489,https://github.com/Stability-AI/generative-models,Category 1: From Scratch,Generative Models,SDXL and more
+490,https://github.com/AUTOMATIC1111/stable-diffusion-webui,Category 1: From Scratch,SD Web UI,Web interface
+491,https://github.com/invoke-ai/InvokeAI,Category 1: From Scratch,InvokeAI,Creative engine
+492,https://github.com/comfyanonymous/ComfyUI,Category 1: From Scratch,ComfyUI,Node-based UI
+493,https://github.com/bmaltais/kohya_ss,Category 1: From Scratch,Kohya SS,Training scripts
+494,https://github.com/d8ahazard/sd_dreambooth_extension,Category 1: From Scratch,DreamBooth,DreamBooth training
+495,https://github.com/XavierXiao/Dreambooth-Stable-Diffusion,Category 1: From Scratch,DreamBooth SD,Fine-tuning
+496,https://github.com/cloneofsimo/lora,Category 1: From Scratch,LoRA,Low-rank adaptation
+497,https://github.com/kohya-ss/sd-scripts,Category 1: From Scratch,SD Scripts,Training scripts
+498,https://github.com/Mikubill/sd-webui-controlnet,Category 1: From Scratch,ControlNet WebUI,ControlNet extension
+499,https://github.com/lllyasviel/ControlNet-v1-1-nightly,Category 1: From Scratch,ControlNet v1.1,Improved ControlNet
+500,https://github.com/salesforce/BLIP,Category 1: From Scratch,BLIP,Vision-language
+501,https://github.com/salesforce/BLIP2,Category 1: From Scratch,BLIP-2,Improved BLIP
+502,https://github.com/salesforce/LAVIS,Category 1: From Scratch,LAVIS,Vision-language
+503,https://github.com/OFA-Sys/OFA,Category 1: From Scratch,OFA,Unified model
+504,https://github.com/microsoft/unilm,Category 1: From Scratch,UniLM,Pre-training
+505,https://github.com/facebookresearch/ImageBind,Category 1: From Scratch,ImageBind,Multimodal
+506,https://github.com/facebookresearch/segment-anything,Category 1: From Scratch,SAM,Image segmentation
+507,https://github.com/IDEA-Research/GroundingDINO,Category 1: From Scratch,GroundingDINO,Open-set detection
+508,https://github.com/IDEA-Research/detrex,Category 1: From Scratch,detrex,Detection transformers
+509,https://github.com/open-mmlab/mmdetection,Category 1: From Scratch,MMDetection,Detection toolbox
+510,https://github.com/open-mmlab/mmcv,Category 1: From Scratch,MMCV,CV foundation
+511,https://github.com/open-mmlab/mmsegmentation,Category 1: From Scratch,MMSegmentation,Segmentation toolbox
+512,https://github.com/open-mmlab/mmpose,Category 1: From Scratch,MMPose,Pose estimation
+513,https://github.com/open-mmlab/mmocr,Category 1: From Scratch,MMOCR,OCR toolbox
+514,https://github.com/open-mmlab/mmaction2,Category 1: From Scratch,MMAction2,Action recognition
+515,https://github.com/open-mmlab/mmtracking,Category 1: From Scratch,MMTracking,Video tracking
+516,https://github.com/open-mmlab/mmgeneration,Category 1: From Scratch,MMGeneration,Generative models
+517,https://github.com/open-mmlab/mmediting,Category 1: From Scratch,MMEditing,Image/video editing
+518,https://github.com/open-mmlab/mmclassification,Category 1: From Scratch,MMClassification,Image classification
+519,https://github.com/open-mmlab/mmselfsup,Category 1: From Scratch,MMSelfSup,Self-supervised
+520,https://github.com/open-mmlab/mmpretrain,Category 1: From Scratch,MMPreTrain,Pre-training toolbox
+521,https://github.com/open-mmlab/mmrazor,Category 1: From Scratch,MMRazor,Model compression
+522,https://github.com/open-mmlab/mmdeploy,Category 1: From Scratch,MMDeploy,Model deployment
+523,https://github.com/PaddlePaddle/PaddleOCR,Category 1: From Scratch,PaddleOCR,OCR toolkit
+524,https://github.com/PaddlePaddle/PaddleNLP,Category 1: From Scratch,PaddleNLP,NLP toolkit
+525,https://github.com/PaddlePaddle/PaddleSeg,Category 1: From Scratch,PaddleSeg,Segmentation
+526,https://github.com/PaddlePaddle/PaddleDetection,Category 1: From Scratch,PaddleDetection,Object detection
+527,https://github.com/PaddlePaddle/PaddleSpeech,Category 1: From Scratch,PaddleSpeech,Speech toolkit
+528,https://github.com/PaddlePaddle/PaddleGAN,Category 1: From Scratch,PaddleGAN,GAN toolkit
+529,https://github.com/modelscope/modelscope,Category 1: From Scratch,ModelScope,Model hub
+530,https://github.com/modelscope/FunASR,Category 1: From Scratch,FunASR,Speech recognition
+531,https://github.com/modelscope/swift,Category 1: From Scratch,SWIFT,LLM fine-tuning
+532,https://github.com/SenseTime/MUMGPT,Category 1: From Scratch,MUMGPT,Multimodal GPT
+533,https://github.com/THUDM/ChatGLM-6B,Category 1: From Scratch,ChatGLM-6B,Chinese LLM
+534,https://github.com/THUDM/GLM-130B,Category 1: From Scratch,GLM-130B,Large LLM
+535,https://github.com/THUDM/CodeGeeX,Category 1: From Scratch,CodeGeeX,Code generation
+536,https://github.com/THUDM/VisualGLM-6B,Category 1: From Scratch,VisualGLM,Vision-language
+537,https://github.com/baichuan-inc/Baichuan-7B,Category 1: From Scratch,Baichuan-7B,Chinese LLM
+538,https://github.com/BAAI-WuDao/BAAI-WuDao-GPT,Category 1: From Scratch,WuDao GPT,Chinese GPT
+539,https://github.com/InternLM/InternLM,Category 1: From Scratch,InternLM,Multilingual LLM
+540,https://github.com/QwenLM/Qwen,Category 1: From Scratch,Qwen,Alibaba LLM
+541,https://github.com/FlagAI-Open/FlagAI,Category 1: From Scratch,FlagAI,Large-scale AI
+542,https://github.com/OpenLMLab/MOSS,Category 1: From Scratch,MOSS,Chinese LLM
+543,https://github.com/OptimalScale/LMFlow,Category 1: From Scratch,LMFlow,LLM fine-tuning
+544,https://github.com/hpcaitech/ColossalAI,Category 1: From Scratch,ColossalAI,Large-scale training
+545,https://github.com/microsoft/DeepSpeed,Category 1: From Scratch,DeepSpeed,Deep learning optimization
+546,https://github.com/facebookresearch/fairscale,Category 1: From Scratch,FairScale,PyTorch extensions
+547,https://github.com/mosaicml/composer,Category 1: From Scratch,Composer,Training library
+548,https://github.com/mosaicml/llm-foundry,Category 1: From Scratch,LLM Foundry,LLM training
+549,https://github.com/Lightning-AI/lightning,Category 1: From Scratch,PyTorch Lightning,Training framework
+550,https://github.com/Lightning-AI/pytorch-lightning,Category 1: From Scratch,PyTorch Lightning,Deep learning
+551,https://github.com/huggingface/accelerate,Category 1: From Scratch,Accelerate,PyTorch training
+552,https://github.com/huggingface/optimum,Category 1: From Scratch,Optimum,Optimization toolkit
+553,https://github.com/huggingface/safetensors,Category 1: From Scratch,Safetensors,Safe serialization
+554,https://github.com/huggingface/tokenizers,Category 1: From Scratch,Tokenizers,Fast tokenization
+555,https://github.com/huggingface/datasets,Category 1: From Scratch,Datasets,Dataset library
+556,https://github.com/huggingface/evaluate,Category 1: From Scratch,Evaluate,Evaluation metrics
+557,https://github.com/jax-ml/jax,Category 1: From Scratch,JAX,Composable transformations
+558,https://github.com/google/flax,Category 1: From Scratch,Flax,Neural networks in JAX
+559,https://github.com/deepmind/optax,Category 1: From Scratch,Optax,Gradient processing
+560,https://github.com/deepmind/haiku,Category 1: From Scratch,Haiku,JAX neural networks
+561,https://github.com/deepmind/chex,Category 1: From Scratch,Chex,JAX testing utilities
+562,https://github.com/deepmind/rlax,Category 1: From Scratch,RLax,RL in JAX
+563,https://github.com/deepmind/dm-haiku,Category 1: From Scratch,DM-Haiku,Neural networks
+564,https://github.com/google/jax-md,Category 1: From Scratch,JAX-MD,Molecular dynamics
+565,https://github.com/n2cholas/jax-cfd,Category 1: From Scratch,JAX-CFD,Computational fluid dynamics
+566,https://github.com/deepmind/acme,Category 4: Scientific Computing,Acme,RL research
+567,https://github.com/deepmind/rlhf,Category 4: Scientific Computing,RLHF,Human feedback
+568,https://github.com/deepmind/sonnet,Category 1: From Scratch,Sonnet,TensorFlow library
+569,https://github.com/keras-team/keras,Category 1: From Scratch,Keras,Deep learning API
+570,https://github.com/tensorflow/tensorflow,Category 1: From Scratch,TensorFlow,ML platform
+571,https://github.com/pytorch/pytorch,Category 1: From Scratch,PyTorch,Deep learning
+572,https://github.com/pytorch/vision,Category 1: From Scratch,TorchVision,Computer vision
+573,https://github.com/pytorch/audio,Category 1: From Scratch,TorchAudio,Audio processing
+574,https://github.com/pytorch/text,Category 1: From Scratch,TorchText,NLP datasets
+575,https://github.com/pytorch/serve,Category 1: From Scratch,TorchServe,Model serving
+576,https://github.com/pytorch/data,Category 1: From Scratch,TorchData,Data loading
+577,https://github.com/pytorch/functorch,Category 1: From Scratch,functorch,JAX-like transforms
+578,https://github.com/pytorch/ignite,Category 1: From Scratch,PyTorch Ignite,Training utilities
+579,https://github.com/skorch-dev/skorch,Category 1: From Scratch,skorch,scikit-learn + PyTorch
+580,https://github.com/catalyst-team/catalyst,Category 1: From Scratch,Catalyst,PyTorch framework
+581,https://github.com/kornia/kornia,Category 1: From Scratch,Kornia,Differentiable CV
+582,https://github.com/albumentations-team/albumentations,Category 1: From Scratch,Albumentations,Image augmentation
+583,https://github.com/rwightman/pytorch-image-models,Category 1: From Scratch,timm,Image models
+584,https://github.com/facebookresearch/detectron2,Category 1: From Scratch,Detectron2,Object detection
+585,https://github.com/ultralytics/yolov5,Category 1: From Scratch,YOLOv5,Object detection
+586,https://github.com/ultralytics/ultralytics,Category 1: From Scratch,Ultralytics,YOLO framework
+587,https://github.com/WongKinYiu/yolov7,Category 1: From Scratch,YOLOv7,State-of-art detector
+588,https://github.com/meituan/YOLOv6,Category 1: From Scratch,YOLOv6,Industrial detector
+589,https://github.com/Megvii-BaseDetection/YOLOX,Category 1: From Scratch,YOLOX,Anchor-free detector
+590,https://github.com/ifzhang/ByteTrack,Category 1: From Scratch,ByteTrack,Multi-object tracking
+591,https://github.com/PaddlePaddle/PaddleClas,Category 1: From Scratch,PaddleClas,Image classification
+592,https://github.com/facebookresearch/vissl,Category 1: From Scratch,VISSL,Self-supervised
+593,https://github.com/facebookresearch/SlowFast,Category 1: From Scratch,SlowFast,Video understanding
+594,https://github.com/facebookresearch/pytorchvideo,Category 1: From Scratch,PyTorchVideo,Video understanding
+595,https://github.com/SwinTransformer/Swin-Transformer-Semantic-Segmentation,Category 1: From Scratch,Swin Seg,Semantic segmentation
+596,https://github.com/NVlabs/SegFormer,Category 1: From Scratch,SegFormer,Segmentation transformer
+597,https://github.com/zhangzjn/OCR-Survey,Category 2: Domain Specific,OCR Survey,OCR overview
+598,https://github.com/tesseract-ocr/tesseract,Category 2: Domain Specific,Tesseract,OCR engine
+599,https://github.com/madmaze/pytesseract,Category 2: Domain Specific,pytesseract,Python Tesseract
+600,https://github.com/PaddlePaddle/PaddleHub,Category 1: From Scratch,PaddleHub,Pre-trained models
+601,https://github.com/speechbrain/speechbrain,Category 1: From Scratch,SpeechBrain,Speech toolkit
+602,https://github.com/espnet/espnet,Category 1: From Scratch,ESPnet,Speech processing
+603,https://github.com/NVIDIA/NeMo,Category 1: From Scratch,NeMo,Neural models
+604,https://github.com/mozilla/DeepSpeech,Category 1: From Scratch,DeepSpeech,Speech-to-text
+605,https://github.com/kaldi-asr/kaldi,Category 1: From Scratch,Kaldi,Speech recognition
+606,https://github.com/alphacep/vosk-api,Category 1: From Scratch,Vosk,Offline speech
+607,https://github.com/snakers4/silero-models,Category 1: From Scratch,Silero,Speech models
+608,https://github.com/lhotse-speech/lhotse,Category 1: From Scratch,Lhotse,Speech data
+609,https://github.com/wenet-e2e/wenet,Category 1: From Scratch,WeNet,Production ASR
+610,https://github.com/k2-fsa/icefall,Category 1: From Scratch,Icefall,Speech recipes
+611,https://github.com/k2-fsa/k2,Category 1: From Scratch,k2,FSA operations
+612,https://github.com/asteroid-team/asteroid,Category 1: From Scratch,Asteroid,Audio source separation
+613,https://github.com/deezer/spleeter,Category 1: From Scratch,Spleeter,Source separation
+614,https://github.com/facebookresearch/demucs,Category 1: From Scratch,Demucs,Music separation
+615,https://github.com/yl4579/StyleTTS2,Category 1: From Scratch,StyleTTS2,Text-to-speech
+616,https://github.com/neonbjb/tortoise-tts,Category 1: From Scratch,Tortoise TTS,Multi-voice TTS
+617,https://github.com/rhasspy/piper,Category 1: From Scratch,Piper,Fast local TTS
+618,https://github.com/MycroftAI/mimic3,Category 1: From Scratch,Mimic 3,Neural TTS
+619,https://github.com/mozilla/TTS,Category 1: From Scratch,Mozilla TTS,Deep learning TTS
+620,https://github.com/Edresson/Coqui-TTS,Category 1: From Scratch,Coqui TTS,TTS library
+621,https://github.com/riffusion/riffusion,Category 1: From Scratch,Riffusion,Music generation
+622,https://github.com/Harmonai-org/sample-generator,Category 1: From Scratch,Sample Generator,Audio generation
+623,https://github.com/archinetai/audio-diffusion-pytorch,Category 1: From Scratch,Audio Diffusion,Audio diffusion
+624,https://github.com/lucidrains/audiolm-pytorch,Category 1: From Scratch,AudioLM,AudioLM implementation
+625,https://github.com/lucidrains/musiclm-pytorch,Category 1: From Scratch,MusicLM,MusicLM implementation
+626,https://github.com/lucidrains/soundstorm-pytorch,Category 1: From Scratch,SoundStorm,SoundStorm implementation
+627,https://github.com/spotify/pedalboard,Category 2: Domain Specific,Pedalboard,Audio effects
+628,https://github.com/librosa/librosa,Category 2: Domain Specific,Librosa,Audio analysis
+629,https://github.com/jiaaro/pydub,Category 2: Domain Specific,PyDub,Audio manipulation
+630,https://github.com/tyiannak/pyAudioAnalysis,Category 2: Domain Specific,pyAudioAnalysis,Audio feature extraction
+631,https://github.com/aubio/aubio,Category 2: Domain Specific,Aubio,Audio analysis
+632,https://github.com/magenta/magenta,Category 1: From Scratch,Magenta,Music and art ML
+633,https://github.com/magenta/note-seq,Category 1: From Scratch,Note-Seq,Music sequences
+634,https://github.com/craffel/pretty-midi,Category 2: Domain Specific,pretty_midi,MIDI utilities
+635,https://github.com/mido/mido,Category 2: Domain Specific,Mido,MIDI library
+636,https://github.com/vishnubob/python-midi,Category 2: Domain Specific,python-midi,MIDI manipulation
+637,https://github.com/MTG/essentia,Category 2: Domain Specific,Essentia,Audio analysis
+638,https://github.com/CPJKU/madmom,Category 2: Domain Specific,madmom,Music analysis
+639,https://github.com/coqui-ai/Trainer,Category 1: From Scratch,Coqui Trainer,Training toolkit
+640,https://github.com/mixxxdj/mixxx,Category 6: Visualization and Games,Mixxx,DJ software
+641,https://github.com/sonic-pi-net/sonic-pi,Category 6: Visualization and Games,Sonic Pi,Live coding music
+642,https://github.com/supercollider/supercollider,Category 6: Visualization and Games,SuperCollider,Audio synthesis
+643,https://github.com/opencv/opencv-python,Category 2: Domain Specific,OpenCV Python,Computer vision
+644,https://github.com/opencv/opencv,Category 2: Domain Specific,OpenCV,Computer vision
+645,https://github.com/scikit-image/scikit-image,Category 2: Domain Specific,scikit-image,Image processing
+646,https://github.com/python-pillow/Pillow,Category 2: Domain Specific,Pillow,Image library
+647,https://github.com/imageio/imageio,Category 2: Domain Specific,imageio,Image I/O
+648,https://github.com/luispedro/mahotas,Category 2: Domain Specific,Mahotas,Computer vision
+649,https://github.com/emcconville/wand,Category 2: Domain Specific,Wand,ImageMagick binding
+650,https://github.com/facebookresearch/nougat,Category 1: From Scratch,Nougat,Document understanding
+651,https://github.com/microsoft/unilm/tree/master/kosmos-2,Category 1: From Scratch,Kosmos-2,Multimodal LLM
+652,https://github.com/microsoft/Bringing-Old-Photos-Back-to-Life,Category 1: From Scratch,Old Photo Restoration,Photo restoration
+653,https://github.com/microsoft/Cream,Category 1: From Scratch,Cream,Vision models
+654,https://github.com/microsoft/Oscar,Category 1: From Scratch,Oscar,Vision-language
+655,https://github.com/microsoft/LayoutLM,Category 1: From Scratch,LayoutLM,Document understanding
+656,https://github.com/microsoft/LayoutLMv3,Category 1: From Scratch,LayoutLMv3,Document AI
+657,https://github.com/microsoft/table-transformer,Category 1: From Scratch,Table Transformer,Table extraction
+658,https://github.com/NielsRogge/Transformers-Tutorials,Category 7: Educational,Transformers Tutorials,HF tutorials
+659,https://github.com/philschmid/deep-learning-pytorch-huggingface,Category 7: Educational,DL HuggingFace,PyTorch HF tutorials
+660,https://github.com/dair-ai/ML-YouTube-Courses,Category 7: Educational,ML YouTube Courses,Video courses
+661,https://github.com/dair-ai/ML-Papers-of-the-Week,Category 7: Educational,ML Papers Weekly,Paper summaries
+662,https://github.com/dair-ai/Prompt-Engineering-Guide,Category 7: Educational,Prompt Engineering,Prompting guide
+663,https://github.com/rasbt/machine-learning-book,Category 7: Educational,ML Book,Raschka's book
+664,https://github.com/rasbt/LLMs-from-scratch,Category 7: Educational,LLMs from Scratch,Building LLMs
+665,https://github.com/mlabonne/llm-course,Category 7: Educational,LLM Course,LLM learning
+666,https://github.com/karpathy/LLM101n,Category 7: Educational,LLM101n,Story LLMs
+667,https://github.com/microsoft/generative-ai-for-beginners,Category 7: Educational,GenAI Beginners,Microsoft course
+668,https://github.com/openai/openai-cookbook,Category 7: Educational,OpenAI Cookbook,OpenAI examples
+669,https://github.com/anthropics/anthropic-cookbook,Category 7: Educational,Anthropic Cookbook,Claude examples
+670,https://github.com/GoogleCloudPlatform/generative-ai,Category 7: Educational,GCP GenAI,Google AI samples
+671,https://github.com/aws-samples/amazon-bedrock-workshop,Category 7: Educational,Bedrock Workshop,AWS AI workshop
+672,https://github.com/udacity/deep-learning-v2-pytorch,Category 7: Educational,Udacity DL,Course materials
+673,https://github.com/DataTalksClub/mlops-zoomcamp,Category 7: Educational,MLOps Zoomcamp,MLOps course
+674,https://github.com/DataTalksClub/data-engineering-zoomcamp,Category 7: Educational,DE Zoomcamp,Data engineering
+675,https://github.com/DataTalksClub/machine-learning-zoomcamp,Category 7: Educational,ML Zoomcamp,ML course
+676,https://github.com/madewithml/madewithml,Category 7: Educational,Made With ML,MLOps course
+677,https://github.com/GokuMohandas/Made-With-ML,Category 7: Educational,Made With ML,Applied ML
+678,https://github.com/mrdbourke/tensorflow-deep-learning,Category 7: Educational,TF Deep Learning,TensorFlow course
+679,https://github.com/mrdbourke/pytorch-deep-learning,Category 7: Educational,PyTorch DL,PyTorch course
+680,https://github.com/huggingface/course,Category 7: Educational,HF Course,Transformers course
+681,https://github.com/huggingface/deep-rl-class,Category 7: Educational,Deep RL Class,RL course
+682,https://github.com/huggingface/diffusion-models-class,Category 7: Educational,Diffusion Class,Diffusion course
+683,https://github.com/huggingface/nlp-course,Category 7: Educational,NLP Course,NLP tutorials
+684,https://github.com/facebookresearch/llama-recipes,Category 7: Educational,LLaMA Recipes,Fine-tuning guide
+685,https://github.com/ray-project/llm-applications,Category 7: Educational,LLM Applications,Ray LLM examples
+686,https://github.com/pinecone-io/examples,Category 7: Educational,Pinecone Examples,Vector DB examples
+687,https://github.com/weaviate/recipes,Category 7: Educational,Weaviate Recipes,Vector search
+688,https://github.com/qdrant/examples,Category 7: Educational,Qdrant Examples,Vector examples
+689,https://github.com/milvus-io/bootcamp,Category 7: Educational,Milvus Bootcamp,Vector DB tutorials
+690,https://github.com/practical-tutorials/project-based-learning,Category 7: Educational,Project Learning,Learning projects
+691,https://github.com/codecrafters-io/build-your-own-x,Category 7: Educational,Build Your Own X,Build tutorials
+692,https://github.com/ossu/computer-science,Category 7: Educational,OSSU CS,CS curriculum
+693,https://github.com/kamranahmedse/developer-roadmap,Category 7: Educational,Dev Roadmap,Learning roadmaps
+694,https://github.com/public-apis/public-apis,Category 7: Educational,Public APIs,API collection
+695,https://github.com/EbookFoundation/free-programming-books,Category 7: Educational,Free Books,Free resources
+696,https://github.com/trimstray/the-book-of-secret-knowledge,Category 7: Educational,Secret Knowledge,Awesome lists
+697,https://github.com/sindresorhus/awesome,Category 7: Educational,Awesome Lists,Curated lists
+698,https://github.com/vinta/awesome-python,Category 7: Educational,Awesome Python,Python resources
+699,https://github.com/josephmisiti/awesome-machine-learning,Category 7: Educational,Awesome ML,ML resources
+700,https://github.com/ujjwalkarn/Machine-Learning-Tutorials,Category 7: Educational,ML Tutorials,Tutorial collection
+701,https://github.com/Avik-Jain/100-Days-Of-ML-Code,Category 7: Educational,100 Days of ML,ML journey
+702,https://github.com/llSourcell/Learn_Machine_Learning_in_3_Months,Category 7: Educational,Learn ML 3 Months,ML roadmap
+703,https://github.com/ZuzooVn/machine-learning-for-software-engineers,Category 7: Educational,ML for SWEs,ML guide
+704,https://github.com/chris-chris/ml-engineering,Category 7: Educational,ML Engineering,ML eng guide
+705,https://github.com/stas00/ml-engineering,Category 7: Educational,ML Engineering,LLM engineering
+706,https://github.com/mli/paper-reading,Category 7: Educational,Paper Reading,Paper summaries
+707,https://github.com/labmlai/papers,Category 7: Educational,Paper Implementations,Paper code
+708,https://github.com/eugeneyan/applied-ml,Category 7: Educational,Applied ML,ML in production
+709,https://github.com/chiphuyen/ml-systems-design,Category 7: Educational,ML Systems Design,System design
+710,https://github.com/chiphuyen/machine-learning-systems-design,Category 7: Educational,ML System Design,ML systems
+711,https://github.com/chiphuyen/dmls-book,Category 7: Educational,DMLS Book,ML systems book
+712,https://github.com/khuyentran1401/Data-science,Category 7: Educational,Data Science Tips,DS tips
+713,https://github.com/khuyentran1401/Efficient_Python_tricks_and_tools_for_data_scientists,Category 7: Educational,Efficient Python,Python tips
+714,https://github.com/lexfridman/mit-deep-learning,Category 7: Educational,MIT Deep Learning,MIT course
+715,https://github.com/yandexdataschool/Practical_RL,Category 7: Educational,Practical RL,RL course
+716,https://github.com/yandexdataschool/nlp_course,Category 7: Educational,NLP Course,NLP course
+717,https://github.com/bentrevett/pytorch-sentiment-analysis,Category 7: Educational,Sentiment Analysis,NLP tutorials
+718,https://github.com/bentrevett/pytorch-seq2seq,Category 7: Educational,Seq2Seq,Sequence models
+719,https://github.com/bentrevett/pytorch-image-classification,Category 7: Educational,Image Classification,Vision tutorials
+720,https://github.com/microsoft/recommenders,Category 2: Domain Specific,Recommenders,Recommendation systems
+721,https://github.com/facebookresearch/ReAgent,Category 4: Scientific Computing,ReAgent,Applied RL
+722,https://github.com/tensorflow/ranking,Category 2: Domain Specific,TF Ranking,Learning to rank
+723,https://github.com/RUCAIBox/RecBole,Category 2: Domain Specific,RecBole,Recommendation framework
+724,https://github.com/lenskit/lkpy,Category 2: Domain Specific,LensKit,Recommendation toolkit
+725,https://github.com/NicolasHug/Surprise,Category 2: Domain Specific,Surprise,Recommendation library
+726,https://github.com/benfred/implicit,Category 2: Domain Specific,Implicit,Implicit feedback
+727,https://github.com/lyst/lightfm,Category 2: Domain Specific,LightFM,Recommendation
+728,https://github.com/tensorflow/agents,Category 4: Scientific Computing,TF Agents,RL library
+729,https://github.com/keras-rl/keras-rl,Category 4: Scientific Computing,Keras RL,Deep RL
+730,https://github.com/hill-a/stable-baselines,Category 4: Scientific Computing,Stable Baselines,RL implementations
+731,https://github.com/rlworkgroup/garage,Category 4: Scientific Computing,Garage,RL toolkit
+732,https://github.com/tensorlayer/tensorlayer,Category 4: Scientific Computing,TensorLayer,Deep learning library
+733,https://github.com/tensorflow/graphics,Category 4: Scientific Computing,TF Graphics,Differentiable graphics
+734,https://github.com/google/mediapipe,Category 2: Domain Specific,MediaPipe,ML solutions
+735,https://github.com/tensorflow/tflite-micro,Category 2: Domain Specific,TFLite Micro,Embedded ML
+736,https://github.com/onnx/onnx,Category 1: From Scratch,ONNX,Model format
+737,https://github.com/onnx/onnxruntime,Category 1: From Scratch,ONNX Runtime,Inference engine
+738,https://github.com/microsoft/onnxruntime,Category 1: From Scratch,ONNX Runtime,Cross-platform ML
+739,https://github.com/NVIDIA/TensorRT,Category 1: From Scratch,TensorRT,Inference optimizer
+740,https://github.com/openvinotoolkit/openvino,Category 1: From Scratch,OpenVINO,Intel inference
+741,https://github.com/apache/tvm,Category 1: From Scratch,TVM,ML compiler
+742,https://github.com/triton-inference-server/server,Category 1: From Scratch,Triton Server,Inference server
+743,https://github.com/alibaba/MNN,Category 1: From Scratch,MNN,Mobile inference
+744,https://github.com/Tencent/ncnn,Category 1: From Scratch,ncnn,Mobile inference
+745,https://github.com/apache/incubator-mxnet,Category 1: From Scratch,MXNet,Deep learning
+746,https://github.com/dmlc/gluon-cv,Category 1: From Scratch,GluonCV,Computer vision
+747,https://github.com/dmlc/gluon-nlp,Category 1: From Scratch,GluonNLP,NLP toolkit
+748,https://github.com/dmlc/dgl,Category 1: From Scratch,DGL,Graph neural networks
+749,https://github.com/pyg-team/pytorch_geometric,Category 1: From Scratch,PyG,Geometric deep learning
+750,https://github.com/rusty1s/pytorch_geometric,Category 1: From Scratch,PyTorch Geometric,Graph neural networks
+751,https://github.com/snap-stanford/ogb,Category 4: Scientific Computing,OGB,Graph benchmarks
+752,https://github.com/stellargraph/stellargraph,Category 1: From Scratch,StellarGraph,Graph ML
+753,https://github.com/PaddlePaddle/PGL,Category 1: From Scratch,PGL,Graph learning
+754,https://github.com/alibaba/graph-learn,Category 1: From Scratch,GraphLearn,Graph learning
+755,https://github.com/awslabs/graph-notebook,Category 7: Educational,Graph Notebook,Graph tutorials
+756,https://github.com/neo4j/neo4j-python-driver,Category 2: Domain Specific,Neo4j Python,Graph database
+757,https://github.com/py2neo-org/py2neo,Category 2: Domain Specific,py2neo,Neo4j library
+758,https://github.com/dpkp/kafka-python,Category 2: Domain Specific,kafka-python,Kafka client
+759,https://github.com/confluentinc/confluent-kafka-python,Category 2: Domain Specific,Confluent Kafka,Kafka client
+760,https://github.com/robinhood/faust,Category 2: Domain Specific,Faust,Stream processing
+761,https://github.com/bytewax/bytewax,Category 2: Domain Specific,Bytewax,Stream processing
+762,https://github.com/apache/beam,Category 2: Domain Specific,Apache Beam,Unified processing
+763,https://github.com/apache/spark,Category 2: Domain Specific,Apache Spark,Big data processing
+764,https://github.com/apache/flink,Category 2: Domain Specific,Apache Flink,Stream processing
+765,https://github.com/palantir/pyspark-style-guide,Category 7: Educational,PySpark Guide,PySpark style
+766,https://github.com/databricks/koalas,Category 4: Scientific Computing,Koalas,Pandas on Spark
+767,https://github.com/fugue-project/fugue,Category 4: Scientific Computing,Fugue,Unified interface
+768,https://github.com/ibis-project/ibis,Category 4: Scientific Computing,Ibis,DataFrame API
+769,https://github.com/duckdb/duckdb,Category 4: Scientific Computing,DuckDB,Analytical database
+770,https://github.com/apache/arrow,Category 4: Scientific Computing,Apache Arrow,Columnar memory
+771,https://github.com/aymericdamien/TensorFlow-Examples,Category 7: Educational,TF Examples,TensorFlow tutorials
+772,https://github.com/jtoy/awesome-tensorflow,Category 7: Educational,Awesome TensorFlow,TF resources
+773,https://github.com/bharathgs/Awesome-pytorch-list,Category 7: Educational,Awesome PyTorch,PyTorch resources
+774,https://github.com/ritchieng/the-incredible-pytorch,Category 7: Educational,Incredible PyTorch,PyTorch tutorials
+775,https://github.com/vahidk/EffectiveTensorflow,Category 7: Educational,Effective TensorFlow,TF best practices
+776,https://github.com/aladdinpersson/Machine-Learning-Collection,Category 7: Educational,ML Collection,PyTorch tutorials
+777,https://github.com/jcjohnson/pytorch-examples,Category 7: Educational,PyTorch Examples,Learning PyTorch
+778,https://github.com/yunjey/pytorch-tutorial,Category 7: Educational,PyTorch Tutorial,Beginner tutorials
+779,https://github.com/L1aoXingyu/pytorch-beginner,Category 7: Educational,PyTorch Beginner,Chinese tutorials
+780,https://github.com/MorvanZhou/PyTorch-Tutorial,Category 7: Educational,Morvan PyTorch,Video tutorials
+781,https://github.com/MorvanZhou/Tensorflow-Tutorial,Category 7: Educational,Morvan TensorFlow,TF tutorials
+782,https://github.com/lyhue1991/eat_tensorflow2_in_30_days,Category 7: Educational,TF2 in 30 Days,Chinese course
+783,https://github.com/lyhue1991/eat_pytorch_in_20_days,Category 7: Educational,PyTorch 20 Days,Chinese course
+784,https://github.com/dsgiitr/d2l-pytorch,Category 7: Educational,D2L PyTorch,D2L in PyTorch
+785,https://github.com/ShusenTang/Dive-into-DL-PyTorch,Category 7: Educational,D2L PyTorch,Chinese D2L
+786,https://github.com/zergtant/pytorch-handbook,Category 7: Educational,PyTorch Handbook,Chinese handbook
+787,https://github.com/chenyuntc/pytorch-book,Category 7: Educational,PyTorch Book,Chinese book
+788,https://github.com/INTERMT/Awesome-PyTorch-Chinese,Category 7: Educational,Awesome PyTorch CN,Chinese resources
+789,https://github.com/nndl/nndl-codes,Category 7: Educational,NNDL Codes,Neural networks book
+790,https://github.com/nndl/nndl.github.io,Category 7: Educational,NNDL Book,DL textbook
+791,https://github.com/dragen1860/Deep-Learning-with-TensorFlow-book,Category 7: Educational,DL with TF,Chinese book
+792,https://github.com/dragen1860/TensorFlow-2.x-Tutorials,Category 7: Educational,TF2 Tutorials,Chinese tutorials
+793,https://github.com/PaddlePaddle/book,Category 7: Educational,PaddlePaddle Book,DL book
+794,https://github.com/apachecn/sklearn-doc-zh,Category 7: Educational,Sklearn Chinese,Chinese docs
+795,https://github.com/apachecn/pytorch-doc-zh,Category 7: Educational,PyTorch Chinese,Chinese docs
+796,https://github.com/apachecn/tensorflow-doc-zh,Category 7: Educational,TF Chinese,Chinese docs
+797,https://github.com/Mikoto10032/DeepLearning,Category 7: Educational,Deep Learning Notes,Chinese notes
+798,https://github.com/scutan90/DeepLearning-500-questions,Category 7: Educational,DL 500 Questions,Chinese QA
+799,https://github.com/exacity/deeplearningbook-chinese,Category 7: Educational,Deep Learning Book CN,Chinese translation
+800,https://github.com/fluentpython/example-code-2e,Category 7: Educational,Fluent Python,Book code
+801,https://github.com/cosmicpython/book,Category 7: Educational,Architecture Patterns,Python patterns
+802,https://github.com/PacktPublishing/Hands-On-Machine-Learning-with-Scikit-Learn-Keras-and-TensorFlow-2nd-Edition,Category 7: Educational,Hands-On ML,Book code
+803,https://github.com/PacktPublishing/Python-Deep-Learning-Second-Edition,Category 7: Educational,Python DL,Book code
+804,https://github.com/PacktPublishing/Python-Machine-Learning-Second-Edition,Category 7: Educational,Python ML,Book code
+805,https://github.com/oreilly-mlops/news-model-example,Category 7: Educational,MLOps News Model,MLOps example
+806,https://github.com/alirezadir/Production-Level-Deep-Learning,Category 7: Educational,Production DL,Production guide
+807,https://github.com/anyscale/ray-summit-2023-training,Category 7: Educational,Ray Summit Training,Ray tutorials
+808,https://github.com/GoogleCloudPlatform/mlops-with-vertex-ai,Category 7: Educational,Vertex AI MLOps,GCP tutorials
+809,https://github.com/GoogleCloudPlatform/python-docs-samples,Category 7: Educational,GCP Python Samples,GCP examples
+810,https://github.com/aws-samples/aws-machine-learning-university-accelerated-nlp,Category 7: Educational,AWS NLP Course,AWS ML
+811,https://github.com/aws-samples/aws-machine-learning-university-accelerated-cv,Category 7: Educational,AWS CV Course,AWS ML
+812,https://github.com/Azure/azureml-examples,Category 7: Educational,AzureML Examples,Azure tutorials
+813,https://github.com/Azure/MachineLearningNotebooks,Category 7: Educational,AzureML Notebooks,Azure ML
+814,https://github.com/microsoft/machine-learning-api-examples,Category 7: Educational,MS ML Examples,ML API examples
+815,https://github.com/microsoft/ML-For-Beginners,Category 7: Educational,ML for Beginners,Microsoft course
+816,https://github.com/microsoft/AI-For-Beginners,Category 7: Educational,AI for Beginners,Microsoft course
+817,https://github.com/microsoft/Data-Science-For-Beginners,Category 7: Educational,DS for Beginners,Microsoft course
+818,https://github.com/microsoft/Web-Dev-For-Beginners,Category 7: Educational,Web for Beginners,Microsoft course
+819,https://github.com/freeCodeCamp/freeCodeCamp,Category 7: Educational,freeCodeCamp,Learning platform
+820,https://github.com/tuvtran/project-based-learning,Category 7: Educational,Project Learning,Learning projects
+821,https://github.com/practical-tutorials/project-based-tutorials-in-c,Category 7: Educational,C Tutorials,C projects
+822,https://github.com/danistefanovic/build-your-own-x,Category 7: Educational,Build Your Own,From scratch projects
+823,https://github.com/ryanmcdermott/clean-code-python,Category 7: Educational,Clean Code Python,Code quality
+824,https://github.com/zedr/clean-code-python,Category 7: Educational,Clean Code Python,Clean code principles
+825,https://github.com/wdxtub/clean-code-python,Category 7: Educational,Clean Code Python,Chinese version
+826,https://github.com/satwikkansal/wtfpython,Category 7: Educational,WTF Python,Python quirks
+827,https://github.com/gto76/python-cheatsheet,Category 7: Educational,Python Cheatsheet,Quick reference
+828,https://github.com/crazyguitar/pysheeet,Category 7: Educational,Python Cheatsheet,Code snippets
+829,https://github.com/charlax/python-education,Category 7: Educational,Python Education,Learning resources
+830,https://github.com/dabeaz-course/practical-python,Category 7: Educational,Practical Python,Course materials
+831,https://github.com/dabeaz-course/python-mastery,Category 7: Educational,Python Mastery,Advanced Python
+832,https://github.com/dabeaz/python-cookbook,Category 7: Educational,Python Cookbook,Code recipes
+833,https://github.com/jackfrued/Python-100-Days,Category 7: Educational,Python 100 Days,Chinese course
+834,https://github.com/walter201230/Python,Category 7: Educational,Python Basics,Chinese course
+835,https://github.com/TwoWater/Python,Category 7: Educational,Grass Python,Chinese course
+836,https://github.com/wistbean/learn_python3_spider,Category 7: Educational,Python Spider,Web scraping
+837,https://github.com/Kr1s77/awesome-python-login-model,Category 7: Educational,Login Models,Web scraping
+838,https://github.com/Jrohy/python3-crawler,Category 7: Educational,Python Crawler,Chinese scraping
+839,https://github.com/lawlite19/MachineLearning_Python,Category 7: Educational,ML Python,Chinese ML
+840,https://github.com/lijin-THU/notes-python,Category 7: Educational,Python Notes,Chinese notes
+841,https://github.com/shimohq/chinese-programmer-wrong-pronunciation,Category 7: Educational,Pronunciation,Tech pronunciation
+842,https://github.com/byoungd/English-level-up-tips,Category 7: Educational,English Tips,English learning
+843,https://github.com/justjavac/free-programming-books-zh_CN,Category 7: Educational,Free Books CN,Chinese resources
+844,https://github.com/halfrost/LeetCode-Go,Category 3: Algorithms,LeetCode Go,Algorithm solutions
+845,https://github.com/azl397985856/leetcode,Category 3: Algorithms,LeetCode,Chinese solutions
+846,https://github.com/labuladong/fucking-algorithm,Category 3: Algorithms,Fucking Algorithm,Chinese algorithms
+847,https://github.com/youngyangyang04/leetcode-master,Category 3: Algorithms,LeetCode Master,Chinese course
+848,https://github.com/greyireland/algorithm-pattern,Category 3: Algorithms,Algorithm Pattern,Chinese patterns
+849,https://github.com/MisterBooo/LeetCodeAnimation,Category 3: Algorithms,LeetCode Animation,Animated solutions
+850,https://github.com/doocs/leetcode,Category 3: Algorithms,Doocs LeetCode,Multi-language
+851,https://github.com/grandyang/leetcode,Category 3: Algorithms,LeetCode Solutions,C++ solutions
+852,https://github.com/pezy/LeetCode,Category 3: Algorithms,LeetCode C++,C++ solutions
+853,https://github.com/haoel/leetcode,Category 3: Algorithms,LeetCode,C++ solutions
+854,https://github.com/fishercoder1534/Leetcode,Category 3: Algorithms,LeetCode Java,Java solutions
+855,https://github.com/wind-liang/leetcode,Category 3: Algorithms,LeetCode Chinese,Chinese explanations
+856,https://github.com/neetcode-gh/leetcode,Category 3: Algorithms,NeetCode,Video solutions
+857,https://github.com/wisdompeak/LeetCode,Category 3: Algorithms,LeetCode,Hard problems
+858,https://github.com/mission-peace/interview,Category 3: Algorithms,Interview,Interview prep
+859,https://github.com/yangshun/tech-interview-handbook,Category 3: Algorithms,Tech Interview,Interview guide
+860,https://github.com/jwasham/coding-interview-university,Category 3: Algorithms,Coding Interview,Interview prep
+861,https://github.com/Grokking/interview-cheatsheet,Category 3: Algorithms,Interview Cheatsheet,Quick reference
+862,https://github.com/TSiege/Tech-Interview-Cheat-Sheet,Category 3: Algorithms,Tech Interview,Interview tips
+863,https://github.com/MaximAbramchuck/awesome-interview-questions,Category 3: Algorithms,Interview Questions,Question collection
+864,https://github.com/donnemartin/system-design-primer,Category 3: Algorithms,System Design,System design
+865,https://github.com/checkcheckzz/system-design-interview,Category 3: Algorithms,System Design Interview,Interview prep
+866,https://github.com/karanpratapsingh/system-design,Category 3: Algorithms,System Design,System design course
+867,https://github.com/madd86/awesome-system-design,Category 3: Algorithms,Awesome System Design,System design resources
+868,https://github.com/binhnguyennus/awesome-scalability,Category 3: Algorithms,Awesome Scalability,Scalability patterns
+869,https://github.com/kilimchoi/engineering-blogs,Category 3: Algorithms,Engineering Blogs,Tech blogs
+870,https://github.com/mtdvio/every-programmer-should-know,Category 3: Algorithms,Every Programmer,Dev knowledge
+871,https://github.com/bregman-arie/devops-exercises,Category 2: Domain Specific,DevOps Exercises,DevOps practice
+872,https://github.com/bregman-arie/devops-resources,Category 2: Domain Specific,DevOps Resources,DevOps links
+873,https://github.com/MichaelCade/90DaysOfDevOps,Category 2: Domain Specific,90 Days DevOps,DevOps journey
+874,https://github.com/kamranahmedse/devops-roadmap,Category 2: Domain Specific,DevOps Roadmap,Learning path
+875,https://github.com/veggiemonk/awesome-docker,Category 2: Domain Specific,Awesome Docker,Docker resources
+876,https://github.com/wsargent/docker-cheat-sheet,Category 2: Domain Specific,Docker Cheatsheet,Docker reference
+877,https://github.com/docker/docker-py,Category 2: Domain Specific,docker-py,Docker SDK
+878,https://github.com/docker/compose,Category 2: Domain Specific,Docker Compose,Multi-container
+879,https://github.com/ramitsurana/awesome-kubernetes,Category 2: Domain Specific,Awesome K8s,K8s resources
+880,https://github.com/kubernetes-client/python,Category 2: Domain Specific,K8s Python,K8s client
+881,https://github.com/kelseyhightower/kubernetes-the-hard-way,Category 2: Domain Specific,K8s Hard Way,K8s from scratch
+882,https://github.com/helm/helm,Category 2: Domain Specific,Helm,K8s package manager
+883,https://github.com/argoproj/argo-cd,Category 2: Domain Specific,Argo CD,GitOps
+884,https://github.com/argoproj/argo-workflows,Category 2: Domain Specific,Argo Workflows,Workflow engine
+885,https://github.com/tektoncd/pipeline,Category 2: Domain Specific,Tekton,CI/CD
+886,https://github.com/jenkinsci/jenkins,Category 2: Domain Specific,Jenkins,CI/CD server
+887,https://github.com/drone/drone,Category 2: Domain Specific,Drone,CI platform
+888,https://github.com/concourse/concourse,Category 2: Domain Specific,Concourse,CI system
+889,https://github.com/buildbot/buildbot,Category 2: Domain Specific,Buildbot,CI framework
+890,https://github.com/pypa/pipenv,Category 5: Small Frameworks,Pipenv,Dependency management
+891,https://github.com/python-poetry/poetry,Category 5: Small Frameworks,Poetry,Dependency management
+892,https://github.com/pypa/pip,Category 5: Small Frameworks,pip,Package installer
+893,https://github.com/pypa/setuptools,Category 5: Small Frameworks,setuptools,Build system
+894,https://github.com/pypa/wheel,Category 5: Small Frameworks,wheel,Built packages
+895,https://github.com/pypa/twine,Category 5: Small Frameworks,twine,PyPI upload
+896,https://github.com/pypa/build,Category 5: Small Frameworks,build,PEP 517 build
+897,https://github.com/astral-sh/ruff,Category 5: Small Frameworks,Ruff,Fast linter
+898,https://github.com/astral-sh/uv,Category 5: Small Frameworks,uv,Fast package manager
+899,https://github.com/psf/black,Category 5: Small Frameworks,Black,Code formatter
+900,https://github.com/PyCQA/isort,Category 5: Small Frameworks,isort,Import sorter
+901,https://github.com/PyCQA/flake8,Category 5: Small Frameworks,flake8,Linter
+902,https://github.com/PyCQA/bandit,Category 5: Small Frameworks,Bandit,Security linter
+903,https://github.com/python/mypy,Category 5: Small Frameworks,mypy,Type checker
+904,https://github.com/microsoft/pyright,Category 5: Small Frameworks,Pyright,Type checker
+905,https://github.com/davidhalter/jedi,Category 5: Small Frameworks,Jedi,Autocompletion
+906,https://github.com/hhatto/autopep8,Category 5: Small Frameworks,autopep8,PEP8 formatter
+907,https://github.com/google/yapf,Category 5: Small Frameworks,yapf,Code formatter
+908,https://github.com/pre-commit/pre-commit,Category 5: Small Frameworks,pre-commit,Git hooks
+909,https://github.com/pre-commit/pre-commit-hooks,Category 5: Small Frameworks,pre-commit-hooks,Hook collection
+910,https://github.com/PyCQA/autoflake,Category 5: Small Frameworks,autoflake,Remove unused
+911,https://github.com/asottile/pyupgrade,Category 5: Small Frameworks,pyupgrade,Syntax upgrade
+912,https://github.com/charliermarsh/ruff,Category 5: Small Frameworks,Ruff,Fast Python linter
+913,https://github.com/python-jsonschema/check-jsonschema,Category 5: Small Frameworks,check-jsonschema,Schema validation
+914,https://github.com/mkdocs/mkdocs,Category 5: Small Frameworks,MkDocs,Documentation
+915,https://github.com/squidfunk/mkdocs-material,Category 5: Small Frameworks,Material for MkDocs,MkDocs theme
+916,https://github.com/readthedocs/readthedocs.org,Category 5: Small Frameworks,Read the Docs,Doc hosting
+917,https://github.com/pdoc3/pdoc,Category 5: Small Frameworks,pdoc,Auto documentation
+918,https://github.com/mitmproxy/pdoc,Category 5: Small Frameworks,pdoc,API documentation
+919,https://github.com/tox-dev/tox,Category 5: Small Frameworks,tox,Test automation
+920,https://github.com/pypa/virtualenv,Category 5: Small Frameworks,virtualenv,Virtual environments
+921,https://github.com/pyenv/pyenv,Category 5: Small Frameworks,pyenv,Python version management
+922,https://github.com/pyenv/pyenv-virtualenv,Category 5: Small Frameworks,pyenv-virtualenv,Virtualenv plugin
+923,https://github.com/asdf-vm/asdf,Category 5: Small Frameworks,asdf,Version manager
+924,https://github.com/conda/conda,Category 5: Small Frameworks,conda,Package manager
+925,https://github.com/mamba-org/mamba,Category 5: Small Frameworks,mamba,Fast conda
+926,https://github.com/conda-forge/miniforge,Category 5: Small Frameworks,miniforge,Conda distribution
+927,https://github.com/nteract/papermill,Category 9: Data Processing,Papermill,Parameterized notebooks
+928,https://github.com/jupyter/nbconvert,Category 9: Data Processing,nbconvert,Notebook conversion
+929,https://github.com/jupyter/nbformat,Category 9: Data Processing,nbformat,Notebook format
+930,https://github.com/jupyterlab/jupyterlab,Category 9: Data Processing,JupyterLab,Jupyter IDE
+931,https://github.com/jupyter/notebook,Category 9: Data Processing,Jupyter Notebook,Notebook interface
+932,https://github.com/ipython/ipython,Category 9: Data Processing,IPython,Interactive Python
+933,https://github.com/voila-dashboards/voila,Category 9: Data Processing,Voil_,Notebook dashboards
+934,https://github.com/jupyter-widgets/ipywidgets,Category 9: Data Processing,ipywidgets,Interactive widgets
+935,https://github.com/bqplot/bqplot,Category 6: Visualization and Games,bqplot,2D plotting
+936,https://github.com/plotly/jupyter-dash,Category 6: Visualization and Games,Jupyter Dash,Dash in Jupyter
+937,https://github.com/plotly/dash,Category 6: Visualization and Games,Dash,Analytical apps
+938,https://github.com/gradio-app/gradio,Category 6: Visualization and Games,Gradio,ML demos
+939,https://github.com/marimo-team/marimo,Category 9: Data Processing,marimo,Reactive notebook
+940,https://github.com/quarto-dev/quarto-cli,Category 9: Data Processing,Quarto,Scientific publishing
+941,https://github.com/posit-dev/great-tables,Category 6: Visualization and Games,Great Tables,Table generation
+942,https://github.com/vega/altair,Category 6: Visualization and Games,Altair,Vega-Lite visualization
+943,https://github.com/vispy/vispy,Category 6: Visualization and Games,VisPy,Scientific visualization
+944,https://github.com/K3D-tools/K3D-jupyter,Category 6: Visualization and Games,K3D,3D visualization
+945,https://github.com/pyviz/panel,Category 6: Visualization and Games,Panel,App builder
+946,https://github.com/holoviz/param,Category 6: Visualization and Games,Param,Declarative parameters
+947,https://github.com/voxel51/fiftyone,Category 6: Visualization and Games,FiftyOne,Dataset curation
+948,https://github.com/activeloopai/deeplake,Category 9: Data Processing,Deep Lake,Data lake for AI
+949,https://github.com/lancedb/lancedb,Category 9: Data Processing,LanceDB,Vector database
+950,https://github.com/weaviate/weaviate,Category 9: Data Processing,Weaviate,Vector search
+951,https://github.com/qdrant/qdrant,Category 9: Data Processing,Qdrant,Vector similarity
+952,https://github.com/milvus-io/milvus,Category 9: Data Processing,Milvus,Vector database
+953,https://github.com/pgvector/pgvector,Category 9: Data Processing,pgvector,Postgres vectors
+954,https://github.com/Pinecone-io/pinecone-python-client,Category 9: Data Processing,Pinecone,Vector DB client
+955,https://github.com/docarray/docarray,Category 9: Data Processing,DocArray,Multi-modal data
+956,https://github.com/jina-ai/jina,Category 9: Data Processing,Jina,Neural search
+957,https://github.com/marqo-ai/marqo,Category 9: Data Processing,Marqo,Tensor search
+958,https://github.com/semi-technologies/weaviate,Category 9: Data Processing,Weaviate,Vector database
+959,https://github.com/txtai/txtai,Category 9: Data Processing,txtai,Semantic search
+960,https://github.com/neuml/txtai,Category 9: Data Processing,txtai,AI search
+961,https://github.com/deepset-ai/haystack,Category 2: Domain Specific,Haystack,LLM framework
+962,https://github.com/hwchase17/langchain,Category 2: Domain Specific,LangChain,LLM applications
+963,https://github.com/guidance-ai/guidance,Category 2: Domain Specific,Guidance,LLM control
+964,https://github.com/outlines-dev/outlines,Category 2: Domain Specific,Outlines,Structured generation
+965,https://github.com/stanfordnlp/dspy,Category 2: Domain Specific,DSPy,LLM programming
+966,https://github.com/BerriAI/litellm,Category 2: Domain Specific,LiteLLM,LLM proxy
+967,https://github.com/ollama/ollama-python,Category 2: Domain Specific,Ollama Python,Local LLM
+968,https://github.com/PromptMagic/prompt-library,Category 2: Domain Specific,Prompt Library,Prompt collection
+969,https://github.com/sgl-project/sglang,Category 1: From Scratch,SGLang,LLM programming
+970,https://github.com/modal-labs/modal-client,Category 2: Domain Specific,Modal,Serverless compute
+971,https://github.com/instructor-ai/instructor,Category 2: Domain Specific,Instructor,Structured LLM output
+972,https://github.com/jxnl/instructor,Category 2: Domain Specific,Instructor,Pydantic + LLM
+973,https://github.com/pydantic/pydantic-ai,Category 2: Domain Specific,Pydantic AI,LLM agents
+974,https://github.com/phidatahq/phidata,Category 2: Domain Specific,Phidata,AI assistants
+975,https://github.com/crewAIInc/crewAI,Category 2: Domain Specific,CrewAI,AI agents
+976,https://github.com/joaomdmoura/crewAI,Category 2: Domain Specific,CrewAI,Multi-agent framework
+977,https://github.com/e2b-dev/e2b,Category 2: Domain Specific,E2B,AI sandboxes
+978,https://github.com/geekan/MetaGPT,Category 2: Domain Specific,MetaGPT,Multi-agent
+979,https://github.com/OpenBMB/ChatDev,Category 2: Domain Specific,ChatDev,AI software company
+980,https://github.com/microsoft/autogen,Category 2: Domain Specific,AutoGen,Multi-agent framework
+981,https://github.com/AgentOps-AI/agentops,Category 2: Domain Specific,AgentOps,Agent observability
+982,https://github.com/assafelovic/gpt-researcher,Category 2: Domain Specific,GPT Researcher,Autonomous research
+983,https://github.com/yoheinakajima/babyagi,Category 2: Domain Specific,BabyAGI,Task-driven agent
+984,https://github.com/torantulino/Auto-GPT,Category 2: Domain Specific,Auto-GPT,Autonomous GPT-4
+985,https://github.com/AntonOsika/gpt-engineer,Category 2: Domain Specific,GPT Engineer,AI code generation
+986,https://github.com/Pythagora-io/gpt-pilot,Category 2: Domain Specific,GPT Pilot,AI development
+987,https://github.com/OpenDevin/OpenDevin,Category 2: Domain Specific,OpenDevin,AI software developer
+988,https://github.com/stitionai/devika,Category 2: Domain Specific,Devika,AI software engineer
+989,https://github.com/All-Hands-AI/OpenHands,Category 2: Domain Specific,OpenHands,AI coding agent

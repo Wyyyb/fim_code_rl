@@ -15,3 +15,5 @@ filename = "swe_lego_synthetic_data_resolved_trajectories.json"
 with open(filename, "w", encoding="utf-8") as f:
     json.dump(data_list, f, ensure_ascii=False, indent=4)
 print(f"Saved {len(data_list)} records to {filename}")
+
+
