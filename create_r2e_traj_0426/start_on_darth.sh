@@ -11,5 +11,6 @@ uv run python src/r2egym/agenthub/run/edit.py runagent_multiple \
   --use_fn_calling True \
   --exp_name r2egym-training-trajectories \
   --temperature 0.2 \
-  --max_steps 40
+  --max_steps 40 \
+  --backend docker
 

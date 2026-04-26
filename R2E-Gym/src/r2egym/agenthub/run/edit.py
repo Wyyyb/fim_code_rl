@@ -196,7 +196,7 @@ def runagent(
     llm_name="gpt-4o",
     temperature=0,
     use_fn_calling: bool = True,
-    backend: str = "kubernetes", # "kubernetes" or "docker"
+    backend: str = "docker", # "kubernetes" or "docker"
     max_reward_calc_time: int = 300,
     max_iterations: int = 1,
     scaffold: str = "r2egym",
