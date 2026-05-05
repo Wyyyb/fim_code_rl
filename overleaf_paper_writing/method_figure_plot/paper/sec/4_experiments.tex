@@ -1,0 +1,401 @@
+% =============================================================================
+% SECTION 4 — EXPERIMENTS
+% =============================================================================
+% Notes:
+%  - The main table uses a multicolumn header row per base model (rather than
+%    multirow), which avoids the \multirow + \rowcolor interaction that hid
+%    the 7B label in the previous version.
+%  - The light-blue Δ row requires \usepackage[table]{xcolor} (or colortbl).
+%  - All numerical results are means over three independent seeds; std bands
+%    in red are placeholders awaiting final replication runs.
+% =============================================================================
+
+\section{Experiments}
+\label{sec:exp}
+
+\subsection{Setup}
+\label{sec:exp:setup}
+
+\paragraph{Benchmarks.}
+We evaluate on three groups of benchmarks. \emph{Coding agent benchmarks}
+comprise SWE-Bench-Verified (500 instances) and SWE-Bench-Lite
+(300 instances)~\citep{swebench}; both are in-domain for the
+post-training pipelines and constitute our primary measure of end-task
+progress. \emph{Non-agent coding benchmarks} cover
+LiveCodeBench~\citep{livecodebench}, OJBench~\citep{ojbench}, and
+FullStackBench-EN~\citep{fullstackbench}; these probe pure code generation
+without an agent loop and serve as a regression check for capability
+erosion. \emph{Tool-use and out-of-domain agent benchmarks} include
+Terminal-Bench~\citep{terminalbench}, $\tau$-bench~\citep{taubench}, and
+BFCL~\citep{bfcl}; the latter two contain no Python code-editing
+trajectories at all, and they are the appropriate stage on which to test
+our central hypothesis that the function-call inductive bias transfers
+across task families.
+
+\paragraph{Mid-training and post-training pipeline.}
+We mid-train Qwen2.5-Coder-Instruct (7B, 14B, 32B) and Qwen3-8B on the
+selected FIM corpus. The training objective is the standard FIM loss on
+the middle span (rationale plus body), packed to the model's native
+context length and using the model's native FIM sentinel tokens to
+preserve compatibility with any FIM signal already learned during
+pretraining. After mid-training we apply existing agentic post-training
+pipelines without modification: R2E-Gym~\citep{r2egym} or
+SWE-Smith~\citep{swesmith} for the Qwen2.5-Coder runs, and
+SWE-Lego~\citep{swelego} for Qwen3-8B. \emph{Important deviation for
+Qwen3-8B}: we train for $2$ epochs rather than the $4$ epochs used in the
+original SWE-Lego setting, as the latter exhibited noticeable overfitting
+in our setup. Hyperparameters, token budgets, and learning-rate schedules
+are reported in Appendix~\ref{app:hp}.
+
+\paragraph{Evaluation protocol.}
+\textbf{All numerical results are reported as the mean over three
+independent evaluation seeds}; the ``\%'' symbol is omitted inside table
+cells. Standard-deviation bands shown in red (\textcolor{red}{$\pm$?}) are
+placeholders awaiting final replication runs. Results are obtained on the
+\emph{final} checkpoint of the training pipeline. A ``baseline'' row
+refers to the base model followed by an agentic post-training pipeline,
+while ``ours'' refers to the same base followed by FIM mid-training and
+then by the identical post-training pipeline. We do not directly evaluate
+mid-training-only checkpoints, because FIM data without subsequent
+instruction-style post-training degrades instruction-following ability and
+makes any comparison against instruction-tuned baselines unfair on
+instruction-following benchmarks. Consequently, every gain we attribute
+to mid-training should be read as a gain that survives subsequent
+post-training. The agent harness is fixed by the post-training pipeline:
+R2E-Gym runs use the R2E-Gym scaffold (an OpenHands
+fork)~\citep{openhands, r2egym}; SWE-Smith runs use
+SWE-agent~\citep{sweagent}; the Qwen3-8B runs use OpenHands directly,
+because the SWE-Lego post-training data exceeds the 32K context length of
+the R2E-Gym/SWE-Smith scaffolds while remaining within Qwen3's
+40{,}960-token context. Maximum turn limits, decoding temperature, and
+per-step timeouts are deferred to Appendix~\ref{app:hp}.
+
+\paragraph{Models and baselines.}
+For Qwen2.5-Coder-Instruct at 7B / 14B / 32B~\citep{qwencoder} we report
+(i) the instruction-tuned base without any agentic training, (ii)
+post-training with R2E-Gym reproduced under our setup, (iii) the official
+R2E-Gym numbers (in grey, where available), (iv) our recipe of FIM
+mid-training followed by R2E-Gym post-training, and at 7B additionally
+the analogous SWE-Smith~\citep{swesmith} variants. For Qwen3-8B we follow
+the SWE-Lego~\citep{swelego} pipeline; the cross-base-model comparison
+thus also varies the post-training pipeline, a confound we discuss in
+Section~\ref{sec:exp:main}.
+
+% =============================================================================
+% 4.2 Main Results
+% =============================================================================
+\subsection{Main Results on Agent Benchmarks}
+\label{sec:exp:main}
+
+% -----------------------------------------------------------------------------
+% Main table: uses multicolumn headers per base model (avoids the
+% multirow+rowcolor interaction that previously hid the 7B label).
+% Δ rows are highlighted via \rowcolor{blue!8} (requires
+% \usepackage[table]{xcolor}).
+% -----------------------------------------------------------------------------
+\begin{table}[t]
+\centering
+\caption{Main results on coding agent benchmarks (SWE-Bench-Verified and
+SWE-Bench-Lite). All cells are percentages, reported as the mean over
+three independent seeds. Bolded rows are our recipe (FIM mid-training
+followed by the same post-training pipeline as the row above). Greyed
+rows are reproduced from officially released numbers; black rows are
+reproduced under our setup. \textcolor{blue!70!black}{Light-blue rows
+report the absolute gain $\Delta$ of our recipe over the same
+post-training pipeline reproduced under our setup.} Std bands shown in
+red are placeholders awaiting final replication results.}
+\label{tab:main}
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lcc}
+\toprule
+Setting & SWE-Bench-Verified & SWE-Bench-Lite \\
+\midrule
+\multicolumn{3}{l}{\textit{Qwen2.5-Coder-7B-Instruct}} \\
+\quad --- (no agentic training)              & 1.8\,($\pm$1.3)                              & 1.0\,($\pm$1.0) \\
+\quad + R2E-Gym (reproduced)                 & 15.00\,(\textcolor{red}{$\pm$?})              & 11.33\,(\textcolor{red}{$\pm$?}) \\
+\quad + R2E-Gym (official)                   & \textcolor{gray}{19.00}                        & \textcolor{gray}{11.00} \\
+\quad \textbf{+ FIM-Midtrain + R2E-Gym}      & \textbf{17.80}\,(\textcolor{red}{$\pm$?})     & \textbf{15.00}\,(\textcolor{red}{$\pm$?}) \\
+\rowcolor{blue!8}
+\quad\quad $\Delta$ (vs.\ reproduced)        & $+2.80$                                        & $+3.67$ \\
+\cmidrule(lr){1-3}
+\quad + SWE-Smith (reproduced)               & 12.30\,(\textcolor{red}{$\pm$?})              & 14.20\,(\textcolor{red}{$\pm$?}) \\
+\quad + SWE-Smith (official)                 & \textcolor{gray}{15.20}                        & \textcolor{gray}{11.70} \\
+\quad \textbf{+ FIM-Midtrain + SWE-Smith}    & \textbf{17.60}\,(\textcolor{red}{$\pm$?})     & \textbf{14.70}\,(\textcolor{red}{$\pm$?}) \\
+\rowcolor{blue!8}
+\quad\quad $\Delta$ (vs.\ reproduced)        & $+5.30$                                        & $+0.50$ \\
+\midrule
+\multicolumn{3}{l}{\textit{Qwen2.5-Coder-14B-Instruct}} \\
+\quad --- (no agentic training)              & 4.0\,($\pm$1.6)                              & 2.7\,($\pm$1.0) \\
+\quad + R2E-Gym (reproduced)                 & 26.20\,(\textcolor{red}{$\pm$?})              & 18.00\,(\textcolor{red}{$\pm$?}) \\
+\quad + R2E-Gym (official)                   & \textcolor{gray}{26.80}                        & \textcolor{gray}{20.67} \\
+\quad \textbf{+ FIM-Midtrain + R2E-Gym}      & \textbf{29.20}\,(\textcolor{red}{$\pm$?})     & \textbf{22.00}\,(\textcolor{red}{$\pm$?}) \\
+\rowcolor{blue!8}
+\quad\quad $\Delta$ (vs.\ reproduced)        & $+3.00$                                        & $+4.00$ \\
+\midrule
+\multicolumn{3}{l}{\textit{Qwen2.5-Coder-32B-Instruct}} \\
+\quad --- (no agentic training)              & 7.0\,($\pm$1.3)                              & 3.0\,($\pm$1.4) \\
+\quad + R2E-Gym (reproduced)                 & 31.80\,(\textcolor{red}{$\pm$?})              & 24.70\,(\textcolor{red}{$\pm$?}) \\
+\quad + R2E-Gym (official)                   & \textcolor{gray}{34.40}                        & \textcolor{gray}{23.77} \\
+\quad \textbf{+ FIM-Midtrain + R2E-Gym}      & \textbf{35.10}\,(\textcolor{red}{$\pm$?})     & \textbf{26.80}\,(\textcolor{red}{$\pm$?}) \\
+\rowcolor{blue!8}
+\quad\quad $\Delta$ (vs.\ reproduced)        & $+3.30$                                        & $+2.10$ \\
+\midrule
+\multicolumn{3}{l}{\textit{Qwen3-8B-Base}} \\
+\quad --- (no agentic training)              & 7.60\,(\textcolor{red}{$\pm$?})               & 5.80\,(\textcolor{red}{$\pm$?}) \\
+\quad + SWE-Lego                             & 31.80\,(\textcolor{red}{$\pm$?})              & 27.30\,(\textcolor{red}{$\pm$?}) \\
+\quad \textbf{+ FIM-Midtrain + SWE-Lego}     & \textbf{35.00}\,(\textcolor{red}{$\pm$?})     & \textbf{32.70}\,(\textcolor{red}{$\pm$?}) \\
+\rowcolor{blue!8}
+\quad\quad $\Delta$ (vs.\ reproduced)        & $+3.20$                                        & $+5.40$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:main} summarizes the in-domain agent results.
+
+\paragraph{Mid-training delivers consistent gains across model scales.}
+Holding the post-training pipeline fixed at R2E-Gym, FIM mid-training
+improves SWE-Bench-Verified by $+2.80$ at 7B, $+3.00$ at 14B, and $+3.30$
+at 32B. The absolute gain stays within a narrow band as the base model
+grows by more than $4{\times}$ in parameters. SWE-Bench-Lite shows the
+same direction at every scale ($+3.67$ / $+4.00$ / $+2.10$). We do not
+interpret this as evidence of monotone scaling, but rather as evidence
+that the structural prior is not absorbed by larger pretrained models in
+the practical deployment range we evaluate. We do not extrapolate these
+trends beyond 32B.
+
+\paragraph{The improvement transfers across post-training pipelines.}
+Replacing R2E-Gym with SWE-Smith on the same 7B base, FIM mid-training
+yields a gain of $+5.30$ points on SWE-Bench-Verified, larger than the
+$+2.80$ observed under R2E-Gym. On SWE-Bench-Lite the SWE-Smith pairing
+gains only $+0.50$, smaller than the $+3.67$ for the corresponding
+R2E-Gym pairing; the cross-pipeline transfer is therefore clearer on
+Verified than on Lite. Taken together, the two pipelines indicate that
+mid-training is not specifically tuned to a single post-training data
+distribution, but the magnitude of its benefit can depend on which
+baseline pipeline it is composed with.
+
+\paragraph{The improvement transfers across base-model families.}
+Switching to Qwen3-8B and the SWE-Lego post-training pipeline,
+mid-training improves SWE-Bench-Verified by $+3.20$ points and
+SWE-Bench-Lite by $+5.40$ points, comparable to the gains observed on
+Qwen2.5-Coder. We note that this comparison varies the post-training
+pipeline simultaneously with the base model (SWE-Lego is required because
+Qwen3-8B's $40{,}960$-token context exceeds that of the
+R2E-Gym/SWE-Smith scaffolds), so the cross-base-model result should be
+read as ``the recipe is not specific to the Qwen2.5-Coder family under
+one alternative agentic pipeline,'' rather than as a guarantee that it
+generalizes across all base-model families. We elaborate this caveat in
+Section~\ref{sec:limitations}. The full Qwen2.5-Coder scaling curves
+($7$B/$14$B/$32$B) are given in Appendix~\ref{app:scaling}.
+
+% =============================================================================
+% 4.3 Capability preservation and cross-domain transfer
+% =============================================================================
+\subsection{Capability Preservation and Cross-Domain Transfer}
+\label{sec:exp:gen}
+
+A natural concern with any post-training stage that specializes a model
+toward a narrow agent task is that it may erode capabilities the base
+model already possessed. We test for this directly on six benchmarks that
+sit outside the SWE-Bench distribution and, in the case of $\tau$-bench
+and BFCL, outside the coding domain entirely. Because this analysis
+requires a controlled comparison among (instruct base) vs.\ (post-training
+only) vs.\ (mid-training $+$ post-training), and the corresponding
+controlled triple is the most expensive to produce, we conduct it at the
+14B scale with the R2E-Gym pipeline. Results are summarized in
+Table~\ref{tab:cap}.
+
+% -----------------------------------------------------------------------------
+% Capability preservation table
+% -----------------------------------------------------------------------------
+\begin{table}[t]
+\centering
+\caption{Capability preservation and cross-domain transfer at 14B with the
+R2E-Gym post-training pipeline. ``Non-agent coding'' tests pure code
+generation; ``Agent OOD'' is closer to coding agents but in a different
+environment; ``Tool use'' tests non-coding tool-call behavior. Bold marks
+the better trained variant per column (post-only vs.\ ours); the Instruct
+row is shown as a reference ceiling and is not in competition. All cells
+are percentages, std bands in red are placeholders.}
+\label{tab:cap}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcccccc|c}
+\toprule
+& \multicolumn{3}{c}{Non-agent coding}
+& \multicolumn{1}{c}{Agent OOD}
+& \multicolumn{2}{c}{Tool use}
+& \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-5} \cmidrule(lr){6-7}
+Setting (Qwen2.5-Coder-14B-base)
+& LiveCode & OJBench & FSB-EN
+& Terminal
+& $\tau$-bench & BFCL
+& Avg \\
+\midrule
+Instruct (no agentic training)
+  & 37.20 & 5.20 & 53.80
+  & 0.00
+  & 5.70 & 23.20
+  & 20.85 \\
++ R2E-Gym
+  & 24.10\,(\textcolor{red}{$\pm$?})
+  & 2.80\,(\textcolor{red}{$\pm$?})
+  & 47.72\,(\textcolor{red}{$\pm$?})
+  & 1.28\,(\textcolor{red}{$\pm$?})
+  & 0.40\,(\textcolor{red}{$\pm$?})
+  & 15.70\,(\textcolor{red}{$\pm$?})
+  & 15.33 \\
+\textbf{+ FIM-Midtrain + R2E-Gym}
+  & \textbf{35.20}\,(\textcolor{red}{$\pm$?})
+  & \textbf{4.74}\,(\textcolor{red}{$\pm$?})
+  & \textbf{48.07}\,(\textcolor{red}{$\pm$?})
+  & \textbf{2.47}\,(\textcolor{red}{$\pm$?})
+  & \textbf{4.40}\,(\textcolor{red}{$\pm$?})
+  & \textbf{18.20}\,(\textcolor{red}{$\pm$?})
+  & \textbf{18.85} \\
+\rowcolor{blue!8}
+$\Delta$ (vs.\ post-training only)
+  & $+11.10$ & $+1.94$ & $+0.35$
+  & $+1.19$
+  & $+4.00$ & $+2.50$
+  & $+3.52$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Agentic post-training has a substantial hidden capability cost.}
+Applying R2E-Gym alone to the 14B base reduces every non-agent coding and
+tool-use benchmark relative to the Instruct ceiling: LiveCodeBench drops
+by $13.10$ points, BFCL by $7.50$, FullStackBench-EN by $6.08$,
+$\tau$-bench by $5.30$, and OJBench by $2.40$. Averaged across the six
+benchmarks the post-trained model loses $5.52$ points relative to the
+Instruct ceiling. This regression is rarely highlighted in agent papers,
+but it is the implicit cost being paid for SWE-Bench gains.
+
+\paragraph{Mid-training largely closes the regression gap.}
+Adding FIM mid-training before the same post-training restores
+LiveCodeBench by $+11.10$, OJBench by $+1.94$ (within $0.46$ of the
+Instruct ceiling), and FullStackBench-EN by $+0.35$. The six-benchmark
+average rises from $15.33$ to $18.85$, an increase of $+3.52$ over the
+post-training-only configuration, while the SWE-Bench-Verified gain on
+the same base is preserved (Table~\ref{tab:main}). In other words,
+mid-training improves the cost--benefit profile of agentic post-training:
+the in-domain target metric improves, and the bulk of the off-distribution
+capability erosion is undone in the same training run.
+
+\paragraph{Cross-domain transfer to non-coding tool use.}
+The most direct test of our motivating hypothesis lies in the rightmost
+columns of Table~\ref{tab:cap}: $\tau$-bench and BFCL contain no Python
+code-editing data, and our mid-training corpus contains no tool-use
+trajectories. Mid-training nevertheless improves $\tau$-bench by
+$+4.00$ and BFCL by $+2.50$ over post-training alone, with a directionally
+consistent recovery on the also-OOD Terminal-Bench ($+1.19$). Because the
+mid-training data carries no tool-use signal a priori, the only mechanism
+by which it can affect these benchmarks is by installing a structural
+prior at mid-training time that survives subsequent post-training. The
+fact that this prior moves $\tau$-bench and BFCL in the same direction
+as the in-domain SWE-Bench gains is consistent with our hypothesis that
+the function-call site and the agent tool-call step share an underlying
+conditioning structure (Section~\ref{sec:method:motivation}).
+
+
+\subsection{Ablation Studies}
+\label{sec:exp:ablation}
+
+We conduct two controlled ablations, both on the Qwen2.5-Coder-7B base
+with R2E-Gym post-training and a shared mid-training-free baseline. The
+first isolates the role of the chain-of-thought rationale embedded in the
+FIM middle span; the second isolates the role of the function-aware
+selection pipeline. All selection variants in Block (B) operate under a
+controlled budget: each variant selects exactly $100$K single functions
+for masking, and basic hard filters (LoC $\in [10, 200]$, dunder methods
+excluded) are applied uniformly. Differences across rows therefore reflect
+\emph{which} functions are selected rather than \emph{how many}. Mask
+granularity beyond single functions, score-threshold sensitivity, and
+mid-training token budget are reserved for future investigation; due to
+compute constraints, the ablations run at the 7B scale only.
+
+% -----------------------------------------------------------------------------
+% Ablation table
+% -----------------------------------------------------------------------------
+\begin{table}[t]
+\centering
+\caption{Ablation studies on the Qwen2.5-Coder-7B base with R2E-Gym
+post-training. \textbf{(A)} varies the source of the rationale embedded in
+the FIM middle span. \textbf{(B)} varies the function-selection algorithm
+with all other components fixed (CoT source held to Gemini-3, budget
+fixed to 100K single functions). The two blocks share the same baseline
+(\emph{w/o mid-train}) and the same full configuration. Bold marks our
+default recipe.}
+\label{tab:ablation}
+\small
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{lccc}
+\toprule
+Setting & SWE-Bench-Verified & SWE-Bench-Lite & Average \\
+\midrule
+\multicolumn{4}{l}{\emph{(A) Chain-of-thought source (selection fixed to ``full'')}} \\
+\midrule
+w/o mid-train (baseline)            & 15.00 & 11.33 & 13.17 \\
++ FIM, no CoT                       & 15.60 & 11.00 & 13.30 \\
++ FIM, self-CoT (Qwen2.5-Coder-7B)  & 16.40 & 13.30 & 14.85 \\
+\textbf{+ FIM, Gemini-3 CoT (full)} & \textbf{17.80} & \textbf{15.00} & \textbf{16.40} \\
+\midrule
+\multicolumn{4}{l}{\emph{(B) Function-selection algorithm (CoT fixed to Gemini-3, budget fixed to 100K functions)}} \\
+\midrule
+w/o mid-train (baseline)               & 15.00 & 11.33 & 13.17 \\
+Random                                 & \textcolor{red}{XX.XX} & \textcolor{red}{XX.XX} & \textcolor{red}{XX.XX} \\
+Gemini-selected                        & \textcolor{red}{XX.XX} & \textcolor{red}{XX.XX} & \textcolor{red}{XX.XX} \\
+PDG only                               & \textcolor{red}{XX.XX} & \textcolor{red}{XX.XX} & \textcolor{red}{XX.XX} \\
+PDG + complexity ($\hat{H}$)           & \textcolor{red}{XX.XX} & \textcolor{red}{XX.XX} & \textcolor{red}{XX.XX} \\
+PDG + inferability ($\hat{I}$)         & \textcolor{red}{XX.XX} & \textcolor{red}{XX.XX} & \textcolor{red}{XX.XX} \\
+\textbf{Full (PDG + $\hat{H}$ + $\hat{I}$)} & \textbf{17.80} & \textbf{15.00} & \textbf{16.40} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{FIM structure contributes independently of CoT distillation.}
+Block (A) of Table~\ref{tab:ablation} disarms a natural reviewer concern:
+that our improvements stem primarily from distilling reasoning from a
+frontier model. Removing the rationale entirely (\emph{no CoT}) still
+improves the average by $+0.13$ over the no-mid-training baseline, with a
+$+0.6$ gain on SWE-Bench-Verified, indicating that the function-aware FIM
+objective by itself contributes some signal even without any external
+rationale. Replacing Gemini-3 with rationales generated by the model
+being trained (\emph{self-CoT}) reaches an average of $14.85$, recovering
+$1.7$ of the $3.2$-point gap between \emph{no CoT} and \emph{Gemini-3 CoT};
+high-quality external rationales help, but a sizable fraction of the
+gain is reproducible without a frontier teacher.
+
+\paragraph{The function-selection algorithm is the dominant lever within mid-training.}
+Block (B) varies the selection algorithm with the CoT source held fixed
+to Gemini-3 and the selection budget fixed to 100K single functions, so
+that all rows incur identical mid-training cost.
+\emph{Random} masking establishes the floor: with no structural priors
+beyond the basic hard filters, mid-training reaches
+\textcolor{red}{XX.XX} on average, a margin of \textcolor{red}{$+$X.XX}
+over no mid-training. Letting Gemini-3 directly choose which functions
+to mask (\emph{Gemini-selected})---a strong non-structural baseline that
+uses the same teacher we use for rationales---reaches
+\textcolor{red}{XX.XX}, indicating that frontier judgment on \emph{which}
+function to mask is helpful but not by itself sufficient. Restricting the
+candidate pool to functions with at least one neighbor in the program
+dependency graph (\emph{PDG only}) reaches \textcolor{red}{XX.XX}, a
+further \textcolor{red}{$+$X.XX} over Random: functions embedded in
+caller-callee or sibling structure are intrinsically more useful as FIM
+targets than isolated ones, even before any scoring is applied. Adding a
+scoring function on top of the PDG pool yields the next layer of gain:
+\emph{PDG + complexity} reaches \textcolor{red}{XX.XX} and
+\emph{PDG + inferability} reaches \textcolor{red}{XX.XX}, showing that
+both the intrinsic difficulty of the target and its recoverability from
+surrounding context independently contribute beyond the structural
+filter. Combining the two scores via the harmonic-mean-like
+$\hat{H}\,\hat{I}/(\hat{H}+\hat{I})$ form---the \emph{full}
+configuration---reaches $16.40$, a further \textcolor{red}{$+$X.XX} over
+the better single-score variant. The combination is therefore not
+redundant: $\hat{H}$ and $\hat{I}$ measure complementary properties of a
+candidate, and selecting targets that score highly on only one of the
+two yields either unlearnable noise (high complexity, low inferability)
+or trivial fills (low complexity, high inferability).

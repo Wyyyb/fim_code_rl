@@ -1,0 +1,154 @@
+% =============================================================================
+% Teaser figure (Fig 1): three-panel TikZ.
+%   (left)   function call site, four-color decomposition
+%   (middle) agent step, four-color decomposition
+%   (right)  SWE-Bench-V/L gain across 7B/14B/32B (bar groups)
+% Requires: \usepackage{tikz}, \usetikzlibrary{positioning, fit, calc, backgrounds}
+% =============================================================================
+\begin{tikzpicture}[
+  font=\sffamily\footnotesize,
+  every node/.style={inner sep=2pt},
+  panel/.style={draw=black!55, line width=0.45pt, rounded corners=2.5pt,
+                fill=white, inner sep=4pt},
+  caption/.style={font=\sffamily\scriptsize\bfseries, text=black!75},
+  ctxC/.style ={fill=blue!15,    draw=blue!55,  line width=0.4pt, rounded corners=1.5pt},
+  actC/.style ={fill=orange!25,  draw=orange!75,line width=0.4pt, rounded corners=1.5pt},
+  retC/.style ={fill=green!18,   draw=green!55!black, line width=0.4pt, rounded corners=1.5pt},
+  contC/.style={fill=violet!15,  draw=violet!55,line width=0.4pt, rounded corners=1.5pt},
+  arr/.style={->, >=stealth, line width=0.45pt, color=black!55},
+  legend/.style={font=\sffamily\scriptsize, text=black!80, inner sep=1.5pt},
+]
+
+% --------------------------------------------------------------------------- %
+% LEFT PANEL: function call site
+% --------------------------------------------------------------------------- %
+\node[caption] (lefttitle) at (0,0) {Function call site};
+
+% lines stacked vertically
+\node[ctxC,  below=0.18cm of lefttitle, anchor=north west,
+      text width=4.05cm, align=left, xshift=-2.0cm]
+  (ctxL) {\texttt{cfg = load\_config(path)}\\\texttt{x   = preprocess(cfg, raw)}};
+\node[actC,  below=0.10cm of ctxL.south west, anchor=north west,
+      text width=4.05cm, align=left]
+  (actL) {\texttt{y = transform(x, cfg.mode)}};
+\node[retC,  below=0.10cm of actL.south west, anchor=north west,
+      text width=4.05cm, align=left]
+  (retL) {\texttt{\# returns: tensor of shape ...}};
+\node[contC, below=0.10cm of retL.south west, anchor=north west,
+      text width=4.05cm, align=left]
+  (contL) {\texttt{loss = criterion(y, target)}\\\texttt{loss.backward()}};
+
+% inline labels
+\node[legend, anchor=west] at ($(ctxL.east) +(0.05,0)$) {pre-call context};
+\node[legend, anchor=west] at ($(actL.east) +(0.05,0)$) {call};
+\node[legend, anchor=west] at ($(retL.east) +(0.05,0)$) {return};
+\node[legend, anchor=west] at ($(contL.east)+(0.05,0)$) {downstream use};
+
+% bracket
+\coordinate (lboxNW) at ($(ctxL.north west)+(-0.12,0.10)$);
+\coordinate (lboxSE) at ($(contL.east)+(2.20,-0.10)$);
+\node[panel, fit=(lboxNW)(lboxSE)] (lpanel) {};
+\node[caption, anchor=north] at ($(lpanel.north)+(0,-0.04)$) {Function call site};
+
+% --------------------------------------------------------------------------- %
+% MIDDLE PANEL: agent step
+% --------------------------------------------------------------------------- %
+\coordinate (midOrigin) at ($(lpanel.east)+(0.55,0)$);
+
+\node[ctxC, anchor=north west, text width=3.55cm, align=left]
+  (ctxM) at ($(midOrigin)+(0,0.5)$)
+  {\textit{history $h_t$:} prior tool calls,\\file contents, plan so far};
+\node[actC, anchor=north west, text width=3.55cm, align=left,
+      below=0.10cm of ctxM.south west]
+  (actM) {\textit{action $a_t$:}\\\texttt{run\_tests(...)}};
+\node[retC, anchor=north west, text width=3.55cm, align=left,
+      below=0.10cm of actM.south west]
+  (retM) {\textit{observation $o_{t+1}$:}\\\texttt{stderr: AssertionError ...}};
+\node[contC, anchor=north west, text width=3.55cm, align=left,
+      below=0.10cm of retM.south west]
+  (contM) {\textit{continuation:} reason about\\error, propose next edit};
+
+\node[legend, anchor=west] at ($(ctxM.east) +(0.05,0)$) {context};
+\node[legend, anchor=west] at ($(actM.east) +(0.05,0)$) {action};
+\node[legend, anchor=west] at ($(retM.east) +(0.05,0)$) {ext.\ return};
+\node[legend, anchor=west] at ($(contM.east)+(0.05,0)$) {next step};
+
+\coordinate (mboxNW) at ($(ctxM.north west)+(-0.12,0.10)$);
+\coordinate (mboxSE) at ($(contM.east)+(1.85,-0.10)$);
+\node[panel, fit=(mboxNW)(mboxSE)] (mpanel) {};
+\node[caption, anchor=north] at ($(mpanel.north)+(0,-0.04)$) {Agent step};
+
+% double arrow between left and middle
+\draw[<->, line width=0.6pt, color=black!70]
+  ($(lpanel.east)+(0.05,0)$) -- ($(mpanel.west)+(-0.05,0)$)
+  node[midway, above=0.5pt, font=\sffamily\scriptsize\bfseries, text=black!70]
+    {isomorphic};
+
+% --------------------------------------------------------------------------- %
+% RIGHT PANEL: SWE-Bench gain across model sizes
+% --------------------------------------------------------------------------- %
+\coordinate (rightOrigin) at ($(mpanel.east)+(0.65,-0.05)$);
+
+\begin{scope}[shift={(rightOrigin)}]
+  % bar plot specs
+  \def\plotW{4.4}    % cm
+  \def\plotH{2.8}    % cm
+  \def\maxY{40}      % score axis max
+  \pgfmathsetmacro{\unit}{\plotH/\maxY}
+
+  % axis frame
+  \draw[black!55, line width=0.4pt] (0,0) rectangle (\plotW,\plotH);
+  % y-axis ticks
+  \foreach \y in {0,10,20,30,40} {
+    \draw[black!45, line width=0.3pt]
+      (-0.06,\y*\unit) -- (0,\y*\unit)
+      node[anchor=east, xshift=-0.06cm, font=\sffamily\tiny]{\y};
+    \draw[black!10, line width=0.25pt, dotted]
+      (0,\y*\unit) -- (\plotW,\plotH * \y / \maxY);
+  }
+
+  % three groups: 7B, 14B, 32B
+  % each group has two bars: post-only (grey), +FIM (red)
+  \def\bw{0.34}        % bar width cm
+  \def\gap{0.10}       % gap between bars within group
+  \def\groupgap{1.45}  % center-to-center between groups
+  \pgfmathsetmacro{\firstx}{0.55}
+
+  % data: post / ours / lite-post / lite-ours
+  \foreach \i/\size/\vp/\vo/\lp/\lo in {%
+    0/7B/15.0/17.8/11.3/15.0,
+    1/14B/26.2/29.2/18.0/22.0,
+    2/32B/31.8/35.1/24.7/26.8} {
+      \pgfmathsetmacro{\xc}{\firstx + \i*\groupgap}
+      % verified
+      \pgfmathsetmacro{\xa}{\xc - \bw - 0.55*\gap}
+      \pgfmathsetmacro{\xb}{\xc - 0.5*\gap}
+      \pgfmathsetmacro{\xd}{\xc + 0.5*\gap}
+      \pgfmathsetmacro{\xe}{\xc + \bw + 0.55*\gap}
+      % verified bars
+      \fill[black!35] (\xa,0) rectangle (\xb,\vp*\unit);
+      \fill[red!70!black] (\xb+0.02,0) rectangle (\xb+0.02+\bw,\vo*\unit);
+      \node[font=\sffamily\tiny, text=red!75!black] at (\xb+0.02+\bw/2, \vo*\unit + 0.20)
+            {\pgfmathprintnumber[fixed,precision=1]{\vo}};
+      \node[font=\sffamily\tiny, text=black!50] at (\xa+\bw/2, \vp*\unit + 0.20)
+            {\pgfmathprintnumber[fixed,precision=1]{\vp}};
+      % size label
+      \node[font=\sffamily\scriptsize\bfseries, anchor=north] at (\xc+0.02, -0.05)
+        {\size};
+  }
+
+  % axis title
+  \node[font=\sffamily\scriptsize, anchor=south, rotate=90]
+    at (-0.55, \plotH/2) {SWE-Bench-V (\%)};
+  \node[caption, anchor=south] at (\plotW/2, \plotH+0.05)
+    {Mid-training gain across scales};
+
+  % legend
+  \node[anchor=north west, font=\sffamily\tiny, fill=white,
+        draw=black!30, inner sep=2pt, line width=0.3pt]
+    at (0.18, \plotH-0.10)
+    {\tikz{\fill[black!35] (0,0) rectangle (0.22,0.14);}\, post-only \\[-1pt]
+     \tikz{\fill[red!70!black] (0,0) rectangle (0.22,0.14);}\, +\,FIM};
+\end{scope}
+
+\end{tikzpicture}

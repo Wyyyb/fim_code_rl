@@ -1,0 +1,587 @@
+\documentclass{article}
+
+\usepackage[main]{neurips_2026}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{multirow}
+
+\title{Function-Aware Fill-in-the-Middle as Mid-Training\\for Coding Agent Foundation Models}
+
+\author{%
+  Anonymous Authors \\
+  Anonymous Institution \\
+  \texttt{anonymous@example.com}
+}
+
+
+\begin{document}
+\maketitle
+
+% =============================================================================
+% ABSTRACT  (~ 175 words, single paragraph)
+% =============================================================================
+\begin{abstract}
+Coding agents must integrate external tool returns into ongoing reasoning---a
+capability that standard left-to-right pretraining on code exposes only in its
+forward direction. We observe that the
+\textit{action $\rightarrow$ observation $\rightarrow$ continuation} loop of a
+coding agent is structurally isomorphic to a function call site, where a
+caller binds arguments, a callee returns a value computed elsewhere, and
+downstream code consumes that value. This conditioning structure exists at
+internet scale in ordinary code. We exploit it through
+\emph{function-aware fill-in-the-middle (FIM) mid-training}: a self-supervised
+objective that masks functions selected via program dependency graph
+analysis and a complexity--inferability double criterion. We mid-train
+Qwen2.5-Coder (7B/14B/32B) and Qwen3-8B on a 3B-token decontaminated corpus
+drawn from 990 GitHub repositories, then apply existing agentic post-training
+pipelines (r2e-gym, swe-smith) without modification. Mid-training improves
+SWE-Bench-Verified by $+2.8/+3.0/+3.3$ points at 7B/14B/32B---a consistent
+gain across scales---and the improvement holds across post-training pipelines
+and base-model families. Beyond in-domain gains, mid-training also mitigates
+the capability erosion that agentic post-training otherwise inflicts on
+non-agent coding (e.g., LiveCodeBench) and non-coding tool-use benchmarks
+(tau-bench, BFCL): although the mid-training corpus contains Python code
+only, the function-call inductive bias survives post-training and yields
+consistent improvements over post-training alone.
+\end{abstract}
+
+
+% =============================================================================
+% 1. INTRODUCTION  (~ 1.3 页)  -- 见 intro.tex
+% =============================================================================
+\input{sections/intro.tex}
+% [Intro content provided separately above; insert here.]
+
+
+% =============================================================================
+% 2. RELATED WORK  (~ 0.6 页)
+% =============================================================================
+% 四块:
+%   2.1 Mid-training / continued pretraining
+%       - 引用 MiniCPM, OLMo, Code-Llama long-context mid-training 等
+%       - 我们的差异化: agent-oriented mid-training, 用 structured FIM.
+%
+%   2.2 Fill-in-the-middle pretraining
+%       - 引用 Bavarian 2022, Code-Llama, StarCoder, Qwen-Coder, DeepSeek-Coder
+%       - 关键: 这些都是 random span FIM, 在 pretraining 阶段大规模混合.
+%         我们的差异化: function-aware selection + CoT + mid-training stage.
+%   CAUTION: 不要否认前人贡献, frame 成 "extension/specialization".
+%
+%   2.3 Coding agent foundation models
+%       - SWE-Bench, r2e-gym, swe-smith, SWE-agent, OpenHands
+%       - Synthetic agent trajectory works (SWE-Gym, Agent-FLAN)
+%       - 我们的差异化: 不依赖 trajectory, 用 self-supervised code 信号.
+%
+%   2.4 Distillation from frontier models [必须有, 主动 disarm]
+%       - acknowledge 我们用 Gemini-3 生成 CoT, 引用 Distill-Whisper, Orca,
+%         Self-Instruct 等
+%       - 强调我们 ablation 拆开 distillation 与 FIM 结构两部分贡献:
+%         "We separate the contribution of FIM structure from CoT distillation
+%          via a controlled ablation in Section X.X."
+% CAUTION: 这一节存在 = 主动 disarm reviewer 的 distillation 质疑.
+% =============================================================================
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Mid-training and continued pretraining.}
+% TODO
+
+\paragraph{Fill-in-the-middle objectives.}
+% TODO
+
+\paragraph{Coding agent foundation models.}
+% TODO
+
+\paragraph{Distillation from frontier models.}
+% TODO (主动 disarm reviewer)
+
+
+% =============================================================================
+% 3. METHOD  (~ 2 页)  -- 已写完, 见 method.tex
+% =============================================================================
+\input{sections/method.tex}
+
+
+% =============================================================================
+% 4. EXPERIMENTS  (~ 3.0 页, 32B 已完成, 去掉 compute-matched)
+% =============================================================================
+\section{Experiments}
+\label{sec:exp}
+
+
+% -----------------------------------------------------------------------------
+% 4.1 Experimental Setup  (~ 0.4 页)
+% -----------------------------------------------------------------------------
+% 关键: 必须在 setup 显式说明 evaluation 是在 mid+post (or post-only) 上做的,
+% 不是在 mid-only ckpt 上做的. Reviewer 会问. 现在主动说清楚.
+%
+% Benchmarks 拆三类:
+%   * Agent benchmarks (in-domain):    SWE-Bench-Verified, SWE-Bench-Lite
+%   * Tool-use benchmarks (OOD):       tau-bench, BFCL
+%   * Non-agent coding (regression check):
+%       LiveCodeBench, OJBench, FullStackBench-EN/ZH, Terminal-Bench, HumanEval+
+%
+% Eval protocol:
+%   - All evaluations are on the FINAL checkpoint after the full pipeline.
+%   - "Baseline" means: base model + post-training (e.g. r2e-gym).
+%   - "Ours" means:     base model + FIM mid-training + post-training.
+%   - We do NOT evaluate the mid-train-only checkpoint directly because mid-
+%     training on FIM data degrades instruction-following ability (Qwen2.5-
+%     Coder-Instruct itself acquires IF via standard SFT post-training).
+%     Comparing a mid-train-only ckpt to instruction-tuned baselines would
+%     be unfair on instruction-following bench. We make this explicit so
+%     all "+X" claims are read as "X gained from mid-training that survives
+%     subsequent post-training".
+%
+% Eval scaffold: agent harness, max turns, retrieval setting
+% Statistical protocol: 3 seeds, mean ± std, paired bootstrap
+%
+% Baselines:
+%   - Qwen2.5-Coder-Instruct (no agentic training, ceiling for non-agent bench)
+%   - r2e-gym  (ours-reproduced + official)
+%   - swe-smith (ours-reproduced + official)
+%   - +FIM-Midtrain + r2e-gym
+%   - +FIM-Midtrain + swe-smith
+% -----------------------------------------------------------------------------
+\subsection{Setup}
+\label{sec:exp:setup}
+
+% TODO benchmarks (3 类) + eval protocol (post-pipeline) + baselines
+
+
+% -----------------------------------------------------------------------------
+% 4.2 Main Results: Agent and Tool-Use Benchmarks  (~ 0.7 页 + 大表)
+% -----------------------------------------------------------------------------
+% =============================================================================
+% TAB 3 [必须, paper 主表 1]: Agent + tool-use 主表
+%   行: 跨 7B/14B/32B 用 \multirow 分组, 每组内:
+%     - Base instruct (no agentic post-training)
+%     - r2e-gym (ours-reproduced)
+%     - r2e-gym (official report)         [灰色]
+%     - +FIM-Midtrain + r2e-gym           [bold, ours]
+%     - swe-smith (ours-reproduced)       [仅 7B 块有]
+%     - swe-smith (official report)       [灰色, 仅 7B]
+%     - +FIM-Midtrain + swe-smith         [bold, ours, 仅 7B]
+%   列: SWE-Bench-V, SWE-Bench-L, tau-bench, BFCL, average
+%   每个数字带 ± std (3 seeds).
+%
+% 数字 (32B 已校正):
+%   7B  + r2e-gym:                     SWE-V 15.00, SWE-L 11.33
+%   7B  + FIM + r2e-gym:               SWE-V 17.80, SWE-L 15.00
+%   7B  + swe-smith:                   SWE-V 12.30, SWE-L 15.20
+%   7B  + FIM + swe-smith:             SWE-V 17.60, SWE-L 14.70
+%   14B + r2e-gym:                     SWE-V 26.20, SWE-L 18.00
+%   14B + FIM + r2e-gym:               SWE-V 29.20, SWE-L 22.00
+%   32B + r2e-gym:                     SWE-V 31.80, SWE-L 24.70
+%   32B + FIM + r2e-gym:               SWE-V 35.10, SWE-L 26.80
+% =============================================================================
+%
+% 写作 critical paragraph (paper 最强卖点之一):
+%   独立段落 highlight cross-domain transfer (tau-bench / BFCL):
+%   "Crucially, our mid-training corpus contains exclusively Python code with
+%    no tool-use trajectory data. While the absolute tau-bench / BFCL scores
+%    of mid-train+post-train models do not exceed the original instruction-
+%    tuned base, they consistently exceed those of post-train-only models
+%    (+4.0 on tau-bench, +2.5 on BFCL at 14B). Since mid-training contains
+%    no tool-use signal, the only mechanism by which it can affect these
+%    benchmarks is by installing a structural prior that survives post-
+%    training. This directly supports our hypothesis that function calls
+%    and agent tool calls share an underlying conditioning structure."
+% -----------------------------------------------------------------------------
+\subsection{Main Results on Agent and Tool-Use Benchmarks}
+\label{sec:exp:main}
+
+% TODO TAB 3 (含 32B 完整数据)
+% TODO 主结果段落
+% TODO 单独一段 cross-domain transfer (tau-bench / BFCL)
+
+
+% -----------------------------------------------------------------------------
+% 4.3 Capability Preservation on Non-Agent Coding  (~ 0.6 页 + 表)
+%     [REWRITTEN: 强化"防退化"叙事]
+% -----------------------------------------------------------------------------
+% 这一节承担了原 compute-matched 的 selling point.
+% 核心 message: 单独 r2e-gym post-training 在 non-agent coding bench 上严重
+% 退化, 加 mid-training 后退化被基本消除, 部分 benchmark 还有提升.
+% --> mid-training 改善了 agent post-training 的 capability cost-benefit profile.
+%
+% =============================================================================
+% TAB 4 [必须, paper 主表 2]: Non-agent coding 主表 (14B 完整对照)
+%   行结构:
+%     Qwen2.5-Coder-14B-Instruct          (no agentic post-training, ceiling)
+%     14B + r2e-gym                        (post-training only, 严重退化)
+%     14B + FIM-Midtrain + r2e-gym         (我们的, 接近恢复)
+%   列: LiveCodeBench, OJBench, FullStackBench-EN, FullStackBench-ZH,
+%       Terminal-Bench, HumanEval+, average
+%
+% 数字 (14B):
+%   Instruct:               LiveCode 37.2, OJBench 5.20, FSB-EN 53.8,
+%                           Terminal 0,    tau 5.70,     BFCL 23.2  (avg 20.85)
+%   + r2e-gym:              LiveCode 24.1, OJBench 2.80, FSB-EN 47.72,
+%                           Terminal 1.28, tau 0.40,     BFCL 15.7  (avg 15.33)
+%   + FIM + r2e-gym:        LiveCode 35.2, OJBench 4.74, FSB-EN 48.07,
+%                           Terminal 2.47, tau 4.40,     BFCL 18.2  (avg 18.85)
+% =============================================================================
+%
+% 写作要点 (3 段):
+%   (a) Capability regression as the hidden cost of agentic post-training.
+%       单独 r2e-gym 让 14B LiveCode 从 37.2 砸到 24.1, FSB-EN 从 53.8 到 47.72.
+%       这是现有 agent 工作很少 report 的代价.
+%   (b) Mid-training 大幅消除该退化:
+%       LiveCode 35.2 (恢复 11.1 of 13.1 drop),
+%       OJBench 4.74 (vs ceiling 5.20),
+%       FSB-EN 48.07 (recovery 0.35).
+%       Average 18.85 vs post-only 15.33: +3.5 跨 6 个 benchmark.
+%   (c) 跨域泛化 (训练数据是 Python, 多/异构 任务也受益):
+%       - Terminal-Bench 1.28 -> 2.47 (closest to non-coding tool use)
+%       - FullStackBench-ZH 提升 (语言泛化)
+%       - 这些点支持 "structural prior 而非 task-specific shortcut".
+%
+% CAUTION:
+%   - Frame 成 "mid-training fixes a side-effect of post-training while still
+%     improving in-domain", 不是 "we beat post-training".
+%   - 由于 compute, 此 controlled regression 分析仅在 14B; in-domain SWE 一致
+%     的 7B/32B 趋势 suggests 类似 pattern, 但留作 limitation.
+% -----------------------------------------------------------------------------
+\subsection{Capability Preservation on Non-Agent Coding}
+\label{sec:exp:gen}
+
+% TODO TAB 4 (14B 三行对照)
+% TODO 段落 (a): post-training 单独导致 capability regression
+% TODO 段落 (b): mid-training 缓解退化, 6-bench average +3.5
+% TODO 段落 (c): 跨域 (Terminal-Bench, FSB-ZH) 进一步支持 structural prior 论点
+
+
+% -----------------------------------------------------------------------------
+% 4.4 Cross-Base-Model Validation: Qwen3-8B  (~ 0.3 页 + 小表)
+% -----------------------------------------------------------------------------
+% 支持 abstract/intro 的 cross-base-model claim.
+%
+% =============================================================================
+% TAB 5 [必须]: Qwen3-8B 小表
+%   行: Qwen3-8B + swe-lego (50%)                  baseline
+%       Qwen3-8B + FIM-Midtrain + swe-lego (50%)   [bold, 数字标红]
+%   列: SWE-Bench-V (其他列等结果再补)
+%
+% 数字 (待更新, 标红):
+%   baseline:           SWE-V 30.2
+%   + FIM-Midtrain:     SWE-V 33.4   (+3.2)
+% =============================================================================
+%
+% 写作要点:
+%   - "to verify the approach is not specific to Qwen2.5-Coder, we repeat the
+%     core experiment on Qwen3-8B"
+%   - Honest about pipeline: 这里使用 swe-lego (50% data) 做 post-training,
+%     与 Qwen2.5-Coder 的 r2e-gym 不同, 因此 cross-base 这一变量同时伴随
+%     pipeline 变化; 我们 frame 成 "在另一组合下仍观察到类似量级的提升 (+3.2)"
+%   - 数字标红, paper 投稿前更新 + 去掉颜色
+%
+% CAUTION:
+%   - 措辞谨慎: 一组 base model 不能 generalise 到 "all base model"
+%   - Limitation 重申一次
+% -----------------------------------------------------------------------------
+\subsection{Cross-Base-Model Validation}
+\label{sec:exp:crossbase}
+
+% TODO TAB 5: Qwen3-8B (数字标红, 待更新)
+% TODO 段落, 措辞谨慎
+
+
+% -----------------------------------------------------------------------------
+% 4.5 Consistency Across Model Sizes  (~ 0.3 页 + 1 张图)
+%     [UPDATED: 32B 校正后, gain consistent rather than growing]
+% -----------------------------------------------------------------------------
+% =============================================================================
+% FIG 6 [必须]: 三 size scaling 图.
+%   X 轴 model size (7B/14B/32B, log scale),
+%   Y 轴 SWE-Bench-Verified,
+%   两条线: r2e-gym only, +FIM-Midtrain + r2e-gym.
+%   每个 size 旁标注 absolute gain (+2.8 / +3.0 / +3.3).
+%
+% 数字 (校正后):
+%   7B:  15.00 -> 17.80   gain +2.8
+%   14B: 26.20 -> 29.20   gain +3.0
+%   32B: 31.80 -> 35.10   gain +3.3
+% =============================================================================
+%
+% 写作 framing (低调, consistent 而非 growing):
+%   "Across the three sizes evaluated, the absolute gain from mid-training
+%    remains within a narrow band (+2.8 to +3.3) and shows no sign of
+%    diminishing with scale. This addresses a natural concern that larger
+%    models, having seen more pretraining tokens, would already have
+%    absorbed the structural prior; in our experiments the gain at 32B is
+%    on par with that at 7B and 14B. The relative gain is largest at 7B
+%    (+18.7%) and smaller at 14B/32B (+11.5%/+10.4%), as expected from a
+%    higher baseline. Whether the gain remains consistent at 70B+ is left
+%    to future work."
+%
+% CAUTION:
+%   - 不 claim "scales", 用 "consistent across the scales evaluated"
+%   - 主动 acknowledge relative gain 在 14B 略低于 7B, 用 "higher baseline"
+%     解释, 避免 reviewer 拿这点攻击
+%   - 不外推到 70B+
+% -----------------------------------------------------------------------------
+\subsection{Consistency Across Model Sizes}
+\label{sec:exp:scaling}
+
+% TODO FIG 6: scaling curve (三个 size 实测点)
+% TODO 段落: consistent gain across scales, 反驳 "大模型已经会了"
+
+
+% -----------------------------------------------------------------------------
+% [REMOVED] Compute-Matched Comparison
+%
+% RATIONALE: mid-training 与 post-training 不必在具体下游 SWE 任务上直接做
+% compute-match. Section 4.3 已经显示 post-training 单独对 non-agent coding
+% 与 tool-use 能力造成显著退化 (LiveCode -13.1, BFCL -7.5, tau-bench -5.3),
+% 而 mid-training 能在保留这些能力的同时提升 in-domain 性能, 这本身就是比
+% compute-matched curve 更直接的 "投资 mid-training 而非更多 post-training
+% data" 的论据.
+% -----------------------------------------------------------------------------
+
+
+% -----------------------------------------------------------------------------
+% 4.6 Ablation Studies  (~ 0.7 页, 表 + 文字 + 图)
+% -----------------------------------------------------------------------------
+% Ablation 维度 (全部在 14B + r2e-gym 上 controlled):
+%
+%   (A) CoT source [critical, disarm distillation 质疑]:
+%       - Baseline (no mid-train, post-train only)
+%       - FIM mid-train, no CoT
+%       - FIM mid-train, 14B-self CoT
+%       - FIM mid-train, Gemini-3 CoT  (full method)
+%       Narrative:
+%         "Removing CoT reduces SWE-V from X to Y but still beats no
+%          mid-training by Z, indicating FIM structure contributes
+%          independently of distillation signal. Replacing Gemini-3 with
+%          self-generated CoT recovers most but not all of the gain,
+%          suggesting that CoT quality matters but is not the sole driver."
+%       CAUTION: 主动写 "due to compute constraints, we conduct this
+%                ablation on the 14B configuration".
+%
+%   (B) Selection algorithm:
+%       - Random function selection
+%       - PDG only (no inferability score)
+%       - Inferability only (no PDG)
+%       - Full (PDG + complexity + inferability)
+%
+%   (C) Mask granularity (1 / 2 / 3 connected functions / mixed)
+%
+%   (D) Score threshold sensitivity (tau_d, tau_FIM sweep)
+%
+%   (E) Mid-training token budget scaling (0.5B / 1B / 2B / 3B / 5B)
+%       回答 "more is better?" + saturation 行为
+%
+% =============================================================================
+% TAB 6 [必须]: 综合 ablation 表
+%   一张大表, 五块 sub-table 或 multirow:
+%   (A) CoT source: 4 行
+%   (B) Selection: 4 行
+%   (C) Granularity: 4 行
+%   (D) Threshold: 5 行 sweep
+%   (E) Token budget: 5 行 sweep
+%   列: SWE-Bench-V (主指标), 可选 SWE-Bench-L
+%
+% FIG 9 [建议]: token budget scaling curve
+%   X 轴 mid-training tokens (0.5B / 1B / 2B / 3B / 5B), log scale,
+%   Y 轴 SWE-Bench-Verified.
+% =============================================================================
+% -----------------------------------------------------------------------------
+\subsection{Ablation Studies}
+\label{sec:exp:ablation}
+
+% TODO TAB 6: 综合 ablation 表
+% TODO CoT source ablation (4 配置)
+% TODO selection algorithm ablation
+% TODO mask granularity ablation
+% TODO threshold sensitivity sweep
+% TODO 实验 (强烈建议): mid-training token budget scaling
+% TODO FIG 9: token budget scaling curve
+
+
+% =============================================================================
+% 5. ANALYSIS  (~ 0.9 页)
+% =============================================================================
+\section{Analysis}
+\label{sec:analysis}
+
+
+% -----------------------------------------------------------------------------
+% 5.1 Behavioral Analysis  (~ 0.4 页)
+% -----------------------------------------------------------------------------
+% Trajectory-level metrics, mid-training 前后对比:
+%   - Average tool calls per task
+%   - Recovery rate after error / unexpected output
+%   - Average context usage at success
+%   - max-turn 限制下的 success curve
+%
+% =============================================================================
+% TAB 7 [建议]: trajectory metrics 对比 (14B)
+%   行: r2e-gym only / +FIM + r2e-gym
+%   列: avg tool calls, recovery rate, context @ success, success @ max-turn=k
+% =============================================================================
+% -----------------------------------------------------------------------------
+\subsection{Behavioral Changes in Agent Trajectories}
+\label{sec:analysis:behavior}
+
+% TODO TAB 7: trajectory-level metrics
+% TODO 实验: parse SWE-agent log 提取 metrics
+
+
+% -----------------------------------------------------------------------------
+% 5.2 Failure Mode Analysis  (~ 0.3 页)
+% -----------------------------------------------------------------------------
+% =============================================================================
+% FIG 8 [建议]: stacked bar chart, 失败类型分布对比
+%   X 轴: r2e-gym only vs +FIM + r2e-gym
+%   Y 轴: # failed tasks, 按 failure type stacked
+%   Failure types: localization error, patch error, env error, infinite loop,
+%                  timeout, etc.
+% =============================================================================
+%
+% 写作 takeaway: 提升集中在 "需要 function-level reasoning across files"
+% 的任务, 对应 motivation.
+% -----------------------------------------------------------------------------
+\subsection{Where Does Mid-Training Help Most?}
+\label{sec:analysis:failure}
+
+% TODO FIG 8: failure mode breakdown
+% TODO 分析: 标注 SWE-Bench task 类型
+
+
+% -----------------------------------------------------------------------------
+% 5.3 General Capability Forgetting Check  (~ 0.2 页)
+% -----------------------------------------------------------------------------
+% 这一节与 Section 4.3 互补: 4.3 看 coding/tool-use 任务退化,
+% 这里看更广义的通用能力 (语言/数学/IF).
+%
+% =============================================================================
+% TAB 8 [必须]: 通用 benchmark forgetting check (14B)
+%   行:
+%     Qwen2.5-Coder-14B-Instruct       baseline ceiling
+%     14B + r2e-gym                     post-training only
+%     14B + FIM + r2e-gym               ours
+%   列: MMLU, MATH, IFEval, average
+% =============================================================================
+%
+% CAUTION: 不测的话 reviewer 必然假设有 forgetting 问题.
+%          主动 report 比被发现强.
+% -----------------------------------------------------------------------------
+\subsection{Preservation of General Capabilities}
+\label{sec:analysis:forgetting}
+
+% TODO TAB 8: forgetting check
+% TODO 实验: MMLU / MATH / IFEval 14B baseline vs +FIM
+
+
+% =============================================================================
+% 6. LIMITATIONS AND DISCUSSION  (~ 0.4 页)
+% =============================================================================
+% 必须 acknowledge:
+%   1. Python-heavy benchmark; 跨语言 generalisation 仅由 FullStackBench-ZH
+%      间接支持, 未在主表覆盖 Java/C++/Rust 等.
+%   2. CoT 监督依赖 frontier model API (Gemini-3-Preview); 自蒸馏 ablation
+%      恢复了大部分 gain (Section 4.6), 但完全开源复现需要相应替代.
+%   3. PDG 分析对动态语言不完美 (动态 dispatch, decorator, monkey patching);
+%      详见 Appendix.
+%   4. Cross-base-model 仅在 Qwen3-8B + swe-lego 上做, 该实验同时伴随
+%      post-training pipeline 变化, 因此 cross-family 结论的强度受限.
+%      未覆盖 Llama, DeepSeek 等其他 family.
+%   5. Capability preservation 的 controlled comparison 仅在 14B (Section 4.3);
+%      7B/32B 的 in-domain SWE-Bench 趋势 suggests 类似 pattern 但未 controlled.
+%   6. Function-aware FIM 假设代码 modular; 极端 monolithic 或 inline-heavy
+%      代码上的 selection pipeline 行为未充分研究.
+% =============================================================================
+\section{Limitations and Discussion}
+\label{sec:limitations}
+
+% TODO: 6 条 limitations
+
+
+% =============================================================================
+% 7. CONCLUSION  (~ 0.25 页)
+% =============================================================================
+% 4-5 句:
+%   - 重申 framing (function call ↔ agent step 的 structural isomorphism)
+%   - 重申 method (function-aware FIM mid-training, PDG + 双信号 + CoT)
+%   - 重申结果: 三轴 robustness 一致 + 同一 corpus 跨任务族提升
+%   - future direction: 跨语言, 跨 base family 扩展, mid-training 与
+%     RL post-training 的协同
+% =============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+% TODO: 4-5 句 conclusion
+
+
+% =============================================================================
+% References & Appendix
+% =============================================================================
+\bibliographystyle{plainnat}
+% \bibliography{refs}
+
+\section*{References}
+% TODO: 整理参考文献
+% 必引文献 cluster:
+%   FIM:           Bavarian 2022, Code-Llama, StarCoder, Qwen-Coder,
+%                  DeepSeek-Coder
+%   Mid-training:  MiniCPM, OLMo, 任何 explicit "mid-training" paper
+%   Coding agent:  SWE-Bench, SWE-agent, OpenHands, Aider, r2e-gym, swe-smith,
+%                  swe-lego, R2E, SWE-Gym
+%   Distillation:  Orca, Self-Instruct, Distill-Whisper
+%   Tool use eval: tau-bench, BFCL
+%   General eval:  MMLU, MATH, IFEval (forgetting check)
+%   Program analysis: PDG classical refs
+
+\appendix
+
+% =============================================================================
+% APPENDIX
+%
+%   A. Detailed dataset statistics (含 78K filtered files, 33M lines, 平均 LoC,
+%      10 类 category 分布, license 分布, decontamination 列表)
+%   B. Hyperparameters (含 mid-training 3B token budget 详细 schedule, LR sweep)
+%   C. Algorithm details
+%      - PDG 实现细节 (Python AST 处理动态特性的 workaround)
+%      - 复杂度/可推断性 score 完整公式与超参
+%      - Group topology 完整 8 种 pattern 定义
+%      - CoT prompt template (Gemini-3 用什么 prompt)
+%      - 14B-self CoT prompt template (与 Gemini-3 一致, 仅换模型)
+%   D. Additional results
+%      - 每个 benchmark 的 per-task breakdown
+%      - Qwen3-8B 上更详细的 trajectory 分析 (如有)
+%      - 7B / 32B 上的 capability preservation sanity check (如时间允许)
+%   E. Qualitative examples (一两个 SWE-Bench task, 对比 baseline 与 ours
+%      的 trajectory)
+%   F. Reproducibility checklist
+% =============================================================================
+\section{Dataset Details}
+\label{app:data}
+
+\section{Training Hyperparameters}
+\label{app:hp}
+
+\section{Algorithm Details}
+\label{app:algo}
+
+\section{Additional Results}
+\label{app:results}
+
+\section{Qualitative Examples}
+\label{app:examples}
+
+\input{checklist.tex}
+
+\end{document}

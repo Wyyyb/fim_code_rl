@@ -1,0 +1,313 @@
+% =============================================================
+% references.bib
+% Bibliography for "Function-Aware Fill-in-the-Middle as
+% Mid-Training for Coding Agent Foundation Models" (NeurIPS 2026)
+% =============================================================
+
+% --- Coding agents and SWE benchmarks ---
+
+@inproceedings{swebench,
+  title     = {{SWE-bench}: Can Language Models Resolve Real-World {GitHub} Issues?},
+  author    = {Jimenez, Carlos E. and Yang, John and Wettig, Alexander and Yao, Shunyu and Pei, Kexin and Press, Ofir and Narasimhan, Karthik},
+  booktitle = {The Twelfth International Conference on Learning Representations (ICLR)},
+  year      = {2024},
+  url       = {https://arxiv.org/abs/2310.06770}
+}
+
+@inproceedings{sweagent,
+  title     = {{SWE-agent}: Agent--Computer Interfaces Enable Automated Software Engineering},
+  author    = {Yang, John and Jimenez, Carlos E. and Wettig, Alexander and Lieret, Kilian and Yao, Shunyu and Narasimhan, Karthik and Press, Ofir},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2024},
+  url       = {https://arxiv.org/abs/2405.15793}
+}
+
+@inproceedings{openhands,
+  title     = {{OpenHands}: An Open Platform for {AI} Software Developers as Generalist Agents},
+  author    = {Wang, Xingyao and Li, Boxuan and Song, Yufan and Xu, Frank F. and Tang, Xiangru and Yuan, Mingchen and Pan, Hao and Yang, Yueqi and Hu, Jiayi and Tan, Mingyang and Liu, Yongliang and Liu, Yujia and Du, Tianbao and Zhang, Hao and Zhang, Yan and Yu, Jiawei and Zhao, Wanjun and Yang, Robert M. and Yi, Jingbo and Zhang, Mingzhang and Wang, Yuxiang and Wei, Jiawei and Olausson, Theo and Liu, Tianyu and Sun, Ren-Biao and Liu, Wendong and Yang, Tianyang and Mao, Frank and Wang, Yu Chen and Liu, Wei and Lin, Bill and Wei, Boyuan and Liang, Hanzhe and Yan, Yifan and Sun, Yibo and Sun, Yuhan and Liu, Hangrui and Wang, Heran and Yan, Hao and Tang, Tao and Yang, Yufeng and Reddy, Vijay and Gandhi, Saatvik and Singh, Pravir and Yu, Yu and Liu, Tianhao and Pang, Jianan and Wang, Yumeng and Geng, Saurabh and Hu, Yang and Zhao, Lily and Zhao, Yipeng and Liu, Pinjia and Bian, Junda and Mu, Junyi and Tan, Junyu and Wang, Hao and Lai, Wangchunshu and Garg, Shivansh and Wang, Yunzhu and Lo, Robert and Tao, Junda and Liu, Junyu and Lyu, Yifei and Wang, Yueting and Hu, Mingyu and Yang, Boqin and Liu, Bo and Sun, Hao and Wang, Yangruibo and Yang, John and Bansal, Mohit and Mihalcea, Rada and Cao, Yang and Liu, Edward and Du, Tongshuang and Press, Ofir and Liang, Percy and Heinz, Justin and Hellendoorn, Vincent J. and Boehme, Marcel and Zheng, Lianmin and Stoica, Ion and Wang, Junfeng and Henderson, Peter and Goyal, Prateek and Mitchell, Eric and Ji, Heng and Frank, Charlie and Hendrycks, Dan and Liang, Yiming and Sun, Maosong and Neubig, Graham},
+  booktitle = {The Thirteenth International Conference on Learning Representations (ICLR)},
+  year      = {2025},
+  url       = {https://arxiv.org/abs/2407.16741}
+}
+
+@misc{swegym,
+  title         = {Training Software Engineering Agents and Verifiers with {SWE-Gym}},
+  author        = {Pan, Jiayi and Wang, Xingyao and Neubig, Graham and Jaitly, Navdeep and Ji, Heng and Suhr, Alane and Zhang, Yizhe},
+  year          = {2024},
+  eprint        = {2412.21139},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE},
+  url           = {https://arxiv.org/abs/2412.21139}
+}
+
+@misc{r2egym,
+  title         = {{R2E-Gym}: Procedural Environments and Hybrid Verifiers for Scaling Open-Weights {SWE} Agents},
+  author        = {Jain, Naman and Singh, Jaskirat and Shetty, Manish and Zheng, Liang and Sen, Koushik and Stoica, Ion},
+  year          = {2025},
+  eprint        = {2504.07164},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE},
+  url           = {https://arxiv.org/abs/2504.07164}
+}
+
+@misc{swesmith,
+  title         = {{SWE-smith}: Scaling Data for Software Engineering Agents},
+  author        = {Yang, John and Lieret, Kilian and Jimenez, Carlos E. and Wettig, Alexander and Khandpur, Kabir and Zhang, Yanzhe and Hui, Binyuan and Press, Ofir and Schmidt, Ludwig and Yang, Diyi},
+  year          = {2025},
+  eprint        = {2504.21798},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE},
+  url           = {https://arxiv.org/abs/2504.21798}
+}
+
+@misc{swelego,
+  title         = {{SWE-Lego}: Pushing the Limits of Supervised Fine-tuning for Software Issue Resolving},
+  author        = {{SWE-Lego Team}},
+  year          = {2026},
+  eprint        = {2601.01426},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE},
+  url           = {https://arxiv.org/abs/2601.01426}
+}
+
+% --- Code foundation models ---
+
+@misc{qwencoder,
+  title         = {{Qwen2.5-Coder} Technical Report},
+  author        = {Hui, Binyuan and Yang, Jian and Cui, Zeyu and Yang, Jiaxi and Liu, Dayiheng and Zhang, Lei and Liu, Tianyu and Zhang, Jiajun and Yu, Bowen and Lu, Keming and Dang, Kai and Fan, Yang and Zhang, Yichang and Yang, An and Men, Rui and Huang, Fei and Zheng, Bo and Miao, Yibo and Quan, Shanghaoran and Feng, Yunlong and Ren, Xingzhang and Ren, Xuancheng and Zhou, Jingren and Lin, Junyang},
+  year          = {2024},
+  eprint        = {2409.12186},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2409.12186}
+}
+
+@misc{deepseekcoder,
+  title         = {{DeepSeek-Coder}: When the Large Language Model Meets Programming -- The Rise of Code Intelligence},
+  author        = {Guo, Daya and Zhu, Qihao and Yang, Dejian and Xie, Zhenda and Dong, Kai and Zhang, Wentao and Chen, Guanting and Bi, Xiao and Wu, Y. and Li, Y. K. and Luo, Fuli and Xiong, Yingfei and Liang, Wenfeng},
+  year          = {2024},
+  eprint        = {2401.14196},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE},
+  url           = {https://arxiv.org/abs/2401.14196}
+}
+
+@misc{starcoder,
+  title         = {{StarCoder}: May the Source be with You!},
+  author        = {Li, Raymond and Ben Allal, Loubna and Zi, Yangtian and Muennighoff, Niklas and Kocetkov, Denis and Mou, Chenghao and Marone, Marc and Akiki, Christopher and Li, Jia and Chim, Jenny and Liu, Qian and Zheltonozhskii, Evgenii and Zhuo, Terry Yue and Wang, Thomas and Dehaene, Olivier and Davaadorj, Mishig and Lamy-Poirier, Joel and Monteiro, Jo{\~a}o and Shliazhko, Oleh and Gontier, Nicolas and Meade, Nicholas and Zebaze, Armel and Yee, Ming-Ho and Umapathi, Logesh Kumar and Zhu, Jian and Lipkin, Benjamin and Oblokulov, Muhtasham and Wang, Zhiruo and Murthy, Rudra and Stillerman, Jason and Patel, Siva Sankalp and Abulkhanov, Dmitry and Zocca, Marco and Dey, Manan and Zhang, Zhihan and Fahmy, Nour and Bhattacharyya, Urvashi and Yu, Wenhao and Singh, Swayam and Luccioni, Sasha and Villegas, Paulo and Kunakov, Maxim and Zhdanov, Fedor and Romero, Manuel and Lee, Tony and Timor, Nadav and Ding, Jennifer and Schlesinger, Claire and Schoelkopf, Hailey and Ebert, Jan and Dao, Tri and Mishra, Mayank and Gu, Alex and Robinson, Jennifer and Anderson, Carolyn Jane and Dolan-Gavitt, Brendan and Contractor, Danish and Reddy, Siva and Fried, Daniel and Bahdanau, Dzmitry and Jernite, Yacine and Mu{\~n}oz Ferrandis, Carlos and Hughes, Sean and Wolf, Thomas and Guha, Arjun and von Werra, Leandro and de Vries, Harm},
+  year          = {2023},
+  eprint        = {2305.06161},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2305.06161}
+}
+
+@misc{starcoder2,
+  title         = {{StarCoder 2} and {The Stack v2}: The Next Generation},
+  author        = {Lozhkov, Anton and Li, Raymond and Ben Allal, Loubna and Cassano, Federico and Lamy-Poirier, Joel and Tazi, Nouamane and Tang, Ao and Pykhtar, Dmytro and Liu, Jiawei and Wei, Yuxiang and Liu, Tianyang and Tian, Max and Kocetkov, Denis and Zucker, Arthur and Belkada, Younes and Wang, Zijian and Liu, Qian and Abulkhanov, Dmitry and Paul, Indraneil and Li, Zhuang and Li, Wen-Ding and Risdal, Megan and Li, Jia and Zhu, Jian and Zhuo, Terry Yue and Zheltonozhskii, Evgenii and Dade, Nii Osae Osae and Yu, Wenhao and Krauss, Lucas and Jain, Naman and Su, Yixuan and He, Xuanli and Dey, Manan and Abati, Edoardo and Chai, Yekun and Muennighoff, Niklas and Tang, Xiangru and Oblokulov, Muhtasham and Akiki, Christopher and Marone, Marc and Mou, Chenghao and Mishra, Mayank and Gu, Alex and Hui, Binyuan and Dao, Tri and Zebaze, Armel and Dehaene, Olivier and Patry, Nicolas and Xu, Canwen and McAuley, Julian and Hu, Han and Scholak, Torsten and Paquet, Sebastien and Robinson, Jennifer and Anderson, Carolyn Jane and Chapados, Nicolas and Patwary, Mostofa and Tajbakhsh, Nima and Jernite, Yacine and Ferrandis, Carlos Mu{\~n}oz and Zhang, Lingming and Hughes, Sean and Wolf, Thomas and Guha, Arjun and von Werra, Leandro and de Vries, Harm},
+  year          = {2024},
+  eprint        = {2402.19173},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE},
+  url           = {https://arxiv.org/abs/2402.19173}
+}
+
+@misc{codellama,
+  title         = {{Code Llama}: Open Foundation Models for Code},
+  author        = {Rozi{\`e}re, Baptiste and Gehring, Jonas and Gloeckle, Fabian and Sootla, Sten and Gat, Itai and Tan, Xiaoqing Ellen and Adi, Yossi and Liu, Jingyu and Sauvestre, Romain and Remez, Tal and Rapin, J{\'e}r{\'e}my and Kozhevnikov, Artyom and Evtimov, Ivan and Bitton, Joanna and Bhatt, Manish and Ferrer, Cristian Canton and Grattafiori, Aaron and Xiong, Wenhan and D{\'e}fossez, Alexandre and Copet, Jade and Azhar, Faisal and Touvron, Hugo and Martin, Louis and Usunier, Nicolas and Scialom, Thomas and Synnaeve, Gabriel},
+  year          = {2023},
+  eprint        = {2308.12950},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2308.12950}
+}
+
+@misc{qwen3,
+  title         = {{Qwen3} Technical Report},
+  author        = {{Qwen Team}},
+  year          = {2025},
+  eprint        = {2505.09388},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2505.09388}
+}
+
+@misc{qwen3coder,
+  title         = {{Qwen3-Coder-Next} Technical Report},
+  author        = {{Qwen Team}},
+  year          = {2026},
+  eprint        = {2603.00729},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2603.00729}
+}
+
+% --- Fill-in-the-Middle ---
+
+@misc{bavarian2022fim,
+  title         = {Efficient Training of Language Models to Fill in the Middle},
+  author        = {Bavarian, Mohammad and Jun, Heewoo and Tezak, Nikolas and Schulman, John and McLeavey, Christine and Tworek, Jerry and Chen, Mark},
+  year          = {2022},
+  eprint        = {2207.14255},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2207.14255}
+}
+
+% --- Code / agent benchmarks ---
+
+@misc{livecodebench,
+  title         = {{LiveCodeBench}: Holistic and Contamination Free Evaluation of Large Language Models for Code},
+  author        = {Jain, Naman and Han, King and Gu, Alex and Li, Wen-Ding and Yan, Fanjia and Zhang, Tianjun and Wang, Sida and Solar-Lezama, Armando and Sen, Koushik and Stoica, Ion},
+  year          = {2024},
+  eprint        = {2403.07974},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE},
+  url           = {https://arxiv.org/abs/2403.07974}
+}
+
+@misc{ojbench,
+  title         = {{OJBench}: A Competition Level Code Benchmark for Large Language Models},
+  author        = {Wang, Zhexu and Yang, Yiwen and Zhu, Pengfei and Zheng, Chuanrui and Hu, Jianxin and Huang, Wangyue and Wu, Yuchen and Liu, Weizhe and Wang, Shilong and Yan, Yixuan and Liu, Yiwen and Sui, Yufei and Zhang, Lewei and Yang, Tianyu and Yu, Mingyang and Zhao, Junjie and Zhuang, Weiqian and Lu, Ke and Yang, Junjie and He, Cong and Lou, Jian-Guang and Lin, Zhouhan and Liu, Junran and Tao, Yidan and Hua, Tianhe},
+  year          = {2025},
+  eprint        = {2506.16395},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2506.16395}
+}
+
+@misc{fullstackbench,
+  title         = {{FullStack Bench}: Evaluating {LLMs} as Full Stack Coders},
+  author        = {{ByteDance Seed Foundation Code Team}},
+  year          = {2024},
+  eprint        = {2412.00535},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE},
+  url           = {https://arxiv.org/abs/2412.00535}
+}
+
+@misc{terminalbench,
+  title         = {{Terminal-Bench}: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces},
+  author        = {Merrill, Mike A. and others},
+  year          = {2026},
+  eprint        = {2601.11868},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.SE},
+  url           = {https://arxiv.org/abs/2601.11868}
+}
+
+@misc{taubench,
+  title         = {{$\tau$-bench}: A Benchmark for Tool-Agent-User Interaction in Real-World Domains},
+  author        = {Yao, Shunyu and Shinn, Noah and Razavi, Pedram and Narasimhan, Karthik},
+  year          = {2024},
+  eprint        = {2406.12045},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2406.12045}
+}
+
+@inproceedings{bfcl,
+  title     = {The {Berkeley Function Calling Leaderboard (BFCL)}: From Tool Use to Agentic Evaluation of Large Language Models},
+  author    = {Patil, Shishir G. and Mao, Huanzhi and Cheng-Jie Ji, Charlie and Yan, Fanjia and Suresh, Vishnu and Stoica, Ion and Gonzalez, Joseph E.},
+  booktitle = {Proceedings of the 42nd International Conference on Machine Learning (ICML)},
+  year      = {2025},
+  url       = {https://gorilla.cs.berkeley.edu/leaderboard.html}
+}
+
+% --- Generic LLM benchmarks ---
+
+@inproceedings{mmlu,
+  title     = {Measuring Massive Multitask Language Understanding},
+  author    = {Hendrycks, Dan and Burns, Collin and Basart, Steven and Zou, Andy and Mazeika, Mantas and Song, Dawn and Steinhardt, Jacob},
+  booktitle = {The Ninth International Conference on Learning Representations (ICLR)},
+  year      = {2021},
+  url       = {https://arxiv.org/abs/2009.03300}
+}
+
+@inproceedings{mathbench,
+  title     = {Measuring Mathematical Problem Solving with the {MATH} Dataset},
+  author    = {Hendrycks, Dan and Burns, Collin and Kadavath, Saurav and Arora, Akul and Basart, Steven and Tang, Eric and Song, Dawn and Steinhardt, Jacob},
+  booktitle = {Advances in Neural Information Processing Systems Datasets and Benchmarks Track (NeurIPS)},
+  year      = {2021},
+  url       = {https://arxiv.org/abs/2103.03874}
+}
+
+@misc{ifeval,
+  title         = {Instruction-Following Evaluation for Large Language Models},
+  author        = {Zhou, Jeffrey and Lu, Tianjian and Mishra, Swaroop and Brahma, Siddhartha and Basu, Sujoy and Luan, Yi and Zhou, Denny and Hou, Le},
+  year          = {2023},
+  eprint        = {2311.07911},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2311.07911}
+}
+
+@inproceedings{humanevalplus,
+  title     = {Is Your Code Generated by {ChatGPT} Really Correct? {R}igorous Evaluation of Large Language Models for Code Generation},
+  author    = {Liu, Jiawei and Xia, Chunqiu Steven and Wang, Yuyao and Zhang, Lingming},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2023},
+  url       = {https://arxiv.org/abs/2305.01210}
+}
+
+% --- Small-LM / training-strategy related work ---
+
+@misc{minicpm,
+  title         = {{MiniCPM}: Unveiling the Potential of Small Language Models with Scalable Training Strategies},
+  author        = {Hu, Shengding and Tu, Yuge and Han, Xu and He, Chaoqun and Cui, Ganqu and Long, Xiang and Zheng, Zhi and Fang, Yewei and Huang, Yuxiang and Zhao, Weilin and Zhang, Xinrong and Thai, Zheng Leng and Zhang, Kaihuo and Wang, Chongyi and Yao, Yuan and Zhao, Chenyang and Zhou, Jie and Cai, Jie and Zhai, Zhongwu and Ding, Ning and Jia, Chao and Zeng, Guoyang and Li, Dahai and Liu, Zhiyuan and Sun, Maosong},
+  year          = {2024},
+  eprint        = {2404.06395},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2404.06395}
+}
+
+@inproceedings{olmo,
+  title     = {{OLMo}: Accelerating the Science of Language Models},
+  author    = {Groeneveld, Dirk and Beltagy, Iz and Walsh, Pete and Bhagia, Akshita and Kinney, Rodney and Tafjord, Oyvind and Jha, Ananya Harsh and Ivison, Hamish and Magnusson, Ian and Wang, Yizhong and Arora, Shane and Atkinson, David and Authur, Russell and Chandu, Khyathi Raghavi and Cohan, Arman and Dumas, Jennifer and Elazar, Yanai and Gu, Yuling and Hessel, Jack and Khot, Tushar and Merrill, William and Morrison, Jacob and Muennighoff, Niklas and Naik, Aakanksha and Nam, Crystal and Peters, Matthew E. and Pyatkin, Valentina and Ravichander, Abhilasha and Schwenk, Dustin and Shah, Saurabh and Smith, Will and Strubell, Emma and Subramani, Nishant and Wortsman, Mitchell and Dasigi, Pradeep and Lambert, Nathan and Richardson, Kyle and Zettlemoyer, Luke and Dodge, Jesse and Lo, Kyle and Soldaini, Luca and Smith, Noah A. and Hajishirzi, Hannaneh},
+  booktitle = {Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (ACL)},
+  year      = {2024},
+  url       = {https://arxiv.org/abs/2402.00838}
+}
+
+@misc{orca,
+  title         = {{Orca}: Progressive Learning from Complex Explanation Traces of {GPT-4}},
+  author        = {Mukherjee, Subhabrata and Mitra, Arindam and Jawahar, Ganesh and Agarwal, Sahaj and Palangi, Hamid and Awadallah, Ahmed},
+  year          = {2023},
+  eprint        = {2306.02707},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2306.02707}
+}
+
+@inproceedings{selfinstruct,
+  title     = {{Self-Instruct}: Aligning Language Models with Self-Generated Instructions},
+  author    = {Wang, Yizhong and Kordi, Yeganeh and Mishra, Swaroop and Liu, Alisa and Smith, Noah A. and Khashabi, Daniel and Hajishirzi, Hannaneh},
+  booktitle = {Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (ACL)},
+  year      = {2023},
+  url       = {https://arxiv.org/abs/2212.10560}
+}
+
+@misc{distillwhisper,
+  title         = {{Distil-Whisper}: Robust Knowledge Distillation via Large-Scale Pseudo Labelling},
+  author        = {Gandhi, Sanchit and von Platen, Patrick and Rush, Alexander M.},
+  year          = {2023},
+  eprint        = {2311.00430},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2311.00430}
+}
+
+% --- Program Dependence Graph ---
+
+@article{pdg,
+  title     = {The Program Dependence Graph and Its Use in Optimization},
+  author    = {Ferrante, Jeanne and Ottenstein, Karl J. and Warren, Joe D.},
+  journal   = {ACM Transactions on Programming Languages and Systems},
+  volume    = {9},
+  number    = {3},
+  pages     = {319--349},
+  year      = {1987},
+  publisher = {ACM},
+  doi       = {10.1145/24039.24041}
+}

@@ -1,0 +1,144 @@
+% =============================================================================
+% 2. INTRODUCTION
+% =============================================================================
+\section{Introduction}
+\label{sec:intro}
+
+Coding agents that resolve real software engineering issues have moved from
+research demos to deployed systems~\citep{swebench, sweagent,
+openhands}. Their progress, however, has been driven almost entirely by
+scaling synthetic agent-trajectory data during post-training: pipelines such
+as SWE-Gym~\citep{swegym}, r2e-gym~\citep{r2egym}, and
+swe-smith~\citep{swesmith} curate or synthesise trajectories that
+imitate human or LLM behaviour on issue-resolution tasks. The base model
+these pipelines start from is typically a code LLM trained with next-token
+prediction (and, in some cases, random-span FIM) on internet-scale
+code~\citep{qwencoder, deepseekcoder, starcoder}. Between
+these two stages lies a training-time gap: the base model is rarely
+optimised for the conditioning structure that agentic post-training will
+later demand. We treat this gap as an opportunity for a dedicated
+\emph{mid-training} stage that aligns the base model with agent-relevant
+inductive biases before agent-specific data is introduced.
+
+% =============================================================================
+% FIG 1 [必须]: 第一页 teaser figure
+%   (left)  code snippet with call site highlighted in 4 colours, labelled:
+%           caller-context / call / return / downstream-use
+%   (middle) agent trajectory with the same 4 colours, labelled:
+%           history h_t / action a_t / observation o_{t+1} / continuation
+%   (right) bar chart: SWE-Bench-Verified across 7B/14B/32B,
+%           grouped pairs (post-only vs +FIM-Midtrain)
+% =============================================================================
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figs/teaser.pdf}
+\caption{The four-part decomposition of a function call site (left) is
+structurally isomorphic to a single step of a coding agent (middle):
+pre-call context $\leftrightarrow$ history, call $\leftrightarrow$ action,
+return $\leftrightarrow$ external observation, downstream use
+$\leftrightarrow$ continuation. Function-aware FIM mid-training exploits
+this correspondence as a self-supervised prior, yielding consistent
+SWE-Bench-Verified gains of $+2.8/+3.0/+3.3$ across 7B/14B/32B Qwen2.5-Coder
+bases (right; solid bars = SWE-Bench-Verified, hatched bars =
+SWE-Bench-Lite).}
+\label{fig:teaser}
+\end{figure}
+
+Our central observation is that the inductive bias required by a coding
+agent already exists in ordinary code, but in a shape that left-to-right
+pretraining systematically under-exposes. At each step an agent maintains a
+history $h_t$, samples an action $a_t \sim \pi(a_t \mid h_t)$, receives an
+observation $o_{t+1}$ produced by an external process, and continues
+conditioned on the entire trace. This four-part decomposition---context,
+action, externally-computed return, continuation---is precisely the
+decomposition of a function call site: pre-call code that establishes intent
+and binds arguments; the call itself; a return value produced by code
+outside the immediate scope; and downstream code that consumes the return
+value. A model trained to reason \emph{bidirectionally} about function-level
+dependencies must learn to reconstruct a callee's behaviour from caller
+context and downstream usage, which is the same competence required to
+predict an agent's continuation given a history and a tool return. The
+correspondence is structural rather than literal---FIM training conditions
+on a given suffix while agent inference generates one---but it suggests
+that representations induced by the former should transfer to the latter,
+an empirical question we address in Section~\ref{sec:exp}.
+
+The fill-in-the-middle objective itself is not new: it has been part of code
+LLM pretraining since~\citet{bavarian2022fim}, and recent code LLMs mix
+random-span FIM into their pretraining
+corpora~\citep{qwencoder, deepseekcoder, starcoder}. We
+argue, however, that random-span FIM is poorly aligned with the agentic
+conditioning structure for three reasons. \emph{(i) Span boundaries are
+syntactically arbitrary:} most masked spans cut through expressions or
+partial statements and provide only weak signal about function-level
+dependencies. \emph{(ii) There is no reasoning supervision:} the model
+fills the span directly, with no intermediate rationale mirroring an
+agent's think-then-act pattern. \emph{(iii) The objective is dissolved
+into pretraining:} by the time agent post-training begins, any structural
+prior conferred by FIM has been amortised across trillions of unrelated
+tokens. We address all three points. We select masking targets at function
+granularity using program dependency graph analysis combined with a
+complexity--inferability double criterion that is deliberately
+base-model-agnostic (Section~\ref{sec:method:selection}). We embed
+chain-of-thought rationales \emph{inside} the FIM middle span so that the
+model learns to produce a reasoning trace consistent with the eventual
+code (Section~\ref{sec:method:cot}). And we apply the objective at a
+dedicated mid-training stage, concentrating its signal immediately before
+agentic post-training rather than spreading it across pretraining.
+
+We evaluate this recipe along three axes of robustness. \emph{Across model
+sizes}, mid-training improves SWE-Bench-Verified at 7B
+($15.0 \to 17.8$, $+2.8$), 14B ($26.2 \to 29.2$, $+3.0$), and 32B
+($31.8 \to 35.1$, $+3.3$): the gain is consistent across the scales we
+evaluate, indicating that the structural prior is not absorbed by larger
+pretrained models and remains useful in the practical deployment range.
+\emph{Across post-training pipelines}, mid-training improves both r2e-gym
+and swe-smith on the same 7B base, with the swe-smith pairing improving by
+$+5.3$ points on SWE-Bench-Verified. \emph{Across base-model families},
+mid-training transfers from Qwen2.5-Coder to Qwen3-8B
+(\textcolor{red}{$30.2 \to 33.4$ on SWE-Bench-Verified}, paired with the
+swe-lego post-training pipeline), suggesting the prior is not specific to
+a single pretraining recipe.
+
+A second set of results probes our motivating hypothesis. We note first
+that all benchmarks in this paper are evaluated on checkpoints that have
+undergone the full pipeline---either post-training alone (baseline) or
+mid-training followed by post-training (ours)---because a mid-trained
+checkpoint without subsequent instruction-style post-training has degraded
+instruction-following ability and is not directly comparable to
+instruction-tuned baselines. Under this protocol, we observe that agentic
+post-training alone substantially regresses non-target capabilities at
+14B: r2e-gym alone drops LiveCodeBench from $37.2$ to $24.1$, BFCL from
+$23.2$ to $15.7$, and tau-bench from $5.7$ to $0.4$. Adding mid-training
+before the same post-training largely restores them to $35.2$, $18.2$, and
+$4.4$ respectively---gains of $+11.1$, $+2.5$, and $+4.0$ over post-training
+alone. Because the mid-training corpus contains only Python code with no
+tool-use data, mid-training a priori has no reason to affect tau-bench or
+BFCL; the fact that it does, and in the same direction as the in-domain
+SWE-Bench gains, provides direct evidence for the isomorphism between
+function calls and agent tool calls.
+
+\paragraph{Contributions.}
+\textbf{(1) Conceptual framing.} We articulate a structural correspondence
+between function call sites and the action--observation--continuation loop
+of coding agents, and motivate function-granularity FIM as a self-supervised
+prior for agent capability that exists at internet scale in ordinary code.
+\textbf{(2) Method.} We introduce a function-aware FIM mid-training pipeline
+combining program dependency graph analysis, a hand-designed
+complexity--inferability double criterion that is base-model-agnostic, and
+chain-of-thought rationales embedded inside the FIM middle span.
+\textbf{(3) Three-axis robustness.} We empirically validate the recipe along
+three independent axes---model size (7B/14B/32B), post-training pipeline
+(r2e-gym, swe-smith), and base-model family (Qwen2.5-Coder,
+Qwen3)---observing consistent gains in every configuration, with
+SWE-Bench-Verified improvements of $+2.8/+3.0/+3.3$ at 7B/14B/32B.
+\textbf{(4) Direct test of the motivating hypothesis.} The same mid-training
+corpus---Python code only, no tool-use data---yields gains over
+post-training-only baselines on tau-bench ($+4.0$), BFCL ($+2.5$), and
+LiveCodeBench ($+11.1$ recovery from post-training-induced regression),
+providing direct evidence that the function-call inductive bias survives
+agentic post-training and transfers across task families.
+\textbf{(5) Open release.} We release the 990-repository decontaminated
+corpus (78K filtered self-contained Python files, $\approx 33\mathrm{M}$
+lines), the full selection pipeline, and all mid-training checkpoints to
+support reproduction.
