@@ -1,16 +1,12 @@
 % =============================================================================
 % SECTION 3 — METHOD
 % =============================================================================
-% Drop-in replacement for the Method section of paper_skeleton.tex.
-% Uses standard amsmath / algorithm / algpseudocode environments.
-%
-% Required packages already in skeleton:
-%   amsmath, algorithm, algpseudocode, multirow, booktabs, graphicx
-%
 % Forward references used:
-%   Section~\ref{sec:exp:ablation}  (selection-algorithm ablation)
-%   Section~\ref{sec:method:cot}     (CoT augmentation, this section)
-%   Appendix~\ref{app:algo}          (full algorithm details)
+%   Section~\ref{sec:exp:ablation}
+%   Section~\ref{sec:method:cot}
+%   Appendix~\ref{app:data}                corpus details (Fig. dataset_categories
+%                                          and Table dataset)
+%   Appendix~\ref{app:algo}                full algorithm details
 % =============================================================================
 
 \section{Method}
@@ -19,73 +15,46 @@
 \subsection{Motivation: Function Calls as Agent-Like Structures}
 \label{sec:method:motivation}
 
-A coding agent operates by interleaving \emph{actions} (tool calls) with
-\emph{observations} (tool returns) and continuing its reasoning conditioned on
-both. Formally, at step $t$ an agent maintains a history $h_t$ and samples an
-action $a_t \sim \pi(a_t \mid h_t)$; the environment yields an observation
-$o_{t+1} \sim p(o_{t+1} \mid h_t, a_t)$; and the agent then produces a
-continuation conditioned on the entire trace
-$\pi(\,\cdot \mid h_t, a_t, o_{t+1})$. The capability that distinguishes a
-useful agent from a competent code model is precisely this third step:
-\emph{integrating an externally returned value into ongoing reasoning}.
+Formally, at step $t$ a coding agent maintains a history $h_t$ and samples
+an action $a_t \sim \pi(a_t \mid h_t)$; the environment yields an
+observation $o_{t+1} \sim p(o_{t+1} \mid h_t, a_t)$; and the agent
+continues conditioned on the full trace,
+$\pi(\,\cdot \mid h_t, a_t, o_{t+1})$. Under the function-call/agent-step
+correspondence introduced in Section~\ref{sec:intro}
+(Figure~\ref{fig:teaser}, left), $h_t$ aligns with the pre-call context,
+$a_t$ with the call, $o_{t+1}$ with the return, and the continuation with
+downstream usage of the returned value.
 
-We observe that this conditioning structure is not unique to agentic
-trajectories. Every function call site in real-world code exhibits the same
-four-part pattern:
-\textit{(i)} a pre-call context that establishes intent and binds arguments,
-\textit{(ii)} the call itself,
-\textit{(iii)} a return value produced by code outside the immediate scope,
-and \textit{(iv)} downstream code that consumes that return value. The pre-call
-context corresponds to $h_t$, the call to $a_t$, the return to $o_{t+1}$, and
-the downstream usage to the agent's continuation. Figure~\ref{fig:isomorphism}
-illustrates this correspondence.
-
-% TODO FIG 2: side-by-side isomorphism diagram
-% \begin{figure}[t]
-% \centering
-% \includegraphics[width=\linewidth]{figs/isomorphism.pdf}
-% \caption{Structural correspondence between a function call site (top) and a
-% single agent step (bottom). Both decompose into context $\to$ action $\to$
-% external return $\to$ continuation. We exploit this correspondence by
-% constructing a self-supervised mid-training objective from real-world code.}
-% \label{fig:isomorphism}
-% \end{figure}
-
-This correspondence motivates our central design: rather than rely on
-synthesised agent trajectories, we extract an agentic conditioning signal from
-the structure already present in source code, using the
-fill-in-the-middle (FIM) objective. We emphasise that the correspondence is
-\emph{structural} rather than literal. FIM training maximises
-$\log P(M \mid \text{prefix}, \text{suffix})$, where the suffix is given;
-agent inference generates the continuation autoregressively. We hypothesise
-that training a model to reason bidirectionally about function-level
-dependencies induces a representation that is also useful when the
-``suffix'' is generated rather than observed---an empirical question we test
-in Section~\ref{sec:exp}.
-
-Standard random-span FIM, as used during pretraining of recent code
-LLMs~\citep{TODO_qwen_coder, TODO_deepseek_coder, TODO_starcoder}, captures
-this structure only incidentally: most masked spans cut across syntactically
-arbitrary boundaries and provide weak agent-relevant signal. We instead
-construct a \emph{function-aware} variant that selects masking targets
-based on program structure and contextual predictability.
+This correspondence motivates our central design: extract an agentic
+conditioning signal from the structure already present in source code via
+the fill-in-the-middle (FIM) objective. The correspondence is
+\emph{structural} rather than literal---FIM conditions on a given suffix
+while agent inference generates one---but training a model to reason
+bidirectionally about function-level dependencies should induce a
+representation useful when the ``suffix'' is generated rather than
+observed. Standard random-span
+FIM~\citep{qwencoder, deepseekcoder, starcoder} captures this
+structure only incidentally; we instead construct a \emph{function-aware}
+variant that selects masking targets based on program structure and
+contextual predictability.
 
 \subsection{Data Collection and Decontamination}
 \label{sec:method:data}
 
 We curate a corpus of $990$ Python repositories from GitHub. Starting from
-$\sim\!2{,}000$ candidates retrieved by combining a star-count threshold with
-ten topic queries (Appendix~\ref{app:data}), we apply manual quality filtering
-and remove every repository whose origin overlaps with the source repositories
-of SWE-Bench~\citep{TODO_swebench} (verified by repository name and any known
-fork). To eliminate the possibility of test-time leakage from training-data
-commits, we restrict each repository to commits whose timestamp precedes the
-earliest base-commit used in SWE-Bench-Verified and SWE-Bench-Lite. The full
-repository list, license inventory, and commit hashes will be released to
-support reproduction.
-
-% TODO FIG 3: 10-category distribution
-% TODO TAB 1: dataset statistics (file count, total LoC, license breakdown)
+$\sim\!2{,}000$ candidates retrieved by combining a star-count threshold
+with ten topic queries, we apply manual quality filtering and remove every
+repository whose origin overlaps with the source repositories of
+SWE-Bench~\citep{swebench} (verified by repository name and any known
+fork). To eliminate the possibility of test-time leakage from
+training-data commits, we restrict each repository to commits whose
+timestamp precedes the earliest base-commit used in SWE-Bench-Verified
+and SWE-Bench-Lite. The filtered corpus contains $\approx 78\mathrm{K}$
+self-contained Python files ($\approx 33\mathrm{M}$ lines) and yields
+roughly $3\mathrm{B}$ training tokens under the Qwen2.5-Coder tokenizer.
+Topic-category breakdown, per-property statistics, license inventory, and
+commit hashes are reported in Appendix~\ref{app:data}; the full
+repository list will be released to support reproduction.
 
 \subsection{Function-Aware FIM Target Selection}
 \label{sec:method:selection}
@@ -95,40 +64,52 @@ mask targets together with the corresponding masked file. Each target is
 a single function or a connected group of $2$--$3$ functions; the latter
 variant is studied in Section~\ref{sec:exp:ablation}. The pipeline has four
 stages: dependency-graph construction, complexity scoring, inferability
-scoring, and threshold-based selection. Algorithm~\ref{alg:selection}
-summarises the single-function pipeline; group selection is described
-in Section~\ref{sec:method:groups}.
+scoring, and threshold-based selection. Figure~\ref{fig:pdg_score}
+illustrates the pipeline on a small example; the full single-function
+selection algorithm is given in Appendix~\ref{app:algo:single}.
+
+% -----------------------------------------------------------------------------
+% Figure: PDG construction and H/I score computation illustration
+% -----------------------------------------------------------------------------
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/teaser_v33.pdf}
+\caption{Function-aware FIM target selection on a small example file.
+\textbf{Left:} the program dependency graph (PDG) is constructed by
+parsing the AST: nodes are top-level functions and class methods,
+directed edges $u\!\to\!v$ are call edges in
+$\mathcal{E}_{\mathrm{call}}$, and undirected edges between same-class
+methods are sibling edges in $\mathcal{E}_{\mathrm{sib}}$.
+\textbf{Middle:} for each candidate function $v$ we compute a complexity
+score $\hat{H}(v)$ from lines of code, cyclomatic complexity, and nesting
+depth (Eq.~\ref{eq:complexity}); and an inferability score $\hat{I}(v)$
+that aggregates five context-derived signals (callers, callees,
+signature, docstring, class structure; Eq.~\ref{eq:inferability}).
+\textbf{Right:} the final FIM score combines $\hat{H}$ and $\hat{I}$ via
+a harmonic-mean-like product (Eq.~\ref{eq:fim_single}); functions that
+are simultaneously hard \emph{and} recoverable from context score highest
+and are selected as mask targets.}
+\label{fig:pdg_score}
+\end{figure}
 
 \subsubsection{Program Dependency Graph}
 \label{sec:method:pdg}
 
-For each source file we parse its abstract syntax tree (AST) and extract
-the set $\mathcal{V}$ of function nodes, where each node corresponds to a
-top-level function or a class method identified by its qualified name
-(e.g.\ \texttt{ClassName.method}). We construct two edge sets:
-
-\paragraph{Call edges $\mathcal{E}_{\text{call}}$.}
-For every \texttt{Call} node inside the body of $u \in \mathcal{V}$, we
-attempt to resolve its callee to some $v \in \mathcal{V}$, adding a directed
-edge $u \to v$. Resolution handles three Python idioms:
-direct module-level invocations, class instantiation
-(\texttt{ClassName(...)} resolved to \texttt{ClassName.\_\_init\_\_}), and
-method calls of the form \texttt{self.m(...)} or \texttt{cls.m(...)}
-inside class bodies. When a call cannot be resolved exactly we fall back to
-short-name matching against the qualified-name index, which recovers most
-cross-module references while admitting a controlled false-positive rate
-(see Appendix~\ref{app:algo}).
-
-\paragraph{Sibling edges $\mathcal{E}_{\text{sib}}$.}
-For every pair of methods belonging to the same class we add an undirected
-sibling edge. These edges capture intra-class coupling that does not
-manifest as direct calls but does carry information through shared
-instance state.
+For each source file we parse its AST and extract the set $\mathcal{V}$
+of function nodes (top-level functions and class methods, identified by
+qualified names). We construct two edge sets: \emph{call edges}
+$\mathcal{E}_{\mathrm{call}}$ between caller and callee, and
+\emph{sibling edges} $\mathcal{E}_{\mathrm{sib}}$ between methods of the
+same class (capturing intra-class coupling that does not manifest as
+direct calls but carries information through shared instance state).
+Call resolution handles common Python idioms (direct invocations, class
+instantiation, \texttt{self}/\texttt{cls} method calls) with a
+short-name fallback against the qualified-name index; details are in
+Appendix~\ref{app:algo:pdg}.
 
 \subsubsection{Complexity Score $\hat{H}$}
 \label{sec:method:complexity}
 
-A useful FIM target should require non-trivial reasoning to reconstruct.
 For each $v \in \mathcal{V}$ we define
 %
 \begin{equation}
@@ -138,18 +119,17 @@ For each $v \in \mathcal{V}$ we define
   \label{eq:complexity}
 \end{equation}
 %
-where $\mathrm{LoC}(v)$ is the lines-of-code count, $\mathrm{CC}(v)$ is
-McCabe cyclomatic complexity, $\mathrm{D}(v)$ is the maximum nesting depth
-of control-flow constructs, and $\phi(x, c) = \min(x / c,\, 2)$ normalises
-each quantity by a soft cap. We use $(c_{\ell}, c_{c}, c_{d}) = (50, 10, 5)$
-and $(w_{\ell}, w_{c}, w_{d}) = (0.4, 0.4, 0.2)$. The cap at $2$ rather than
-$1$ allows genuinely complex functions to score above the median without
-letting outliers dominate.
+where $\mathrm{LoC}(v)$ is lines of code, $\mathrm{CC}(v)$ is McCabe
+cyclomatic complexity, $\mathrm{D}(v)$ is the maximum nesting depth of
+control-flow constructs, and $\phi(x, c) = \min(x / c,\, 2)$ normalizes
+each quantity by a soft cap of $2$ (allowing genuinely complex functions
+to score above the median without letting outliers dominate). Caps and
+weights are listed in Appendix~\ref{app:algo:hyperparams}.
 
 \subsubsection{Inferability Score $\hat{I}$}
 \label{sec:method:inferability}
 
-A target should also be \emph{recoverable} from the surrounding context.
+A target should be \emph{recoverable} from the surrounding context.
 $\hat{I}(v)$ aggregates five context-derived signals that approximate the
 mutual information between $v$'s body and the rest of the file:
 %
@@ -158,208 +138,67 @@ mutual information between $v$'s body and the rest of the file:
               + \beta\,C_{\mathrm{callee}}(v)
               + \gamma\,C_{\mathrm{sig}}(v)
               + \delta\,C_{\mathrm{doc}}(v)
-              + \varepsilon\,C_{\mathrm{class}}(v),
+              + \varepsilon\,C_{\mathrm{class}}(v).
   \label{eq:inferability}
 \end{equation}
 %
-with $(\alpha,\beta,\gamma,\delta,\varepsilon) = (0.30, 0.25, 0.20, 0.10, 0.15)$.
-
-\paragraph{Caller signal $C_{\mathrm{caller}}$.}
-For each caller $u$ of $v$, we score the specificity of its call sites by
-inspecting the syntactic form of each argument: literal constants are
-maximally informative, named variables less so, keyword arguments contribute
-proportionally, and a base score is awarded for the call site itself. The
-sum is normalised by an expected-callers constant.
-
-\paragraph{Callee signal $C_{\mathrm{callee}}$.}
-The number of intra-file functions that $v$ itself calls, normalised by a
-small expected-fan-out constant. A function that orchestrates known
-helpers is more recoverable than one that calls only opaque externals.
-
-\paragraph{Signature signal $C_{\mathrm{sig}}$.}
-A monotone aggregate of return-type annotation, parameter-type annotations,
-the descriptiveness of the function name (decomposed into snake-case parts),
-and the count of non-\texttt{self} parameters.
-
-\paragraph{Documentation signal $C_{\mathrm{doc}}$.}
-Indicator of docstring presence. We do not attempt to score docstring
-informativeness, both for robustness and because Section~\ref{sec:method:cot}
-generates a richer textual rationale.
-
-\paragraph{Class signal $C_{\mathrm{class}}$.}
-For methods, the number of in-class siblings (normalised) plus a small bonus
-when an \texttt{\_\_init\_\_} is present in the same class.
-
-We deliberately keep each component a hand-designed proxy rather than a
-learned predictability score. A learned proxy would couple selection to a
-particular reference model and complicate the cross-base-model
-generalisation analysis (Section~\ref{sec:exp:crossbase}); hand-designed
-features yield a model-agnostic curriculum.
+$C_{\mathrm{caller}}$ scores call-site argument specificity,
+$C_{\mathrm{callee}}$ counts intra-file functions called by $v$,
+$C_{\mathrm{sig}}$ aggregates type annotations and name descriptiveness,
+$C_{\mathrm{doc}}$ indicates docstring presence, and
+$C_{\mathrm{class}}$ counts in-class siblings; full component formulas
+and weights are in Appendix~\ref{app:algo:inferability}. Each component
+is a hand-designed proxy rather than a learned predictability score: a
+learned proxy would couple selection to a particular reference model and
+complicate the cross-base-model generalization analysis
+(Section~\ref{sec:exp:main}).
 
 \subsubsection{Single-Function Score}
 \label{sec:method:single}
 
-The final score combines $\hat{H}$ and $\hat{I}$ in a form that rewards
-\emph{simultaneously} high values of both:
+The final score combines $\hat{H}$ and $\hat{I}$ in a harmonic-mean-like
+form that requires both to be simultaneously high, multiplied by a
+one-sided difficulty penalty $\rho(\Delta(v))$:
 %
 \begin{equation}
   \mathrm{FIM}(v) \;=\;
-  \underbrace{\frac{\hat{H}(v)\,\hat{I}(v)}{\hat{H}(v) + \hat{I}(v) + \epsilon}}_{\text{base score}}
-  \;\cdot\;
-  \underbrace{\rho\!\left(\Delta(v)\right)}_{\text{difficulty penalty}},
+  \frac{\hat{H}(v)\,\hat{I}(v)}{\hat{H}(v) + \hat{I}(v) + \epsilon}
+  \cdot \rho\!\left(\Delta(v)\right),
   \label{eq:fim_single}
 \end{equation}
 %
-where $\epsilon$ is a small constant for numerical stability. The base score
-is a harmonic-mean-like combination: a pure product
-$\hat{H}\,\hat{I}$ would treat $(\hat{H}, \hat{I}) = (\text{high},
-\text{high})$ as comparable to $(\text{very high}, \text{low})$, whereas
-Eq.~\eqref{eq:fim_single} forces both quantities to be large simultaneously
-and penalises imbalance.
-
-\paragraph{Difficulty and the one-sided Gaussian penalty.}
-We define the residual difficulty as the share of complexity that is not
-explained by context:
-\begin{equation}
-  \Delta(v) \;=\; \frac{\max\!\left(0,\,\hat{H}(v) - \hat{I}(v)\right)}{\hat{H}(v) + \epsilon}
-  \;\in\; [0, 1).
-\end{equation}
-The penalty $\rho$ is one-sided: targets with $\Delta(v) \le \tau_d$ are
-left intact, while targets above the threshold are damped:
-%
-\begin{equation}
-  \rho(\Delta) \;=\;
-  \begin{cases}
-    1, & \Delta \le \tau_d, \\[2pt]
-    \exp\!\left(-\dfrac{(\Delta - \tau_d)^2}{2\sigma^2}\right), & \Delta > \tau_d.
-  \end{cases}
-\end{equation}
-We use $\tau_d = 0.5$ and $\sigma = 0.2$. The asymmetry reflects an asymmetry
-in the underlying objective: trivially easy targets are eliminated by the
-hard floor on $\hat{H}$ (below), so we do not need to additionally reward
-high inferability; conversely, targets that remain hard even with full
-context become unlearnable noise and must be down-weighted.
-
-\paragraph{Hard filters.}
-Independent of the smooth score, we discard
-\textit{(i)} functions with $\mathrm{LoC}(v) \notin [10, 200]$ to control
-training-instance length;
-\textit{(ii)} dunder methods (\texttt{\_\_init\_\_}, \texttt{\_\_repr\_\_},
-etc.), which serve as scaffolding rather than reasoning targets;
-\textit{(iii)} functions with $\hat{H}(v) < 0.15$ to remove trivial cases;
-and \textit{(iv)} functions with $\mathrm{FIM}(v) < 0.08$.
-A file with no surviving target contributes nothing to the corpus, ensuring
-each training sample carries informative signal.
-
-\begin{algorithm}[t]
-\caption{Single-function FIM target selection for one file.}
-\label{alg:selection}
-\begin{algorithmic}[1]
-  \Require Source file $s$; thresholds $\tau_d, \tau_{\mathrm{FIM}}, \tau_{\hat H}$
-  \State $T \gets \mathrm{ParseAST}(s)$
-  \State $\mathcal{V}, \mathcal{E}_{\mathrm{call}}, \mathcal{E}_{\mathrm{sib}} \gets \mathrm{BuildPDG}(T)$
-        \Comment{Section~\ref{sec:method:pdg}}
-  \State $\mathcal{C} \gets \emptyset$
-  \For{each $v \in \mathcal{V}$}
-    \If{$v$ is a dunder method \textbf{or} $\mathrm{LoC}(v) \notin [10, 200]$}
-      \State \textbf{continue}
-    \EndIf
-    \State Compute $\hat{H}(v)$ and $\hat{I}(v)$
-          \Comment{Eqs.~\eqref{eq:complexity}, \eqref{eq:inferability}}
-    \If{$\hat{H}(v) < \tau_{\hat H}$} \textbf{continue} \EndIf
-    \State $\Delta(v) \gets \max(0, \hat{H}(v)-\hat{I}(v)) / (\hat{H}(v)+\epsilon)$
-    \State $\mathrm{FIM}(v) \gets \frac{\hat{H}(v)\,\hat{I}(v)}{\hat{H}(v)+\hat{I}(v)+\epsilon}\cdot \rho(\Delta(v))$
-    \If{$\mathrm{FIM}(v) \ge \tau_{\mathrm{FIM}}$}
-      \State $\mathcal{C} \gets \mathcal{C} \cup \{v\}$
-    \EndIf
-  \EndFor
-  \State \Return $\mathcal{C}$ \Comment{ranked by $\mathrm{FIM}$ descending}
-\end{algorithmic}
-\end{algorithm}
+where $\epsilon$ is a small constant. The harmonic-mean form forces both
+$\hat{H}$ and $\hat{I}$ to be large simultaneously, penalizing imbalance;
+the penalty $\rho$ down-weights targets that remain hard even given full
+context (which would otherwise be unlearnable noise). Full forms of
+$\Delta$ and $\rho$, together with the hard filters on length, dunder
+methods, and minimum scores, are deferred to
+Appendix~\ref{app:algo:penalty}.
 
 \subsubsection{Multi-Function Group Selection}
 \label{sec:method:groups}
 
 Real-world code patches frequently span multiple related
 functions~\citep{swebench}, motivating an extension that masks
-\emph{groups} of $k = 2$ or $k = 3$ structurally connected functions.
-We use this variant in the granularity ablation
-(Section~\ref{sec:exp:ablation}); single-function masking remains the
-default in our main results.
-
-\paragraph{Group topology.}
-A candidate group must form a connected subgraph in
-$\mathcal{E}_{\mathrm{call}} \cup \mathcal{E}_{\mathrm{sib}}$. We enumerate
-eight topology patterns:
-\textit{caller-callee}, \textit{co-callee} (two callees of a common caller),
-\textit{sibling-coupled} (same-class methods sharing $\geq 1$ instance
-attribute), and \textit{mutual-call} for $k=2$;
-\textit{call-chain} ($A \!\to\! B \!\to\! C$),
-\textit{hub} ($A \!\to\! B,\; A \!\to\! C$),
-\textit{fan-in} ($B \!\to\! A,\; C \!\to\! A$),
-and \textit{class-triad} (three pairwise state-sharing methods of the same
-class) for $k=3$. The full taxonomy is detailed in Appendix~\ref{app:algo}.
-
-\paragraph{Group score.}
-For a group $G = \{v_1, \dots, v_k\}$ we define
-%
-\begin{equation}
-  \mathrm{FIM}(G) \;=\;
-  \underbrace{\mathrm{Coup}(G)}_{\text{coupling}}
-  \;\cdot\;
-  \frac{\hat{H}(G)\,\hat{I}(G)}{\hat{H}(G) + \hat{I}(G) + \epsilon}
-  \;\cdot\;
-  \rho\!\left(\Delta(G)\right),
-  \label{eq:fim_group}
-\end{equation}
-%
-where $\hat{H}(G) = \tfrac{1}{k}\sum_v \hat{H}(v)$ averages individual
-complexities, $\Delta(G)$ is defined analogously to the single-function case,
-and $\mathrm{Coup}(G) \in [0, 1]$ is a normalised count of intra-group
-edges plus a shared-state ratio:
-%
-\begin{equation}
-  \mathrm{Coup}(G)
-  \;=\; w_{\mathrm{c}}\,\frac{|E^{\text{call}}_G|}{k(k\!-\!1)}
-   + w_{\mathrm{s}}\,\frac{|E^{\text{sib}}_G|}{\binom{k}{2}}
-   + w_{\mathrm{st}}\,\overline{\mathrm{Jacc}}_G,
-\end{equation}
-where $\overline{\mathrm{Jacc}}_G$ is the mean Jaccard similarity over
-pairs in $G$ between sets of accessed instance attributes
-(\texttt{self.x}). We use $(w_c, w_s, w_{\mathrm{st}}) = (0.50, 0.20, 0.30)$.
-The coupling term enters multiplicatively because, unlike the
-single-function case, the value of a multi-function target derives
-specifically from cross-function dependencies; a weakly coupled group is
-indistinguishable from $k$ independent samples.
-
-\paragraph{Group inferability.}
-$\hat{I}(G)$ is recomputed under the assumption that \emph{all} members of
-$G$ are masked simultaneously: caller, callee, and sibling contributions
-from inside $G$ are excluded, and docstrings of group members
-contribute zero (they are part of the masked body). Signature information
-is retained because we do not mask function signatures. This re-computation
-prevents groups from receiving spurious credit for intra-group references
-that disappear under joint masking.
-
-\paragraph{Group selection.}
-We score every candidate group emitted by the topology enumerator and
-discard those with insufficient coupling, complexity, or score (defaults
-in Appendix~\ref{app:algo}). Groups exceeding LoC ratios of
-$0.30$ ($k=2$) or $0.40$ ($k=3$) of the file are rejected. The
-remaining candidates are sorted by $\mathrm{FIM}(G)$ and selected greedily
-under non-overlap: a function may belong to at most one selected group per
-file. Per-file caps ($5$ pairs, $3$ triples) prevent any single file from
-dominating the corpus.
+\emph{groups} of $k=2$ or $k=3$ structurally connected functions; we use
+this variant only in the granularity ablation
+(Section~\ref{sec:exp:ablation}). A group score $\mathrm{FIM}(G)$
+multiplies a coupling term, the harmonic-mean-like product of
+group-level $\hat{H}(G)$ and $\hat{I}(G)$, and a difficulty penalty,
+with $\hat{I}(G)$ recomputed under joint masking so that intra-group
+references cannot inflate the score. Topology patterns (eight in total:
+caller-callee, co-callee, sibling-coupled, mutual-call, call-chain, hub,
+fan-in, class-triad), the full equations, and selection thresholds are
+given in Appendix~\ref{app:algo:groups}.
 
 \subsection{Chain-of-Thought Augmentation}
 \label{sec:method:cot}
 
-For each selected target we generate a natural-language rationale that
-explicates how the function's behaviour is recoverable from the surrounding
-file. The rationale is produced by Gemini-3-Preview prompted with the
-masked file and the original function body (the prompt template is in
-Appendix~\ref{app:algo}). At training time, the rationale is embedded
-\emph{inside} the FIM middle span, immediately before the function body:
+For each selected target we generate a natural-language rationale via
+Gemini-3-Preview prompted with the masked file and the original function
+body (template in Appendix~\ref{app:algo:cot}). At training time, the
+rationale is embedded \emph{inside} the FIM middle span, immediately
+before the function body:
 %
 \begin{center}\small
 \texttt{<fim\_prefix>}\,$\langle$prefix$\rangle$\,%
@@ -368,32 +207,11 @@ Appendix~\ref{app:algo}). At training time, the rationale is embedded
 \end{center}
 %
 The model is therefore trained to produce, in order, a reasoning trace
-followed by the code consistent with that trace---mirroring the
-think-then-act structure of an agent step.
-
-We emphasise that the role of the rationale is not to distil the teacher's
-generic capability, but to provide a structured intermediate supervision
-that aligns reasoning with code under the FIM objective. To separate the
-contribution of FIM structure from that of CoT distillation, we ablate
-both the presence and the source of the rationale in
-Section~\ref{sec:exp:ablation}, including a \emph{self-CoT} variant in
-which the same Qwen2.5-Coder-Instruct model that we are training
-generates its own rationales. We report that the FIM structure alone
-(no CoT) already accounts for a substantial fraction of the gain, and that
-self-generated CoT recovers most of the remainder---indicating that
-high-quality rationales help but are not the principal driver.
-% NOTE: 这一段的具体数字在 ablation 数据出来后填入
-
-\subsection{Mid-Training and Post-Training Setup}
-\label{sec:method:setup}
-
-We mid-train Qwen2.5-Coder-Instruct (7B, 14B, 32B) and Qwen3-8B-Base on the
-selected FIM corpus. The training objective is the standard FIM loss on
-the middle span (rationale plus body), packed to the model's native
-context length and using the model's native FIM sentinel tokens to
-preserve compatibility with any FIM signal already learned during
-pretraining. After mid-training we apply existing agentic
-post-training pipelines (r2e-gym~\citep{TODO_r2egym} and
-swe-smith~\citep{TODO_swesmith}) without modification. Hyperparameters,
-token budgets, and learning-rate schedules are reported in
-Appendix~\ref{app:hp}.
+followed by code consistent with that trace---mirroring the
+think-then-act structure of an agent step. The role of the rationale is
+to provide a structured intermediate supervision aligned with the FIM
+objective rather than to distill the teacher's generic capability; we
+isolate this in Section~\ref{sec:exp:ablation} via a \emph{self-CoT}
+variant in which the model under training generates its own rationales,
+and find that the FIM structure alone already accounts for a substantial
+fraction of the gain.
