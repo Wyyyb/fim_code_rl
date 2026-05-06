@@ -1,0 +1,81 @@
+% =============================================================================
+% 6. RELATED WORK
+% =============================================================================
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Mid-training and continued pretraining.}
+A growing line of work has identified a distinct training stage between
+large-scale pretraining and task-specific post-training, in which a model is
+further trained on a smaller but more carefully curated corpus to install
+inductive biases that are difficult to acquire from either generic web text
+or downstream fine-tuning data. MiniCPM~\citep{minicpm} and
+OLMo~\citep{olmo} explicitly schedule such a stage to upweight high-quality
+or domain-relevant data near the end of pretraining, and
+Code-Llama~\citep{codellama} long-context adaptation can be read as a
+mid-training stage targeting context-length generalisation. We adopt the
+same staging philosophy but apply it to a different end: rather than
+optimising for general data quality or context length, we use mid-training
+as the natural place to install an \textit{agent-oriented} structural prior
+through function-aware FIM. Positioning the objective at this stage
+concentrates its signal immediately before agentic post-training rather
+than diluting it across trillions of pretraining tokens.
+
+\paragraph{Fill-in-the-middle objectives.}
+The fill-in-the-middle objective~\citep{bavarian2022fim} has become a
+standard ingredient in modern code LLM pretraining, with random-span
+variants mixed into the pretraining corpora of
+Code-Llama~\citep{codellama}, StarCoder~\citep{starcoder},
+Qwen-Coder~\citep{qwencoder}, and DeepSeek-Coder~\citep{deepseekcoder}.
+Our work builds directly on this body of evidence that bidirectional
+infilling is a useful complement to left-to-right modelling, and we
+explicitly view our recipe as an \textit{extension and specialisation} of
+prior FIM rather than a replacement. Three differences mark our setting.
+First, masking targets are chosen at \textit{function granularity} via
+program dependency graph analysis and a complexity--inferability double
+criterion, so that the masked region corresponds to a unit of reasoning
+rather than a syntactically arbitrary span. Second, we embed an
+\textit{explicit chain-of-thought} inside the FIM middle so that the
+model is supervised to produce a rationale before the code, mirroring the
+think-then-act structure of an agent step. Third, the objective is applied
+in a \textit{dedicated mid-training stage} rather than dissolved into
+pretraining, so that the structural prior reaches post-training in
+concentrated form. None of the three differences is in tension with prior
+random-span FIM; together, they specialise the same family of objectives
+to coding-agent capability.
+
+\paragraph{Coding agent foundation models.}
+Recent progress on coding agents has been driven by benchmarks such as
+SWE-Bench~\citep{swebench}, scaffolds such as
+SWE-agent~\citep{sweagent} and OpenHands~\citep{openhands}, and
+trajectory-centric post-training pipelines such as
+SWE-Gym~\citep{swegym}, r2e-gym~\citep{r2egym}, and
+SWE-Smith~\citep{swesmith}. These pipelines synthesise or curate agent
+trajectories that imitate human or LLM behaviour on issue-resolution
+tasks, and they have repeatedly demonstrated that high-quality trajectory
+data is sufficient to push end-task numbers. Our work is complementary
+rather than competing: the post-training pipelines we use in our main
+results are r2e-gym and SWE-Smith, applied without modification on top of
+a mid-trained checkpoint. The novelty lies one stage earlier. Instead of
+producing more synthetic trajectories, we extract a self-supervised
+signal from the structure already present in ordinary source code, and
+we show that this signal both raises in-domain agent metrics and
+mitigates the off-domain capability erosion that trajectory-only
+post-training otherwise inflicts.
+
+\paragraph{Distillation from frontier models.}
+Our default recipe uses Gemini-3-Preview to generate the chain-of-thought
+rationales embedded inside each FIM middle span, placing it within the
+broader tradition of distilling capability from a strong teacher into a
+smaller student~\citep{orca, selfinstruct, distillwhisper}. We
+acknowledge this dependency upfront because it is essential for an honest
+reading of our results. The role of the rationale here, however, is not
+to transfer the teacher's generic reasoning ability but to provide a
+structured intermediate supervision aligned with the FIM objective.
+We isolate the contribution of FIM structure from that of CoT
+distillation through a controlled ablation in
+Section~\ref{sec:exp:ablation}: removing the rationale entirely still
+beats the no-mid-training baseline, and replacing the frontier teacher
+with self-generated rationales recovers a sizeable fraction of the gain.
+We therefore do not view the recipe as fundamentally distillation-driven,
+even though the best configuration does benefit from teacher rationales.

@@ -1,0 +1,64 @@
+项目核心
+标题方向：Function-Aware Fill-in-the-Middle as Mid-Training for Coding Agent Foundation Models
+一句话概括：用基于程序依赖图的 function-aware FIM 作为 mid-training 阶段的 self-supervised objective，提升语言模型作为 coding agent 的能力。
+
+Motivation
+核心观察：函数调用关系与 agent 调用工具的过程在结构上同构。
+
+Agent loop: context → action → external return → continuation
+Function call site: caller_context → call → return_value → downstream_use
+
+两者都是"已知前文 + 已知外部返回，推理后续"的四段结构。
+关键 framing（避免被 reviewer 攻击）：
+
+不能说 "FIM = agent loop"。FIM 训练时 suffix 是 given 的（P(M | prefix, suffix)），agent inference 时 continuation 是生成的。
+应该用 "structurally isomorphic" / "shares conditioning structure"。
+写 "we hypothesize that FIM training induces a representation useful for agent-style conditioning"。
+
+为什么是 mid-training 阶段：填补 pretraining → post-training 之间的 gap。Coding agent 现在主要靠堆 SFT/RL 数据，但 base model 本身缺少 agent-relevant 的 inductive bias。
+为什么不直接合成 agent trajectory：FIM 数据可以从 GitHub 上 scalable 获取（几个数量级的数据规模优势），不依赖 trajectory 合成的高成本和 distribution gap。
+
+方法核心
+数据
+
+990 个 GitHub Python repo（从 2000 个候选筛选）
+通过 10 个 category keyword + GitHub star 收集
+已严格去除 SWE-Bench 的 12 个 source repo + fork
+时间戳控制：commit cutoff < SWE-Bench task base commit
+
+Function 选择算法（核心 contribution）
+单函数选择：
+
+AST 解析构建 Program Dependency Graph (PDG)，节点 = function，边 = call edges + sibling edges (同类方法)
+计算 Complexity 分数 Ĥ(v)：基于 LoC、cyclomatic complexity、AST nesting depth 的加权和（cap 在 2）
+计算 Inferability 分数 Î(v)：5 个分量加权
+
+Caller signal（call site specificity，看实参类型）
+Callee signal（intra-file callee 数量）
+Signature signal（return type、param types、function name 描述性）
+Documentation signal（docstring 存在）
+Class signal（同类 sibling 数量 + init bonus）
+
+
+核心公式: FIM = Ĥ·Î / (Ĥ+Î+ε) × penalty
+
+Harmonic-mean-like 形式：强制 Ĥ 和 Î 都高，避免纯乘积下 (high, low) 看起来像 (high, high)
+One-sided Gaussian penalty：difficulty Δ = max(0, Ĥ-Î)/Ĥ，超过 τ_d=0.5 时按 σ=0.2 衰减
+非对称性的 rationale：trivial case 已被 Ĥ≥0.15 hard floor 排除，过难 case 是 unlearnable noise
+
+
+Hard filters: LoC ∈ [10, 200]，去除 dunder methods，最终 score ≥ 0.08
+
+多函数 group 选择（用于 ablation）：
+
+8 个 topology pattern：caller-callee, co-callee, sibling-coupled, mutual-call (k=2); call-chain, hub, fan-in, class-triad (k=3)
+Group score 加入 Coupling 作为乘性因子：Coup × Ĥ(G)·Î(G)/(Ĥ+Î+ε) × penalty
+Coupling = 加权(intra-group call edges + sibling edges + shared self.attr Jaccard)
+Group inferability 重算：把 intra-group 的 caller/callee/sibling 信号扣掉（因为整组都被 mask）
+贪心去重选择，每文件最多 5 pairs / 3 triples
+
+CoT Augmentation
+
+用 Gemini-3-Preview 生成解释性 CoT
+嵌入位置：FIM middle 部分，在 function body 之前：<fim_middle> <CoT> <body>
+Framing："structured intermediate supervision aligning reasoning with code"，不是 distillation

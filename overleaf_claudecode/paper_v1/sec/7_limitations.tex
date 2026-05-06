@@ -1,0 +1,72 @@
+% =============================================================================
+% 7. LIMITATIONS AND DISCUSSION
+% =============================================================================
+\section{Limitations and Discussion}
+\label{sec:limitations}
+
+We close by stating six limitations of the present study, both to scope
+our claims and to flag concrete directions for follow-up work.
+
+\paragraph{Limitation 1: Python-centric evaluation.}
+The mid-training corpus is exclusively Python, and the in-domain agent
+benchmarks (SWE-Bench-Verified and SWE-Bench-Lite) are likewise
+Python-centric. Cross-language generalisation is supported only
+indirectly, through the FullStackBench-ZH bilingual coding benchmark in
+Section~\ref{sec:exp:gen}, and we do not cover Java, C++, Rust, or other
+language ecosystems in the main tables. Whether the function-aware FIM
+recipe transfers to languages with different module systems, type
+disciplines, or call-resolution semantics is left to future work.
+
+\paragraph{Limitation 2: Dependency on a frontier teacher for CoT.}
+Our default recipe relies on the Gemini-3-Preview API to synthesise the
+rationale embedded inside each FIM middle span. The CoT-source ablation
+in Section~\ref{sec:exp:ablation} shows that self-generated rationales
+recover most of the gain and FIM structure alone already beats the
+no-mid-training baseline, so the recipe is not fundamentally
+distillation-bound; nonetheless, a fully open-source replication of our
+best configuration requires either a comparably strong open teacher or
+acceptance of the residual gap reported in that ablation.
+
+\paragraph{Limitation 3: Imperfect program dependency graph analysis on dynamic Python.}
+Our PDG construction operates on the abstract syntax tree and resolves
+calls via a combination of qualified-name matching and short-name
+fallback. This works well for the vast majority of canonical Python code
+but is imperfect on idioms involving dynamic dispatch, decorator chains,
+and monkey patching, where the static call graph and the run-time call
+graph diverge. We characterise these failure modes and the corresponding
+mitigations in Appendix~\ref{app:algo}; an analysis-aware extension that
+incorporates light dynamic information is a natural next step.
+
+\paragraph{Limitation 4: Cross-base-family validation is partial.}
+The cross-base-model evidence in Section~\ref{sec:exp:crossbase} comes
+from a single non-Qwen2.5-Coder configuration (Qwen3-8B paired with the
+swe-lego post-training pipeline). Because moving from Qwen2.5-Coder to
+Qwen3-8B simultaneously varies the post-training pipeline (swe-lego is
+required to fit Qwen3's $40{,}960$-token context), the cross-family
+result should be read as ``the recipe is not specific to a single
+pretraining/post-training combination'' rather than as a guarantee that
+it generalises across all base-model families. Validations on Llama, the
+DeepSeek family, and other architectures are not covered here.
+
+\paragraph{Limitation 5: Capability-preservation comparison only at 14B.}
+The controlled three-row comparison in Section~\ref{sec:exp:gen}
+(instruct base vs.\ post-training only vs.\ mid-training plus
+post-training) is conducted at the 14B scale only, due to the cost of
+running the full set of non-agent coding and tool-use benchmarks at
+every scale. The 7B and 32B in-domain SWE-Bench trends are consistent
+with the 14B picture and suggest a similar regression-recovery pattern,
+but we do not run the fully controlled triple at those scales and
+therefore do not make a quantitative claim about capability preservation
+outside 14B.
+
+\paragraph{Limitation 6: Modularity assumption of function-aware selection.}
+Function-aware FIM presupposes that the underlying code is meaningfully
+modular, so that masking a single function or a small connected group
+produces a non-trivial reasoning target. On extreme monolithic code or
+inline-heavy codebases---scripts dominated by top-level statements,
+generated code with few callable abstractions, or notebooks---the
+selection pipeline has fewer eligible targets and may degrade
+gracefully to a much smaller usable subset of files. We do not study
+this regime systematically here; both characterising the breakdown point
+and extending the algorithm with code-block-level abstractions for
+non-modular code are open directions.

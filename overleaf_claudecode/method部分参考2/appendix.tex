@@ -1,0 +1,187 @@
+% =============================================================================
+% Appendix subsection — worked example for Figure 2 (running calculator).
+% This file is meant to be \input{} into the existing
+% `\section{Algorithmic Details}` (label: app:algo) of 9_appendix.tex,
+% directly after `app:algo:inferability` so that the worked numbers follow
+% the component formulas they instantiate.
+% =============================================================================
+
+\subsection{Worked Example: Scoring \texttt{Calculator.total}}
+\label{app:algo:worked_example}
+
+To make the numbers shown in Figure~\ref{fig:pdg_score}(b) fully
+reproducible, this subsection walks through every quantity that goes
+into $\hat{H}$, $\hat{I}$, and the final FIM score on the running
+example. The target function is the body shown verbatim in
+Figure~\ref{fig:pdg_score}(a):
+%
+\begin{center}\small
+\begin{minipage}{0.78\linewidth}
+\begin{verbatim}
+def total(self) -> int:
+    """Sum positive integer entries."""
+    s, n = 0, 0
+    for v in self.history:
+        if is_int(v):
+            if v > 0:
+                s = add(s, v)
+                n += 1
+    if n == 0: return 0
+    return s
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+\paragraph{Lines of code (\textnormal{LoC} = 10).}
+We follow Python's \texttt{ast} convention,
+$\mathrm{LoC}(v)=\texttt{end\_lineno}-(\texttt{lineno}-1)$, i.e.\ the
+number of source lines from the \texttt{def} keyword through the last
+statement of the body, both inclusive. Counting the ten lines above
+verbatim --- including the docstring --- gives $\mathrm{LoC}=10$.
+
+\paragraph{Cyclomatic complexity (\textnormal{CC} = 5).}
+The McCabe complexity counter starts at $1$ and adds $1$ per branching
+node visited by \texttt{ast.walk}: any \texttt{If}/\texttt{IfExp},
+\texttt{For}/\texttt{While}, \texttt{ExceptHandler},
+$(\text{values}{-}1)$ per \texttt{BoolOp}, and one per generator inside
+a comprehension.
+For \texttt{Calculator.total} the contributions are:
+%
+\begin{center}\small
+\begin{tabular}{l l c}
+\toprule
+Source line & AST node & $\Delta\mathrm{CC}$ \\
+\midrule
+\textit{(base)}                       & ---                 & $+1$ \\
+\texttt{for v in self.history:}       & \texttt{ast.For}    & $+1$ \\
+\texttt{if is\_int(v):}               & \texttt{ast.If}     & $+1$ \\
+\texttt{if v > 0:}                    & \texttt{ast.If}     & $+1$ \\
+\texttt{if n == 0: return 0}          & \texttt{ast.If}     & $+1$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+%
+yielding $\mathrm{CC}=5$. Tuple unpacking and the augmented assignment
+\texttt{n += 1} are not branches and contribute nothing.
+
+\paragraph{Maximum nesting depth (\textnormal{D} = 3).}
+The depth counter only increments when entering a structural container
+node: \texttt{If}, \texttt{For}, \texttt{While}, \texttt{AsyncFor},
+\texttt{With}, \texttt{AsyncWith}, or \texttt{Try}. Crucially, this
+list \emph{excludes} \texttt{IfExp} (the inline ``\texttt{a if b else
+c}'' expression), so ternary operators do not count. The deepest path
+in \texttt{total} is
+\texttt{for}~$\to$~\texttt{if is\_int}~$\to$~\texttt{if v>0}, giving
+$\mathrm{D}=3$. The trailing \texttt{if n == 0: return 0} sits at the
+top level of the function body and reaches depth $1$ only.
+
+\paragraph{Complexity score $\hat{H}=0.40$.}
+Plugging into Eq.~\ref{eq:complexity} with the default
+$(w_{\ell},w_{c},w_{d})=(0.4,0.4,0.2)$,
+$(c_{\ell},c_{c},c_{d})=(50,10,5)$, and $\phi(x,c)=\min(x/c,2)$:
+%
+\begin{align*}
+w_{\ell}\,\phi(10,50)
+   &= 0.4\!\cdot\!\min(10/50,2) = 0.4\!\cdot\!0.20 = 0.08, \\
+w_{c}\,\phi(5,10)
+   &= 0.4\!\cdot\!\min(5/10,2)  = 0.4\!\cdot\!0.50 = 0.20, \\
+w_{d}\,\phi(3,5)
+   &= 0.2\!\cdot\!\min(3/5,2)   = 0.2\!\cdot\!0.60 = 0.12, \\
+\hat{H}(\texttt{total})
+   &= 0.08+0.20+0.12 \;=\; 0.40.
+\end{align*}
+
+\paragraph{Inferability score $\hat{I}=0.48$.}
+We compute each of the five components in Eq.~\ref{eq:inferability}
+with the default
+$(\alpha,\beta,\gamma,\delta,\varepsilon)=(0.30,0.25,0.20,0.10,0.15)$.
+
+\emph{(i) Caller specificity ($C_{\mathrm{caller}}$).} The only
+in-file caller is \texttt{Calculator.mean}, which invokes
+\texttt{self.total()} with no arguments and no keywords. The
+specificity routine assigns $0.50$ for the call site, $0$ for
+arguments and keywords, and a $+0.10$ ``found'' bonus, yielding
+$\mathrm{sp}=0.60$. Aggregating over callers and normalizing by $3$,
+%
+\[
+C_{\mathrm{caller}}=\min(0.60/3,\,1.0)=0.20,
+\quad
+\alpha\,C_{\mathrm{caller}}=0.30\!\cdot\!0.20=0.06.
+\]
+
+\emph{(ii) Callee count ($C_{\mathrm{callee}}$).} Inside the body,
+\texttt{total} calls \texttt{is\_int} and \texttt{add}---both defined
+in the same file---so $|\text{intra-file callees}|=2$. The call
+\texttt{self.history.append(v)} does not count because \texttt{append}
+is not a member of $\mathcal{V}$. Hence
+%
+\[
+C_{\mathrm{callee}}=\min(2/4,\,1.0)=0.50,
+\quad
+\beta\,C_{\mathrm{callee}}=0.25\!\cdot\!0.50=0.125\approx 0.13.
+\]
+
+\emph{(iii) Signature ($C_{\mathrm{sig}}$).} The four sub-bonuses are
+$+0.30$ for the return-type annotation \texttt{-> int}, $0$ for
+parameter type annotations (the only argument is \texttt{self}),
+$+\min(\text{name parts}/5,0.25)=+0.20$ for the single-token
+descriptive name \texttt{total}, and $0$ for non-\texttt{self}
+parameters. Thus
+%
+\[
+C_{\mathrm{sig}}=0.30+0.20=0.50,
+\quad
+\gamma\,C_{\mathrm{sig}}=0.20\!\cdot\!0.50=0.10.
+\]
+
+\emph{(iv) Documentation ($C_{\mathrm{doc}}$).} A docstring is
+present (the first body statement is a string constant), so
+$C_{\mathrm{doc}}=0.5$ and
+$\delta\,C_{\mathrm{doc}}=0.10\!\cdot\!0.5=0.05$.
+
+\emph{(v) Class context ($C_{\mathrm{class}}$).} \texttt{total} sits
+inside \texttt{Calculator} alongside three sibling methods
+(\texttt{\_\_init\_\_}, \texttt{push}, \texttt{mean}). The base score
+is $\min(3/5,1.0)=0.60$; because \texttt{Calculator.\_\_init\_\_}
+exists and is distinct from \texttt{total}, a $+0.30$ bonus brings
+$C_{\mathrm{class}}=0.90$, capped at $1.0$. So
+%
+\[
+\varepsilon\,C_{\mathrm{class}}=0.15\!\cdot\!0.90=0.135\approx 0.14.
+\]
+
+Summing the five contributions reproduces the lower bar of
+Figure~\ref{fig:pdg_score}(b):
+%
+\[
+\hat{I}(\texttt{total}) \;=\; 0.06+0.13+0.10+0.05+0.14 \;=\; 0.48.
+\]
+%
+The class-context term dominates because \texttt{total} is embedded in
+a four-method class that also exposes a constructor; the docstring
+term is the smallest because the docstring component itself is capped
+at $0.5$ before being multiplied by the small weight $\delta=0.10$.
+
+\paragraph{Final FIM score and selection.}
+With $\Delta(\texttt{total})=\max(0,\hat{H}-\hat{I})/(\hat{H}+\epsilon)
+=\max(0,-0.08)/0.40=0$, the difficulty penalty
+$\rho(\Delta)=1$ and the harmonic-mean-like product gives
+%
+\[
+\mathrm{FIM}(\texttt{total})
+\;=\;\frac{0.40\!\times\!0.48}{0.40+0.48+\epsilon}
+\;\approx\;\frac{0.192}{0.88}
+\;\approx\;0.22
+\;\geq\;\tau\!=\!0.20,
+\]
+%
+so \texttt{Calculator.total} is selected as a mask target. The four
+short helpers in the file (\texttt{add}, \texttt{is\_int},
+\texttt{Calculator.push}, \texttt{Calculator.mean}) are removed before
+scoring by the LoC hard filter ($\mathrm{LoC}<10$); the dunder method
+\texttt{Calculator.\_\_init\_\_} is removed by the
+\texttt{SKIP\_NAMES} list. The geometry of the threshold curve in
+Figure~\ref{fig:pdg_score}(c) explains why a moderate-on-both-axes
+function like \texttt{total} clears $\tau$ even though no individual
+score is large: the harmonic-mean form rewards balanced contributions
+rather than a single tall component.
