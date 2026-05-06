@@ -1,0 +1,44 @@
+FIM_COMPLETION_PROMPT = '''You are an expert Python programmer. Your task is to complete a masked function based on the surrounding code context.
+
+## Task
+
+Below is a Python file where one function's body has been replaced with `# <MASKED_FUNCTION_BODY>`. Your job is to:
+
+1. **Analyze the context**: Look at the imports, other functions, class definitions, and how this function is called or calls other functions.
+2. **Reason step by step**: Think through what this function should do based on:
+   - The function signature (name, parameters, type hints)
+   - How it's used elsewhere in the code
+   - What other functions it might need to call
+   - The overall purpose of the code
+3. **Write the complete function body**: Provide a working implementation.
+
+## Output Format
+
+Please structure your response as follows:
+
+### Reasoning
+<Your step-by-step analysis of what the function should do>
+
+### Implementation
+```python
+<The complete function body code only, without the function signature>
+```
+
+## Important Notes
+- Only provide the function BODY (the code inside the function), not the signature
+- Maintain proper indentation (the body should be indented with 4 spaces or appropriate level)
+- The implementation should be consistent with the coding style in the file
+- If the function has a docstring, include it as part of the body
+
+## Code with Masked Function
+
+```python
+{masked_code}
+```
+
+## Function to Complete
+
+Function name: `{function_name}`
+
+Please analyze the context and provide your reasoning followed by the implementation.
+'''

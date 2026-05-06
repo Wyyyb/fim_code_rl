@@ -1,0 +1,137 @@
+CRITIQUE_PROMPT = '''You are an expert code reviewer. Your task is to evaluate a function completion against the ground truth implementation, AND determine whether this function is suitable for FIM (Fill-in-the-Middle) evaluation.
+
+## Task
+
+A model was asked to complete a masked function based on surrounding code context. You need to:
+1. **Feasibility Check**: First, determine whether this function is actually feasible to complete based solely on the code context provided. Some functions rely on obscure external libraries, domain-specific APIs, or conventions that cannot be reasonably inferred from the surrounding code. These functions should be marked as infeasible.
+2. **Quality Evaluation**: Compare the completion with the ground truth and score the completion across multiple dimensions.
+
+## Context (Code with Masked Function)
+
+```python
+{masked_code}
+```
+
+## Function Being Evaluated
+
+Function name: `{function_name}`
+
+## Ground Truth Implementation
+
+```python
+{ground_truth}
+```
+
+## Model's Completion
+
+```python
+{completion}
+```
+
+## Part 1: Feasibility Assessment
+
+Determine whether this function is a FAIR test for FIM completion. A function is **infeasible** if:
+- It relies heavily on **uncommon or domain-specific external libraries/APIs** whose usage patterns cannot be inferred from the visible context (e.g., calling specific methods of a niche library that isn't used elsewhere in the file).
+- It requires **knowledge of external conventions, configurations, or data formats** not present in the file.
+- The surrounding context provides **insufficient information** to reconstruct the core logic (e.g., the function implements an algorithm whose details are not hinted at anywhere in the file).
+- It uses **magic constants, hardcoded strings, or lookup tables** that are specific to external systems and cannot be guessed.
+
+A function is **feasible** if:
+- Its behavior can be reasonably inferred from the function name, signature, docstring, and surrounding code.
+- It follows patterns established by other functions in the file.
+- It uses standard Python or well-known library APIs that are already imported/used in the file.
+- Even if the exact implementation differs from ground truth, a competent programmer could write a functionally equivalent version from the available context.
+
+## Part 2: Quality Evaluation Criteria
+
+Evaluate the completion on these dimensions (1-5 scale, where 5 is best):
+
+1. **Correctness (1-5)**: Does the implementation produce the same results as the ground truth for all inputs?
+   - 5: Functionally identical
+   - 4: Correct for most cases, minor edge case differences
+   - 3: Partially correct, some important cases wrong
+   - 2: Major functional differences
+   - 1: Completely incorrect
+
+2. **Executability (1-5)**: Can the code actually run without errors? Check for syntax errors, indentation issues, undefined variables, missing imports, type errors, etc.
+   - 5: Code is fully executable, no errors
+   - 4: Minor issues that are easy to fix (e.g., a small typo, slightly off indentation)
+   - 3: Some issues but the main logic is executable (e.g., missing an edge case handler that would crash)
+   - 2: Significant issues that would prevent execution (e.g., syntax errors, undefined variables)
+   - 1: Code is pseudo-code or completely non-executable (e.g., placeholder comments, wrong language syntax)
+
+3. **API Usage (1-5)**: Does it correctly use other functions, methods, and external APIs present in the codebase?
+   - 5: All calls match ground truth
+   - 4: Minor differences in API usage
+   - 3: Some incorrect or missing API calls
+   - 2: Major API usage errors
+   - 1: Completely wrong API usage
+
+4. **Readability (1-5)**: Is the code clean, well-formatted, and follows Python conventions?
+   - 5: Excellent readability, possibly better than ground truth
+   - 4: Good readability, comparable to ground truth
+   - 3: Acceptable readability
+   - 2: Poor readability
+   - 1: Very hard to read
+
+5. **Completeness (1-5)**: Does the implementation handle all cases the ground truth handles?
+   - 5: Handles all cases including edge cases
+   - 4: Handles main cases, may miss some edge cases
+   - 3: Handles basic cases only
+   - 2: Missing important cases
+   - 1: Very incomplete
+
+## Output Format
+
+Please provide your analysis in the following JSON format:
+
+```json
+{{
+  "feasibility": {{
+    "is_feasible": <true or false>,
+    "confidence": <0.0 to 1.0, how confident you are in this judgment>,
+    "reason": "<detailed explanation of why this function is or isn't feasible for FIM evaluation>",
+    "infeasible_factors": ["<list of specific factors making it infeasible, empty if feasible>"]
+  }},
+  "reasoning": "<Your detailed step-by-step analysis comparing the two implementations>",
+  "scores": {{
+    "correctness": <1-5>,
+    "correctness_reason": "<brief explanation>",
+    "executability": <1-5>,
+    "executability_reason": "<brief explanation, list specific issues if any>",
+    "api_usage": <1-5>,
+    "api_usage_reason": "<brief explanation>",
+    "readability": <1-5>,
+    "readability_reason": "<brief explanation>",
+    "completeness": <1-5>,
+    "completeness_reason": "<brief explanation>"
+  }},
+  "overall_score": <1-5>,
+  "overall_reason": "<summary of the overall quality>",
+  "key_differences": ["<list of main differences>"],
+  "key_similarities": ["<list of main similarities>"],
+  "should_discard": <true or false>,
+  "discard_reason": "<if should_discard is true, explain why this sample should be discarded from the dataset>"
+}}
+```
+
+## Decision Logic for `should_discard`
+
+Set `should_discard` to `true` if ANY of the following conditions are met:
+1. **Infeasible**: `is_feasible` is `false` — the function fundamentally cannot be completed from context alone.
+2. **Very Low Quality**: `overall_score` <= 2 AND `executability` <= 2 — the model's completion is too poor to be useful as training/evaluation data.
+3. **Non-executable Garbage**: `executability` == 1 — the completion is completely non-functional.
+
+Otherwise, set `should_discard` to `false`. Even if the completion isn't perfect, it can still be valuable data if the function is feasible and the completion is at least partially correct or executable.
+
+## Scoring Guidelines for Overall Score
+- **5**: The completion is functionally equivalent to the ground truth. It would work correctly as a drop-in replacement.
+- **4**: The completion is mostly correct with minor issues that wouldn't significantly impact functionality.
+- **3**: The completion captures the main idea but has notable differences or issues.
+- **2**: The completion has major problems but shows some understanding of the task.
+- **1**: The completion is fundamentally incorrect or completely misses the point.
+
+Note: A high correctness score but low executability score indicates the model understood the logic but made implementation mistakes. This distinction is important for training data quality assessment.
+
+Please provide your detailed analysis and scores.
+'''
