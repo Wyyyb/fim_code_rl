@@ -1,0 +1,55 @@
+% =============================================================================
+% 6. RELATED WORK
+% =============================================================================
+\section{Related Work}
+\vspace{-0.5ex}
+\label{sec:related}
+
+\textbf{Mid-training and continued pretraining.}
+A growing line of work identifies a distinct stage between large-scale
+pretraining and task-specific post-training, in which a model is further
+trained on a smaller, carefully curated corpus to install inductive biases
+that are hard to acquire from generic web text or downstream fine-tuning.
+MiniCPM~\citep{minicpm} and OLMo~\citep{olmo} schedule such a stage to
+upweight high-quality or domain-relevant data near the end of pretraining,
+and Code-Llama~\citep{codellama} long-context adaptation can be read as a
+mid-training stage targeting context-length generalization. We adopt the
+same staging philosophy but apply it to a different end: installing an
+\textit{agent-oriented} structural prior through function-aware FIM.
+
+\textbf{Fill-in-the-middle objectives.}
+The fill-in-the-middle objective~\citep{bavarian2022fim} is a standard
+ingredient in modern code LLM pretraining, with random-span variants used
+in Code-Llama~\citep{codellama}, StarCoder~\citep{starcoder},
+Qwen-Coder~\citep{qwencoder}, and DeepSeek-Coder~\citep{deepseekcoder}.
+Our recipe extends and specializes prior FIM along three axes. First,
+masking targets are chosen at \textit{function granularity} via program
+dependency graph analysis and a complexity--inferability double criterion,
+so the masked region corresponds to a unit of reasoning rather than an
+arbitrary span. Second, we embed an \textit{explicit chain-of-thought}
+inside the FIM middle, supervising the model to produce a rationale
+before the code. Third, the objective lives in a \textit{dedicated
+mid-training stage} rather than dissolved into pretraining.
+
+\textbf{Coding agent foundation models.}
+Progress on coding agents has been driven by benchmarks such as
+SWE-Bench~\citep{swebench}, scaffolds such as SWE-agent~\citep{sweagent}
+and OpenHands~\citep{openhands}, and trajectory-centric post-training
+pipelines such as SWE-Gym~\citep{swegym}, R2E-Gym~\citep{r2egym}, and
+SWE-Smith~\citep{swesmith}. Our work is complementary: we use R2E-Gym and
+SWE-Smith unmodified on top of a mid-trained checkpoint, and the novelty
+lies one stage earlier---extracting a self-supervised signal from the
+structure already present in source code, which both raises in-domain
+agent metrics and mitigates the off-domain capability erosion that
+trajectory-only post-training otherwise inflicts.
+
+\textbf{Distillation from frontier models.}
+Our default recipe uses Gemini-3-Preview to generate the chain-of-thought
+rationales embedded in each FIM middle span, placing it within the
+tradition of distilling capability from a strong teacher~\citep{orca,
+selfinstruct, distillwhisper}. We isolate the contribution of FIM
+structure from CoT distillation through a controlled ablation in
+Section~\ref{sec:exp:ablation}: removing the rationale still beats the
+no-mid-training baseline, and replacing the frontier teacher with
+self-generated rationales recovers a sizeable fraction of the gain, so
+the recipe is not distillation-bound.
