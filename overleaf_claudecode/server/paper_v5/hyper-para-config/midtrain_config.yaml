@@ -1,0 +1,45 @@
+### model
+model_name_or_path: /mmu-vcg-hdd/multimodal/models/Qwen2.5-Coder-14B-Instruct
+trust_remote_code: true
+rope_scaling: yarn
+
+### method
+stage: sft
+do_train: true
+finetuning_type: full
+deepspeed: /mmu_vcg/libo31/yuxuan/LlamaFactory/examples/deepspeed/ds_z3_config.json
+
+### dataset
+dataset: fim_midtrain_v1,fim_midtrain_v2, fim_midtrain_v3-pairs_1, fim_midtrain_v3-pairs_2, fim_midtrain_v3-triples_1, fim_midtrain_v3-triples_2 
+dataset_dir: /mmu_vcg/libo31/yuxuan/LlamaFactory/data
+template: qwen
+cutoff_len: 32768
+overwrite_cache: true
+preprocessing_num_workers: 16
+
+### output
+output_dir: /mmu_vcg/libo31/yuxuan/LlamaFactory/saves/Qwen2.5-Coder-14B-Instruct-num10
+logging_steps: 10
+save_steps: 999999
+save_only_model: true
+plot_loss: true
+overwrite_output_dir: false
+
+### train
+flash_attn: fa2
+enable_liger_kernel: true
+use_unsloth_gc: true
+group_by_length: true
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 16
+learning_rate: 1.0e-5
+num_train_epochs: 1.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+weight_decay: 0.05
+bf16: true
+ddp_timeout: 180000000
+
+### logging
+report_to: none
+run_name: Qwen2.5-Coder-7B-Instruct-num03_v1+v2

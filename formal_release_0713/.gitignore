@@ -1,0 +1,4 @@
+# Pipeline output — repos, intermediate JSON, checkpoints, logs, SFT data.
+workdir/
+__pycache__/
+*.pyc
